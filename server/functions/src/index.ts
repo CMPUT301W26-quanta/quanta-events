@@ -7,9 +7,12 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-import {setGlobalOptions} from "firebase-functions";
-import {onRequest} from "firebase-functions/https";
+import { setGlobalOptions } from "firebase-functions";
+import { onCall } from "firebase-functions/https";
 import * as logger from "firebase-functions/logger";
+
+import { initializeApp } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore'
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -24,9 +27,14 @@ import * as logger from "firebase-functions/logger";
 // functions should each use functions.runWith({ maxInstances: 10 }) instead.
 // In the v1 API, each function can only serve one request per container, so
 // this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+setGlobalOptions({ maxInstances: 5 });
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+initializeApp();
+
+export const health = onCall({ maxInstances: 1 }, async (_request) => {
+    const now = Date.now();
+    logger.info("Got health", { now });
+    return {
+        time: now,
+    }
+});
