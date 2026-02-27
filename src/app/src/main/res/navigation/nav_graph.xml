@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_graph">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/testFragmentOne">
 
+    <fragment
+        android:id="@+id/testFragmentOne"
+        android:name="ca.quanta.quantaevents.fragments.TestFragmentOne"
+        android:label="fragment_test_one"
+        tools:layout="@layout/fragment_test_one">
+        <action
+            android:id="@+id/action_testFragmentOne_to_testFragmentTwo"
+            app:destination="@id/testFragmentTwo" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_testFragmentOne"
+        app:destination="@id/testFragmentOne"
+        app:popUpTo="@id/nav_graph" />
+    <fragment
+        android:id="@+id/testFragmentTwo"
+        android:name="ca.quanta.quantaevents.fragments.TestFragmentTwo"
+        android:label="fragment_test_two"
+        tools:layout="@layout/fragment_test_two" />
 </navigation>
