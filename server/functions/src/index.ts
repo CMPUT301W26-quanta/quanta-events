@@ -11,8 +11,8 @@ import { setGlobalOptions } from "firebase-functions";
 import { onCall } from "firebase-functions/https";
 import * as logger from "firebase-functions/logger";
 
-import { initializeApp } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore'
+import { initializeApp } from "firebase-admin/app";
+// import { getFirestore } from 'firebase-admin/firestore'
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -32,9 +32,9 @@ setGlobalOptions({ maxInstances: 5 });
 initializeApp();
 
 export const health = onCall({ maxInstances: 1 }, async (_request) => {
-    const now = Date.now();
-    logger.info("Got health", { now });
-    return {
-        time: now,
-    }
+  const now = Date.now();
+  logger.info("Got health", { now });
+  return {
+    time: now,
+  };
 });
