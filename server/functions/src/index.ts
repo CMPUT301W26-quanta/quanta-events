@@ -14,7 +14,7 @@ import * as z from "zod";
 import { v4 as uuidv4 } from 'uuid';
 
 import { initializeApp } from "firebase-admin/app";
-// import { getFirestore } from 'firebase-admin/firestore'
+import { getFirestore } from 'firebase-admin/firestore'
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -43,7 +43,7 @@ export const health = onCall({ maxInstances: 1 }, async (_request) => {
 
 
 const createUserInterface = z.object({
-  deviceId : z.string(),
+  deviceId : z.string().uuid(),
   name: z.string().optional(),
   email: z.string().email().optional(),
   phone: z.number().int().optional(),
@@ -82,12 +82,12 @@ export const createUser = onCall({ maxInstances: 1 }, async (_request) => {
 });
 
 
-const getUserSchema = z.object({
+const getUserInterface = z.object({
   userId: z.string().uuid(),
 });
 
 export const getUser = onCall({ maxInstances: 1}, async (_request) => {
-  const result = getUserSchema.safeParse(_request.data);
+  const result = getUserInterface.safeParse(_request.data);
   if (!result.success) {
     throw new HttpsError("invalid-argument", "Missing Required Fields");
   }
@@ -103,3 +103,111 @@ export const getUser = onCall({ maxInstances: 1}, async (_request) => {
   logger.info('User found', { userId });
   return userDoc.data();
 });
+
+
+const createEventInterface = z.object({
+  registrationStartTime: z.iso.datetime({ offset: true }),
+  registrationEndTime: z.iso.datetime({ offset: true }),
+  eventName: z.string(),
+  eventDescription: z.string(),
+  registrationLimit: z.number().int().optional(),
+  imageId: z.string().uuid().optional(),
+});
+
+export const createEvent = onCall({ maxInstances: 1}, async (_request) => {
+  const result = createEventInterface.safeParse(_request.data);
+  if (!result.success) {
+    throw new HttpsError("invalid-argument", "Missing Required Fields");
+  }
+  
+  const { registrationStartTime, registrationEndTime, eventName, eventDescription, registrationLimit, imageId } = result.data;
+  const eventId = uuidv4();
+
+  const db = getFirestore();
+  await db.collection('events').doc(eventId).set({
+    waitList: [],
+    cancelledList: [],
+    finalList: [],
+    registrationStartTime,
+    registrationEndTime,
+    eventName,
+    eventDescription,
+    registrationLimit: registrationLimit || null,
+    imageId: imageId || null,
+  });
+
+  logger.info('Created event', { eventId });
+  return { 
+    eventId
+  };
+});
+
+const getEventInterface = z.object({
+    eventId: z.string().uuid(),
+});
+
+export const getEvent = onCall({ maxInstances: 1 }, async (_request) => {
+    const result = getEventInterface.safeParse(_request.data);
+    if (!result.success) {
+        throw new HttpsError('invalid-argument', "Missing Required Fields");
+    }
+
+    const { eventId } = result.data;
+    const db = getFirestore();
+    const eventDoc = await db.collection('events').doc(eventId).get();
+
+    if (!eventDoc.exists) {
+        throw new HttpsError('not-found', 'Event not found');
+    }
+
+    logger.info('Event found', { eventId });
+    return eventDoc.data();
+});
+
+const createImageInterface = z.object({
+  imageData: z.base64()
+});
+
+export const createImage = onCall({ maxInstances: 1 }, async (_request) => {
+  const result = createImageInterface.safeParse(_request.data);
+  if (!result.success) {
+      throw new HttpsError('invalid-argument', "Missing Required Fields");
+  }
+
+  const {imageData} = result.data;
+  const imageId = uuidv4();
+
+  const db = getFirestore();
+  await db.collection('images').doc(imageId).set({
+    imageData,
+  })
+
+  logger.info("Image Created", {imageId});
+  return {
+    imageId
+  };
+});
+
+const getImageInterface = z.object({
+  imageId: z.string().uuid(),
+});
+
+export const getImage = onCall({ maxInstances: 1}, async (_request) => {
+  const result = getImageInterface.safeParse(_request.data);
+  if (!result.success) {
+      throw new HttpsError('invalid-argument', "Missing Required Fields");
+  }
+
+  const {imageId} = result.data;
+  const db = getFirestore();
+
+  const imageDoc = await db.collection("images").doc(imageId).get();
+
+  if (!imageDoc.exists) {
+    throw new HttpsError('not-found', "Image not found");
+  }
+  
+  logger.info("Found image", {imageId});
+  return imageDoc.data();
+});
+
