@@ -36,6 +36,12 @@ public class TestFragmentOne extends Fragment {
             NavDirections action = TestFragmentOneDirections.actionTestFragmentOneToTestFragmentTwo();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
+
+
+        binding.infoButton.setOnClickListener(_view -> {
+            NavDirections action = TestFragmentOneDirections.actionTestFragmentOneToInformationFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        });
     }
 
     @Override

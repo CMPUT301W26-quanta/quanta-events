@@ -1,6 +1,9 @@
 package ca.quanta.quantaevents.fragments;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,13 +12,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import java.util.zip.Inflater;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentInformationBinding;
-import ca.quanta.quantaevents.databinding.FragmentTestOneBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
 /**
@@ -46,12 +46,12 @@ public class InformationFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
-        infoStore.setTitle("Home");
-        infoStore.setSubtitle("Receive lottery selection updates here.");
-        infoStore.setIconRes(R.drawable.material_symbols_home_outline);
+        infoStore.setTitle("Information");
+        infoStore.setSubtitle("Lottery selection information here.");
+        infoStore.setIconRes(R.drawable.material_symbols_info_outline);
 
-        binding.infoButton.setOnClickListener(_view -> {
-            NavDirections action = TestFragmentOneDirections.actionTestFragmentOneToTestFragmentTwo();
+        binding.backButton.setOnClickListener(_view -> {
+            NavDirections action = InformationFragmentDirections.actionGlobalTestFragmentOne();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
     }
@@ -59,7 +59,7 @@ public class InformationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentTestOneBinding.inflate(inflater, container, false);
+        binding = FragmentInformationBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 }

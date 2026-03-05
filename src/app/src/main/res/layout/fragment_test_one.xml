@@ -39,6 +39,6 @@
         android:background="@color/color_light_gray"
         android:text="Account"
         app:strokeColor="@color/color_dark"
-        app:strokeWidth="2dp"/>
+        app:strokeWidth="2dp" />
 
 </LinearLayout>
