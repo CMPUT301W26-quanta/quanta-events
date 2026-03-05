@@ -1,0 +1,31 @@
+name: Build and Deploy Firebase Functions
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - server/**
+    
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+
+      - name: Install Upper Dependencies
+        run: npm install
+        working-directory: ./server
+
+      - name: Install Lower Dependencies
+        run: npm install
+        working-directory: ./server/functions
+
+      - name: Deploy to Firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only functions
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          PROJECT_PATH: ./server
