@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_testFragmentOne_to_testFragmentTwo"
             app:destination="@id/testFragmentTwo" />
+        <action
+            android:id="@+id/action_testFragmentOne_to_eventList"
+            app:destination="@id/eventList" />
     </fragment>
     <action
         android:id="@+id/action_global_testFragmentOne"
@@ -23,4 +26,9 @@
         android:name="ca.quanta.quantaevents.fragments.TestFragmentTwo"
         android:label="fragment_test_two"
         tools:layout="@layout/fragment_test_two" />
+    <fragment
+        android:id="@+id/eventList"
+        android:name="ca.quanta.quantaevents.fragments.EventList"
+        android:label="fragment_event_list"
+        tools:layout="@layout/fragment_event_list" />
 </navigation>
