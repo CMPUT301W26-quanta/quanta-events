@@ -41,12 +41,6 @@ export const health = onCall({ maxInstances: 1 }, async (_request) => {
   };
 });
 
-
-const authInterface = z.object({
-  userId: z.string().uuid,
-  deviceId: z.string().uuid,
-});
-
 type Role = "entrant" | "admin" |"organizer";
 
 async function verifyUser(userId: string, deviceId: string) {
@@ -69,15 +63,6 @@ async function verifyUser(userId: string, deviceId: string) {
 async function requireRole(userData: any, role: Role) {
   if (!userData[role] || userData[role] === null) {
     throw new HttpsError("permission-denied", `User is not an ${role}`);
-  }
-}
-
-function handleError(_response:any, error:any) {
-  if (error.code && error.message) {
-    _response.status(error.code).json({error:error.message});
-  } else {
-    logger.error("Unhandled Error", error);
-    _response.status(500).json({error: "Internal Server Error"});
   }
 }
 
