@@ -8,8 +8,7 @@
  */
 
 import { setGlobalOptions } from "firebase-functions";
-import { onRequest, onCall } from "firebase-functions/https";
-import type { Request, Response } from "express";
+import { onCall, HttpsError } from "firebase-functions/https";
 import * as logger from "firebase-functions/logger";
 import * as z from "zod";
 import { v4 as uuidv4 } from 'uuid';
@@ -25,7 +24,7 @@ import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 // traffic spikes by instead downgrading performance. This limit is a
 // per-function limit. You can override the limit for each function using the
 // `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
+// `onCall({ maxInstances: 5 }, (req, res) => { ... })`.
 // NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
 // functions should each use functions.runWith({ maxInstances: 10 }) instead.
 // In the v1 API, each function can only serve one request per container, so
@@ -34,12 +33,12 @@ setGlobalOptions({ maxInstances: 5 });
 
 initializeApp();
 
-export const health = onRequest({ maxInstances: 1 }, async (_request: Request, _response: Response) => {
+export const health = onCall({ maxInstances: 1 }, async (_request) => {
   const now = Date.now();
   logger.info("Got health", { now });
-  _response.status(200).json({
-    time: now
-  });
+  return {
+    time: now,
+  };
 });
 
 
@@ -56,21 +55,20 @@ async function verifyUser(userId: string, deviceId: string) {
   const userDoc = await db.collection("users").doc(userId).get();
 
   if (!userDoc.exists) {
-    throw {code:404, message: "User does not exist"};
+    throw new HttpsError("not-found", "User does not exist");
   }
 
   const data = userDoc.data()!;
 
   if (data.deviceId !== deviceId) {
-    throw {code:402, message:"Device ID do not match"};
+    throw new HttpsError("unauthenticated", "Device ID does not match");
   }
-
   return data;
 }
 
 async function requireRole(userData: any, role: Role) {
   if (!userData[role] || userData[role] === null) {
-    throw {code:403, message: `User is not an ${role}`};
+    throw new HttpsError("permission-denied", `User is not an ${role}`);
   }
 }
 
@@ -94,34 +92,32 @@ const createUserInterface = z.object({
   isAdmin: z.boolean().optional(),
 });
 
-export const createUser = onRequest({ maxInstances: 1 }, async (_request, _response) => {
-  try {
-    const result = createUserInterface.safeParse(_request.body);
-    if (!result.success) {
-      _response.status(400).json({error: "Missing Required Fields"});
-      return;
-    }
+export const createUser = onCall({ maxInstances: 1 }, async (request) => {
+  const result = createUserInterface.safeParse(request.data);
 
-    const { deviceId, name, email, phone, receiveNotifications, isEntrant, isOrganizer, isAdmin } = result.data;
-
-    const userId = uuidv4();
-
-    const db = getFirestore();
-    await db.collection('users').doc(userId).set({
-      deviceId,        
-      ...(name && { name }),
-      ...(email && { email }),
-      ...(phone && { phone }),
-      entrant: isEntrant ? { enteredEvents: [], receiveNotifications: receiveNotifications ?? false } : null,
-      organizer: isOrganizer ? { createdEvents: [], sentNotifications: [] } : null,
-      admin: isAdmin ? {} : null,
-    });
-
-    logger.info('Created user', { userId });
-    _response.status(201).json({userId});
-  } catch (error) {
-    handleError(_response, error);
+  if (!result.success) {
+    throw new HttpsError("invalid-argument", "Missing Required Fields");
   }
+
+  const { deviceId, name, email, phone, receiveNotifications, isEntrant, isOrganizer, isAdmin } = result.data;
+  const userId = uuidv4();
+
+  const db = getFirestore();
+  await db.collection('users').doc(userId).set({
+
+    deviceId,
+    ...(name && { name }),
+    ...(email && { email }),
+    ...(phone && { phone }),
+    entrant: isEntrant ? { enteredEvents: [], receiveNotifications: receiveNotifications ?? false } : null,
+    organizer: isOrganizer ? { createdEvents: [], sentNotifications: [] } : null,
+    admin: isAdmin ? {} : null,
+
+  });
+
+  logger.info('Created user', { userId });
+  return { userId };
+
 });
 
 const getUserInterface = z.object({
@@ -129,23 +125,22 @@ const getUserInterface = z.object({
     deviceId: z.string().uuid(),
 });
 
-export const getUser = onRequest({ maxInstances: 1}, async (_request, _response) => {
-  try {
-    const result = getUserInterface.safeParse(_request.body);
-    if (!result.success) {
-      _response.status(400).json({error: "Missing Required Fields"});
-      return;
-    }
+export const getUser = onCall({ maxInstances: 1 }, async (request) => {
 
-    const {userId, deviceId} = result.data;
-    const userData = await verifyUser(userId, deviceId);
+  const result = getUserInterface.safeParse(request.data);
 
-    logger.info('User found', { userId });
-    _response.status(200).json(userData);
-  } catch (error) {
-    handleError(_response, error);
+  if (!result.success) {
+    throw new HttpsError("invalid-argument", "Missing Required Fields");
   }
+
+  const { userId, deviceId } = result.data;
+  const userData = await verifyUser(userId, deviceId);
+
+  logger.info('User found', { userId });
+  return userData;
+
 });
+
 
 const createEventInterface = z.object({
     userId: z.string().uuid(),
@@ -161,49 +156,48 @@ const createEventInterface = z.object({
     }),
 });
 
-export const createEvent = onRequest({ maxInstances: 1}, async (_request,_response) => {
-  try{
-    const result = createEventInterface.safeParse(_request.body);
-    if (!result.success) {
-      _response.status(400).json({ error: "Missing Required Fields"});
-      return;
-    }
-  
-    const {userId, deviceId, data} = result.data;
-    const { registrationStartTime, registrationEndTime, eventName, eventDescription, location, registrationLimit, imageId } = data;
+export const createEvent = onCall({ maxInstances: 1 }, async (request) => {
 
-    const userData = await verifyUser(userId, deviceId);
-    await requireRole(userData, "organizer");
-
-    const eventId = uuidv4();
-
-    const db = getFirestore();
-    await db.collection('events').doc(eventId).set({
-      organizer: userId,
-      waitList: [],
-      cancelledList: [],
-      finalList: [],
-      registrationStartTime,
-      registrationEndTime,
-      eventName,
-      eventDescription,
-      location,
-      registrationLimit: registrationLimit || null,
-      imageId: imageId || null,
-    });
-    
-    await db.collection('users').doc(userId).update({
-      "organizer.createdEvents": FieldValue.arrayUnion(eventId),
-    });
-
-    logger.info('Created event', { eventId });
-    _response.status(201).json({
-      eventId,
-    });
-  } catch(error) {
-    handleError(_response, error);
+  const result = createEventInterface.safeParse(request.data);
+  if (!result.success) {
+    throw new HttpsError("invalid-argument", "Missing Required Fields");
   }
+
+  const { userId, deviceId, data } = result.data;
+
+  const { registrationStartTime, registrationEndTime, eventName, eventDescription, location, registrationLimit, imageId } = data;
+
+  const userData = await verifyUser(userId, deviceId);
+
+  await requireRole(userData, "organizer");
+
+  const eventId = uuidv4();
+
+  const db = getFirestore();
+
+  await db.collection('events').doc(eventId).set({
+    organizer: userId,
+    waitList: [],
+    cancelledList: [],
+    finalList: [],
+    registrationStartTime,
+    registrationEndTime,
+    eventName,
+    eventDescription,
+    location,
+    registrationLimit: registrationLimit || null,
+    imageId: imageId || null,
+
+  });
+
+  await db.collection('users').doc(userId).update({
+    "organizer.createdEvents": FieldValue.arrayUnion(eventId),
+  });
+
+  logger.info('Created event', { eventId });
+  return { eventId };
 });
+
 
 const getEventInterface = z.object({
     userId: z.string().uuid(),
@@ -213,33 +207,28 @@ const getEventInterface = z.object({
     }),
 });
 
-export const getEvent = onRequest({ maxInstances: 1 }, async (_request, _response) => {
-  try{
-    const result = getEventInterface.safeParse(_request.body);
-    if (!result.success) {
-        _response.status(400).json({ error: "Missing Required Fields"});
-        return;
-    }
-
-    const { userId, deviceId, data } = result.data;
-    const { eventId } = data;
-    
-    await verifyUser(userId, deviceId);
-
-    const db = getFirestore();
-    const eventDoc = await db.collection('events').doc(eventId).get();
-
-    if (!eventDoc.exists) {
-        _response.status(400).json({error: "Event not found"});
-    }
-
-    logger.info('Event found', { eventId });
-    _response.status(200).json(eventDoc.data());
-
-  } catch(error) {
-    handleError(_response, error);
+export const getEvent = onCall({ maxInstances: 1 }, async (request) => {
+  const result = getEventInterface.safeParse(request.data);
+  if (!result.success) {
+    throw new HttpsError("invalid-argument", "Missing Required Fields");
   }
 
+  const { userId, deviceId, data } = result.data;
+
+  const { eventId } = data;
+
+  await verifyUser(userId, deviceId);
+
+  const db = getFirestore();
+
+  const eventDoc = await db.collection('events').doc(eventId).get();
+
+  if (!eventDoc.exists) {
+    throw new HttpsError("not-found", "Event not found");
+  }
+
+  logger.info('Event found', { eventId });
+  return eventDoc.data();
 });
 
 const createImageInterface = z.object({
@@ -250,35 +239,28 @@ const createImageInterface = z.object({
   }),
 });
 
-export const createImage = onRequest({ maxInstances: 1 }, async (_request, _response) => {
-  try{
-
-    const result = createImageInterface.safeParse(_request.body);
-    if (!result.success) {
-      _response.status(400).json({error:"Missing Required Fields"});
-      return;
-    }
-
-    const {userId, deviceId, data} = result.data;
-    const {imageData} = data;
-
-    await verifyUser(userId, deviceId);
-
-    const imageId = uuidv4();
-    const db = getFirestore();
-    await db.collection('images').doc(imageId).set({
-      imageData,
-    })
-
-    logger.info("Image Created", {imageId});
-
-    _response.status(201).json({ imageId });
-
-  } catch(error) {
-    handleError(_response, error);
+export const createImage = onCall({ maxInstances: 1 }, async (request) => {
+  const result = createImageInterface.safeParse(request.data);
+  if (!result.success) {
+    throw new HttpsError("invalid-argument", "Missing Required Fields");
   }
 
+  const { userId, deviceId, data } = result.data;
+
+  const { imageData } = data;
+
+  await verifyUser(userId, deviceId);
+
+  const imageId = uuidv4();
+
+  const db = getFirestore();
+
+  await db.collection('images').doc(imageId).set({ imageData });
+
+  logger.info("Image Created", { imageId });
+  return { imageId };
 });
+
 
 const getImageInterface = z.object({
   userId: z.string().uuid(),
@@ -288,35 +270,29 @@ const getImageInterface = z.object({
   }),
 });
 
-export const getImage = onRequest({ maxInstances: 1}, async (_request, _response) => {
-  try{
-    const result = getImageInterface.safeParse(_request.body);
-    if (!result.success) {
-      _request.status(400).json({error: "Missing Required Fields"});
-      return;
-    }
-    
-    const {userId, deviceId, data} = result.data;
-    const {imageId} = data;
+export const getImage = onCall({ maxInstances: 1 }, async (request) => {
 
-    await verifyUser(userId, deviceId);
+  const result = getImageInterface.safeParse(request.data);
 
-    const db = getFirestore();
-
-    const imageDoc = await db.collection("images").doc(imageId).get();
-
-    if (!imageDoc.exists) {
-      _response.status(404).json({error:"Image not found"});
-      return;
-    }
-  
-    logger.info("Found image", {imageId});
-    _response.status(200).json(imageDoc.data());
-
-  } catch(error) {
-    handleError(_response, error);
+  if (!result.success) {
+    throw new HttpsError("invalid-argument", "Missing Required Fields");
   }
 
+  const { userId, deviceId, data } = result.data;
+  const { imageId } = data;
+
+  await verifyUser(userId, deviceId);
+
+  const db = getFirestore();
+  
+  const imageDoc = await db.collection("images").doc(imageId).get();
+
+  if (!imageDoc.exists) {
+    throw new HttpsError("not-found", "Image not found");
+  }
+
+  logger.info("Found image", { imageId });
+  return imageDoc.data();
 });
 
 
