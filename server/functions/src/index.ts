@@ -100,6 +100,7 @@ export const createUser = onCall({ maxInstances: 1 }, async (request) => {
   }
 
   const { deviceId, name, email, phone, receiveNotifications, isEntrant, isOrganizer, isAdmin } = result.data;
+
   const userId = uuidv4();
 
   const db = getFirestore();
