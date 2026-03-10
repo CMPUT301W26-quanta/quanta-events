@@ -93,10 +93,11 @@ public class EventCreateEditorFragment extends Fragment {
         String description = safeText(binding.inputDescription.getText());
         String start = getUtcValue(binding.inputStartTime);
         String end = getUtcValue(binding.inputRegistrationEnd);
+        String location = getUtcValue(binding.inputLocation);
         Integer limit = parseInt(binding.inputRegistrationLimit.getText());
 
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(description)
-                || TextUtils.isEmpty(start) || TextUtils.isEmpty(end)) {
+                || TextUtils.isEmpty(start) || TextUtils.isEmpty(end) || TextUtils.isEmpty(location)) {
             Toast.makeText(requireContext(), "Fill required fields", Toast.LENGTH_LONG).show();
             return;
         }
