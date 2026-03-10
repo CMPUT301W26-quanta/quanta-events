@@ -14,6 +14,7 @@ import android.widget.ImageButton;
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
 import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.res.ResourcesCompat;
@@ -35,16 +36,31 @@ public class SmartBurger {
         NavDirections getDirections();
     }
 
+    public final static int ENTRANT_GROUP = 0b001;
+    public final static int ORGANIZER_GROUP = 0b010;
+    public final static int ADMIN_GROUP = 0b100;
+
     static class ItemData {
         final Navigator navigator;
         @DrawableRes
         final int icon;
         final int order;
 
+        @Nullable
+        final Integer group;
+
         ItemData(Navigator navigator, @DrawableRes int icon, int order) {
             this.navigator = navigator;
             this.icon = icon;
             this.order = order;
+            group = null;
+        }
+
+        ItemData(Navigator navigator, @DrawableRes int icon, int group, int order) {
+            this.navigator = navigator;
+            this.icon = icon;
+            this.order = order;
+            this.group = group;
         }
 
         Navigator getNavigator() {
@@ -58,6 +74,11 @@ public class SmartBurger {
 
         int getOrder() {
             return order;
+        }
+
+        @Nullable
+        public Integer getGroup() {
+            return group;
         }
     }
 
@@ -82,8 +103,30 @@ public class SmartBurger {
         navController.addOnDestinationChangedListener((_nc, _nd, _b) -> this.changedDestination());
     }
 
+    /**
+     * Registers a given tagged fragment to the list of items in the smart burger menu, with no group association
+     *
+     * @param fragment  The fragment to register
+     * @param icon      The icon to associate with this fragment
+     * @param navigator The {@link NavDirections} provider to navigate to the given fragment
+     * @return The same {@link SmartBurger} to allow method chaining
+     */
     public <F extends Fragment & Tagged> SmartBurger with(F fragment, @DrawableRes int icon, Navigator navigator) {
         items.put(fragment.getUniqueTag(), new ItemData(navigator, icon, this.items.size()));
+        return this;
+    }
+
+    /**
+     * Registers a given tagged fragment to the list of items in the smart burger menu, with a provided group
+     *
+     * @param fragment  The fragment to register
+     * @param icon      The icon to associate with this fragment
+     * @param group     The group of this fragment. Should be either the bitmasks {@link #ENTRANT_GROUP}, {@link #ORGANIZER_GROUP}, or {@link #ADMIN_GROUP}
+     * @param navigator The {@link NavDirections} provider to navigate to the given fragment
+     * @return The same {@link SmartBurger} to allow method chaining
+     */
+    public <F extends Fragment & Tagged> SmartBurger with(F fragment, @DrawableRes int icon, int group, Navigator navigator) {
+        items.put(fragment.getUniqueTag(), new ItemData(navigator, icon, group, this.items.size()));
         return this;
     }
 
@@ -147,6 +190,7 @@ public class SmartBurger {
 
     private void rebuild() {
         UUID active = new ViewModelProvider(activity).get(SmartBurgerState.class).getActive();
+        int groupFilter = new ViewModelProvider(activity).get(SmartBurgerState.class).getGroupFilter();
         ArrayList<Map.Entry<UUID, ItemData>> itemArray = new ArrayList<>(items.entrySet());
         itemArray.sort(Comparator.comparingInt(a -> a.getValue().getOrder()));
         for (ImageButton button : displayedItems) {
@@ -156,14 +200,18 @@ public class SmartBurger {
         for (Map.Entry<UUID, ItemData> entry : itemArray) {
 
             if (entry.getKey() != active) {
-                ImageButton button = createButton(entry.getValue().getIcon());
-                button.setScaleX(0.8f);
-                button.setScaleY(0.8f);
-                button.setAlpha(0.8f);
-                button.setVisibility(GONE);
-                button.setOnClickListener(_view -> navController.navigate(entry.getValue().getNavigator().getDirections()));
-                displayedItems.add(button);
-                layout.addView(button);
+                Integer group = entry.getValue().getGroup();
+                if (group == null || ((group & groupFilter) > 0)) {
+                    ImageButton button = createButton(entry.getValue().getIcon());
+                    button.setScaleX(0.8f);
+                    button.setScaleY(0.8f);
+                    button.setAlpha(0.8f);
+                    button.setVisibility(GONE);
+                    button.setOnClickListener(_view -> navController.navigate(entry.getValue().getNavigator().getDirections()));
+                    displayedItems.add(button);
+                    layout.addView(button);
+                }
+
             }
         }
         rootButton.bringToFront();
