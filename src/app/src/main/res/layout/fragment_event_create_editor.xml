@@ -176,7 +176,8 @@
                     android:layout_height="wrap_content"
                     android:inputType="textMultiLine"
                     android:minLines="5"
-                    android:gravity="top"
+                    android:maxLines="10"
+                    android:gravity="top|start"
                     android:textColor="@color/text_color" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -198,6 +199,31 @@
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/inputCategory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:textColor="@color/text_color"
+                    android:textColorHint="@color/color_dark_gray" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layout_guidelines"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="Event Guidelines"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:placeholderText="eg. Not outside food allowed"
+                app:placeholderTextColor="@color/color_dark_gray"
+                app:boxStrokeColor="@color/border"
+                app:hintTextColor="@color/text_color"
+                app:boxBackgroundColor="@color/color_light_gray"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputGuidelines"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="text"
@@ -287,10 +313,10 @@
                 <ImageView
                     android:id="@+id/imagePreview"
                     android:layout_width="match_parent"
-                    android:layout_height="160dp"
+                    android:layout_height="200dp"
                     android:layout_marginBottom="12dp"
                     android:visibility="gone"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitXY"
                     android:contentDescription="@string/app_name"
                     android:background="@color/color_light_gray" />
 
@@ -338,14 +364,6 @@
                     android:textSize="12sp" />
 
             </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/eventsContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:orientation="vertical" />
-
         </LinearLayout>
     </ScrollView>
 
@@ -369,7 +387,7 @@
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
             android:text="Back"
-            android:backgroundTint="#C8B4E8"
+            android:backgroundTint="@color/color_light_purple"
             android:textColor="@color/text_color"
             app:cornerRadius="12dp"
             app:strokeColor="@color/border"
