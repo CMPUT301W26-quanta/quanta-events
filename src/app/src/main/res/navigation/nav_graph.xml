@@ -31,4 +31,10 @@
         android:name="ca.quanta.quantaevents.fragments.InformationFragment"
         android:label="fragment_information"
         tools:layout="@layout/fragment_information" />
+    <action
+        android:id="@+id/action_global_testFragmentTwo"
+        app:destination="@id/testFragmentTwo" />
+    <action
+        android:id="@+id/action_global_informationFragment"
+        app:destination="@id/informationFragment" />
 </navigation>
