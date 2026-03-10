@@ -12,18 +12,14 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
-import java.util.zip.Inflater;
+import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
+import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentInformationBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link InformationFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class InformationFragment extends Fragment {
+public class InformationFragment extends Fragment implements Tagged {
 
     public FragmentInformationBinding binding;
 
@@ -31,15 +27,6 @@ public class InformationFragment extends Fragment {
     public InformationFragment() {
         // Required empty public constructor
     }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment InformationFragment.
-     */
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -57,9 +44,17 @@ public class InformationFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentInformationBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    private final static UUID TAG = UUID.randomUUID();
+
+    @NonNull
+    @Override
+    public UUID getUniqueTag() {
+        return TAG;
     }
 }

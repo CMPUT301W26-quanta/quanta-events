@@ -57,27 +57,4 @@ public class UserViewModel extends ViewModel {
                 });
     }
 
-    /**
-     * Calls the getUser cloud function, getting a user's details from the database.
-     * @param userId UUID identifying the user.
-     * @param deviceId UUID identifying the user's device.
-     * @return Map containing the user's information.
-     */
-    public Task<Map<String, Object>> getUser(UUID userId, UUID deviceId) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("userId", userId.toString());
-        data.put("deviceId", deviceId.toString());
-
-        return functions
-                .getHttpsCallable("getUser")
-                .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Map<String, Object>>() {
-                    @Override
-                    public Map<String, Object> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
-                        return result;
-                    }
-                });
-    }
-
 }
