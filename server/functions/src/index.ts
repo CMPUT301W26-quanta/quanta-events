@@ -11,10 +11,12 @@ import { setGlobalOptions } from "firebase-functions";
 import { onCall, HttpsError } from "firebase-functions/https";
 import * as logger from "firebase-functions/logger";
 import * as z from "zod";
-import { v4 as uuidv4 } from 'uuid';
+import * as functions from "./functions";
+import * as util from "./util";
+import { v4 as uuidv4 } from "uuid";
 
 import { initializeApp } from "firebase-admin/app";
-import { getFirestore, FieldValue } from 'firebase-admin/firestore'
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -33,86 +35,16 @@ setGlobalOptions({ maxInstances: 5 });
 
 initializeApp();
 
-export const health = onCall({ maxInstances: 1 }, async (_request) => {
-  const now = Date.now();
-  logger.info("Got health", { now });
-  return {
-    time: now,
-  };
-});
+export const health = onCall({ maxInstances: 1 }, functions.health);
 
-type Role = "entrant" | "admin" |"organizer";
-
-async function verifyUser(userId: string, deviceId: string) {
-  const db = getFirestore();
-
-  const userDoc = await db.collection("users").doc(userId).get();
-
-  if (!userDoc.exists) {
-    throw new HttpsError("not-found", "User does not exist");
-  }
-
-  const data = userDoc.data()!;
-
-  if (data.deviceId !== deviceId) {
-    throw new HttpsError("unauthenticated", "Device ID does not match");
-  }
-  return data;
-}
-
-async function requireRole(userData: any, role: Role) {
-  if (!userData[role] || userData[role] === null) {
-    throw new HttpsError("permission-denied", `User is not an ${role}`);
-  }
-}
-
-const createUserInterface = z.object({
-  deviceId : z.string().uuid(),
-  name: z.string().optional(),
-  email: z.string().email().optional(),
-  phone: z.string().optional(),
-  receiveNotifications: z.boolean().optional(),
-  isEntrant: z.boolean().optional(),
-  isOrganizer: z.boolean().optional(),
-  isAdmin: z.boolean().optional(),
-});
-
-export const createUser = onCall({ maxInstances: 1 }, async (request) => {
-  const result = createUserInterface.safeParse(request.data);
-
-  if (!result.success) {
-    throw new HttpsError("invalid-argument", "Missing Required Fields");
-  }
-
-  const { deviceId, name, email, phone, receiveNotifications, isEntrant, isOrganizer, isAdmin } = result.data;
-
-  const userId = uuidv4();
-
-  const db = getFirestore();
-  await db.collection('users').doc(userId).set({
-
-    deviceId,
-    ...(name && { name }),
-    ...(email && { email }),
-    ...(phone && { phone }),
-    entrant: isEntrant ? { enteredEvents: [], receiveNotifications: receiveNotifications ?? false } : null,
-    organizer: isOrganizer ? { createdEvents: [], sentNotifications: [] } : null,
-    admin: isAdmin ? {} : null,
-
-  });
-
-  logger.info('Created user', { userId });
-  return { userId };
-
-});
+export const createUser = onCall({ maxInstances: 1 }, functions.createUser);
 
 const getUserInterface = z.object({
-    userId: z.string().uuid(),
-    deviceId: z.string().uuid(),
+  userId: z.string().uuid(),
+  deviceId: z.string().uuid(),
 });
 
 export const getUser = onCall({ maxInstances: 1 }, async (request) => {
-
   const result = getUserInterface.safeParse(request.data);
 
   if (!result.success) {
@@ -120,30 +52,27 @@ export const getUser = onCall({ maxInstances: 1 }, async (request) => {
   }
 
   const { userId, deviceId } = result.data;
-  const userData = await verifyUser(userId, deviceId);
+  const userData = await util.verifyUser(userId, deviceId);
 
-  logger.info('User found', { userId });
+  logger.info("User found", { userId });
   return userData;
-
 });
 
-
 const createEventInterface = z.object({
-    userId: z.string().uuid(),
-    deviceId: z.string().uuid(),
-    data: z.object({
-        registrationStartTime: z.iso.datetime({ offset: true }),
-        registrationEndTime: z.iso.datetime({ offset: true }),
-        eventName: z.string(),
-        eventDescription: z.string(),
-        location: z.string(),
-        registrationLimit: z.number().int().optional(),
-        imageId: z.string().uuid().optional(),
-    }),
+  userId: z.string().uuid(),
+  deviceId: z.string().uuid(),
+  data: z.object({
+    registrationStartTime: z.iso.datetime({ offset: true }),
+    registrationEndTime: z.iso.datetime({ offset: true }),
+    eventName: z.string(),
+    eventDescription: z.string(),
+    location: z.string(),
+    registrationLimit: z.number().int().optional(),
+    imageId: z.string().uuid().optional(),
+  }),
 });
 
 export const createEvent = onCall({ maxInstances: 1 }, async (request) => {
-
   const result = createEventInterface.safeParse(request.data);
   if (!result.success) {
     throw new HttpsError("invalid-argument", "Missing Required Fields");
@@ -151,46 +80,58 @@ export const createEvent = onCall({ maxInstances: 1 }, async (request) => {
 
   const { userId, deviceId, data } = result.data;
 
-  const { registrationStartTime, registrationEndTime, eventName, eventDescription, location, registrationLimit, imageId } = data;
-
-  const userData = await verifyUser(userId, deviceId);
-
-  await requireRole(userData, "organizer");
-
-  const eventId = uuidv4();
-
-  const db = getFirestore();
-
-  await db.collection('events').doc(eventId).set({
-    organizer: userId,
-    waitList: [],
-    cancelledList: [],
-    finalList: [],
+  const {
     registrationStartTime,
     registrationEndTime,
     eventName,
     eventDescription,
     location,
-    registrationLimit: registrationLimit || null,
-    imageId: imageId || null,
+    registrationLimit,
+    imageId,
+  } = data;
 
-  });
+  const userData = await util.verifyUser(userId, deviceId);
 
-  await db.collection('users').doc(userId).update({
-    "organizer.createdEvents": FieldValue.arrayUnion(eventId),
-  });
+  await util.requireRole(userData, "organizer");
 
-  logger.info('Created event', { eventId });
+  const eventId = uuidv4();
+
+  const db = getFirestore();
+
+  await db
+    .collection("events")
+    .doc(eventId)
+    .set({
+      organizer: userId,
+      waitList: [],
+      cancelledList: [],
+      finalList: [],
+      registrationStartTime,
+      registrationEndTime,
+      eventName,
+      eventDescription,
+      location,
+      registrationLimit: registrationLimit || null,
+      imageId: imageId || null,
+    });
+
+  await db
+    .collection("users")
+    .doc(userId)
+    .update({
+      "organizer.createdEvents": FieldValue.arrayUnion(eventId),
+    });
+
+  logger.info("Created event", { eventId });
   return { eventId };
 });
 
-
 const getEventInterface = z.object({
-    userId: z.string().uuid(),
-    deviceId: z.string().uuid(),
-    data: z.object({
-      eventId: z.string().uuid(),
-    }),
+  userId: z.string().uuid(),
+  deviceId: z.string().uuid(),
+  data: z.object({
+    eventId: z.string().uuid(),
+  }),
 });
 
 export const getEvent = onCall({ maxInstances: 1 }, async (request) => {
@@ -207,13 +148,13 @@ export const getEvent = onCall({ maxInstances: 1 }, async (request) => {
 
   const db = getFirestore();
 
-  const eventDoc = await db.collection('events').doc(eventId).get();
+  const eventDoc = await db.collection("events").doc(eventId).get();
 
   if (!eventDoc.exists) {
     throw new HttpsError("not-found", "Event not found");
   }
 
-  logger.info('Event found', { eventId });
+  logger.info("Event found", { eventId });
   return eventDoc.data();
 });
 
@@ -241,12 +182,11 @@ export const createImage = onCall({ maxInstances: 1 }, async (request) => {
 
   const db = getFirestore();
 
-  await db.collection('images').doc(imageId).set({ imageData });
+  await db.collection("images").doc(imageId).set({ imageData });
 
   logger.info("Image Created", { imageId });
   return { imageId };
 });
-
 
 const getImageInterface = z.object({
   userId: z.string().uuid(),
@@ -257,7 +197,6 @@ const getImageInterface = z.object({
 });
 
 export const getImage = onCall({ maxInstances: 1 }, async (request) => {
-
   const result = getImageInterface.safeParse(request.data);
 
   if (!result.success) {
@@ -270,7 +209,7 @@ export const getImage = onCall({ maxInstances: 1 }, async (request) => {
   await verifyUser(userId, deviceId);
 
   const db = getFirestore();
-  
+
   const imageDoc = await db.collection("images").doc(imageId).get();
 
   if (!imageDoc.exists) {
@@ -280,5 +219,3 @@ export const getImage = onCall({ maxInstances: 1 }, async (request) => {
   logger.info("Found image", { imageId });
   return imageDoc.data();
 });
-
-
