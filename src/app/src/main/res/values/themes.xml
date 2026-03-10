@@ -9,4 +9,16 @@
     </style>
 
     <style name="Theme.QuantaEvents" parent="Base.Theme.QuantaEvents" />
+
+        <style name="ThemeOverlay.QuantaEvents.DatePicker" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/color_dark_purple</item>
+        <item name="colorOnPrimary">@color/color_light_purple</item>
+        <item name="colorAccent">@color/color_dark_gray</item>
+    </style>
+
+    <style name="ThemeOverlay.QuantaEvents.TimePicker" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/color_dark_purple</item>
+        <item name="colorOnPrimary">@color/color_light_purple</item>
+        <item name="colorAccent">@color/color_dark_gray</item>
+    </style>
 </resources>
