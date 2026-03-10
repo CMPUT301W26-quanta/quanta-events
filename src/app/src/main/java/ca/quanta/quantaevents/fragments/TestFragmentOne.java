@@ -12,11 +12,15 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
+import java.util.UUID;
+
 import ca.quanta.quantaevents.R;
+import ca.quanta.quantaevents.burger.SmartBurgerState;
+import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentTestOneBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
-public class TestFragmentOne extends Fragment {
+public class TestFragmentOne extends Fragment implements Tagged {
     private FragmentTestOneBinding binding;
 
     public TestFragmentOne() {
@@ -37,11 +41,12 @@ public class TestFragmentOne extends Fragment {
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
 
-
         binding.infoButton.setOnClickListener(_view -> {
             NavDirections action = TestFragmentOneDirections.actionTestFragmentOneToInformationFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
+
+        new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
     }
 
     @Override
@@ -49,5 +54,13 @@ public class TestFragmentOne extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentTestOneBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    private static final UUID TAG = UUID.randomUUID();
+
+    @NonNull
+    @Override
+    public UUID getUniqueTag() {
+        return TAG;
     }
 }
