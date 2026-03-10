@@ -39,24 +39,7 @@ export const health = onCall({ maxInstances: 1 }, functions.health);
 
 export const createUser = onCall({ maxInstances: 1 }, functions.createUser);
 
-const getUserInterface = z.object({
-  userId: z.string().uuid(),
-  deviceId: z.string().uuid(),
-});
-
-export const getUser = onCall({ maxInstances: 1 }, async (request) => {
-  const result = getUserInterface.safeParse(request.data);
-
-  if (!result.success) {
-    throw new HttpsError("invalid-argument", "Missing Required Fields");
-  }
-
-  const { userId, deviceId } = result.data;
-  const userData = await util.verifyUser(userId, deviceId);
-
-  logger.info("User found", { userId });
-  return userData;
-});
+export const getUser = onCall({ maxInstances: 1 }, functions.getUser);
 
 const createEventInterface = z.object({
   userId: z.string().uuid(),

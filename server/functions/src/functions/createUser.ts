@@ -1,6 +1,7 @@
 import { logger } from "firebase-functions";
 import { CallableRequest, HttpsError } from "firebase-functions/https";
 import * as z from "zod";
+import * as util from "../util";
 
 import { v4 as uuidv4 } from "uuid";
 import { getFirestore } from "firebase-admin/firestore";
@@ -16,14 +17,7 @@ const createUserInterface = z.object({
   isAdmin: z.boolean().optional(),
 });
 
-export async function createUser(request: CallableRequest<any>) {
-  const result = createUserInterface.safeParse(request.data);
-
-  if (!result.success) {
-    logger.error(result.error);
-    throw new HttpsError("invalid-argument", "Missing Required Fields");
-  }
-
+export async function createUser(request: CallableRequest) {
   const {
     deviceId,
     name,
@@ -33,7 +27,7 @@ export async function createUser(request: CallableRequest<any>) {
     isEntrant,
     isOrganizer,
     isAdmin,
-  } = result.data;
+  } = util.parseInterface(createUserInterface, request);
 
   const userId = uuidv4();
 
