@@ -11,11 +11,15 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import java.util.UUID;
+
 import ca.quanta.quantaevents.R;
+import ca.quanta.quantaevents.burger.SmartBurgerState;
+import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentEntrantEventListBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
-public class EntrantEventListFragment extends Fragment {
+public class EntrantEventListFragment extends Fragment implements Tagged {
     private FragmentEntrantEventListBinding binding;
 
     @Override
@@ -33,6 +37,8 @@ public class EntrantEventListFragment extends Fragment {
         binding.searchButton.setOnClickListener(
                 v -> Navigation.findNavController(v).navigate(R.id.action_entranteventlist_to_entranteventbrowserfragment)
         );
+
+        new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
     }
 
     @Override
@@ -40,6 +46,14 @@ public class EntrantEventListFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentEntrantEventListBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    private final static UUID TAG = UUID.randomUUID();
+
+    @NonNull
+    @Override
+    public UUID getUniqueTag() {
+        return TAG;
     }
 
 }

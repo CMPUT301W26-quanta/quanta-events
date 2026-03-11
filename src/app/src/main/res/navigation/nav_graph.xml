@@ -43,6 +43,11 @@
             app:destination="@id/registerFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_accountfragment_to_homefragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -299,9 +304,23 @@
         app:popUpTo="@id/nav_graph" />
     <action
         android:id="@+id/action_global_eventdashboardFragment"
-        app:destination="@id/eventdashboardFragment" />
+        app:destination="@id/eventdashboardFragment"
+        app:popUpTo="@id/nav_graph"/>
     <action
         android:id="@+id/action_global_informationFragment"
-        app:destination="@id/informationFragment" />
+        app:destination="@id/informationFragment"
+        app:popUpTo="@id/nav_graph"/>
+    <action
+        android:id="@+id/action_global_adminpanelFragment"
+        app:destination="@id/adminpanelFragment"
+        app:popUpTo="@id/nav_graph"/>
+    <action
+        android:id="@+id/action_global_accountFragment"
+        app:destination="@id/accountFragment"
+        app:popUpTo="@id/nav_graph"/>
+    <action
+        android:id="@+id/action_global_entranteventlistFragment"
+        app:destination="@id/entrantEventListFragment"
+        app:popUpTo="@id/nav_graph"/>
 
 </navigation>

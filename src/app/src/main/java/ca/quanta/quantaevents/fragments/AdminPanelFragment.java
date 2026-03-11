@@ -11,11 +11,15 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import java.util.UUID;
+
 import ca.quanta.quantaevents.R;
+import ca.quanta.quantaevents.burger.SmartBurgerState;
+import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentAdminPanelBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
-public class AdminPanelFragment extends Fragment {
+public class AdminPanelFragment extends Fragment implements Tagged {
     private FragmentAdminPanelBinding binding;
 
     @Override
@@ -32,6 +36,7 @@ public class AdminPanelFragment extends Fragment {
         binding.adminBrowseProfilesButton.setOnClickListener(
                 v -> Navigation.findNavController(v).navigate(R.id.action_adminpanelFragment_to_adminprofilebrowserFragment)
         );
+        new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
     }
 
     @Override
@@ -41,5 +46,12 @@ public class AdminPanelFragment extends Fragment {
         return binding.getRoot();
     }
 
+    private static final UUID TAG = UUID.randomUUID();
+
+    @NonNull
+    @Override
+    public UUID getUniqueTag() {
+        return TAG;
+    }
 
 }

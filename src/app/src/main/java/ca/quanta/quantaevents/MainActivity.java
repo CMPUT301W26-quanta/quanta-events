@@ -13,6 +13,8 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import ca.quanta.quantaevents.burger.SmartBurger;
 import ca.quanta.quantaevents.databinding.ActivityMainBinding;
+import ca.quanta.quantaevents.fragments.AdminPanelFragment;
+import ca.quanta.quantaevents.fragments.EntrantEventListFragment;
 import ca.quanta.quantaevents.fragments.EventDashboardFragment;
 import ca.quanta.quantaevents.fragments.InformationFragment;
 import ca.quanta.quantaevents.fragments.HomeFragment;
@@ -54,9 +56,12 @@ public class MainActivity extends AppCompatActivity {
                 );
 
         new SmartBurger(this, ((NavHostFragment) binding.navHost.getFragment()).getNavController(), binding.coordinator)
-                .with(new HomeFragment(), R.drawable.material_symbols_home_outline, NavGraphDirections::actionGlobalHomeFragment)
-                .with(new EventDashboardFragment(), R.drawable.material_symbols_dashboard_outline, NavGraphDirections::actionGlobalEventdashboardFragment)
                 .with(new InformationFragment(), R.drawable.material_symbols_info_outline, NavGraphDirections::actionGlobalInformationFragment)
+                .with(new EventDashboardFragment(), R.drawable.material_symbols_dashboard_outline, NavGraphDirections::actionGlobalEventdashboardFragment)
+                .with(new EntrantEventListFragment(), R.drawable.material_symbols_event_list_outline, NavGraphDirections::actionGlobalEntranteventlistFragment)
+                .with(new AccountFragment(), R.drawable.material_symbols_person_outline, NavGraphDirections::actionGlobalAccountFragment)
+                .with(new AdminPanelFragment(), R.drawable.material_symbols_security, NavGraphDirections::actionGlobalAdminpanelFragment)
+                .with(new HomeFragment(), R.drawable.material_symbols_home_outline, NavGraphDirections::actionGlobalHomeFragment)
                 .inject();
     }
 }

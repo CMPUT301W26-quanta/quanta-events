@@ -39,8 +39,10 @@ public class AccountFragment extends Fragment implements Tagged {
         binding.deleteButton.setOnClickListener(
                 v -> Navigation.findNavController(v).navigate(R.id.action_accountfragment_to_registerfragment)
         );
+        binding.saveButton.setOnClickListener(
+                v -> Navigation.findNavController(v).navigate(R.id.action_accountfragment_to_homefragment)
+        );
 
-        new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
     }
 
     @Override
