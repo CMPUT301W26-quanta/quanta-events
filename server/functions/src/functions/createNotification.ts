@@ -9,6 +9,7 @@ const createNotificationInterface = z.object({
   senderId: z.uuid(),
   recipientIds: z.array(z.uuid()).optional(),
   message: z.string().optional(),
+  title: z.string().optional(),
 });
 
 export async function createNotification(request: CallableRequest) {
@@ -16,6 +17,7 @@ export async function createNotification(request: CallableRequest) {
     senderId,
     recipientIds,
     message,
+    title,
   } = util.parseInterface(createNotificationInterface, request);
 
   const notificationId = uuidv4();
@@ -29,6 +31,7 @@ export async function createNotification(request: CallableRequest) {
         senderId,
         ...(recipientIds && { recipientIds }),
         ...(message && { message }),
+        ...(title && { title }),
       });
   } catch (_) {
     throw new HttpsError("already-exists", "Notification already exists");
