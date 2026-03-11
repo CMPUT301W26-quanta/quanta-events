@@ -70,7 +70,7 @@ const createUserInterface = z.object({
   deviceId : z.string().uuid(),
   name: z.string().optional(),
   email: z.string().email().optional(),
-  phone: z.number().int().optional(),
+  phone: z.string().optional(),
   receiveNotifications: z.boolean().optional(),
   isEntrant: z.boolean().optional(),
   isOrganizer: z.boolean().optional(),

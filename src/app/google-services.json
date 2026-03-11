@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "97133064822",
+    "project_id": "quanta-events",
+    "storage_bucket": "quanta-events.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:97133064822:android:5c909fce530f38f86be557",
+        "android_client_info": {
+          "package_name": "ca.quanta.quantaevents"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvxH-PMb8L91No-4uDzKnswkVg7Dy7NeY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

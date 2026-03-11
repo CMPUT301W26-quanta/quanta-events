@@ -15,15 +15,16 @@ import androidx.navigation.Navigation;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
-import ca.quanta.quantaevents.burger.SmartBurgerState;
 import ca.quanta.quantaevents.burger.Tagged;
-import ca.quanta.quantaevents.databinding.FragmentHomeBinding;
+import ca.quanta.quantaevents.databinding.FragmentInformationBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
-public class HomeFragment extends Fragment implements Tagged {
-    private FragmentHomeBinding binding;
+public class InformationFragment extends Fragment implements Tagged {
 
-    public HomeFragment() {
+    public FragmentInformationBinding binding;
+
+
+    public InformationFragment() {
         // Required empty public constructor
     }
 
@@ -32,26 +33,24 @@ public class HomeFragment extends Fragment implements Tagged {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
-        infoStore.setTitle("Home");
-        infoStore.setSubtitle("Receive lottery selection updates here.");
-        infoStore.setIconRes(R.drawable.material_symbols_home_outline);
+        infoStore.setTitle("Information");
+        infoStore.setSubtitle("Lottery selection information here.");
+        infoStore.setIconRes(R.drawable.material_symbols_info_outline);
 
-        binding.infoButton.setOnClickListener(_view -> {
-            NavDirections action = TestFragmentOneDirections.actionTestFragmentOneToInformationFragment();
+        binding.backButton.setOnClickListener(_view -> {
+            NavDirections action = InformationFragmentDirections.actionGlobalTestFragmentOne();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
-
-        new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        binding = FragmentInformationBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
-    private static final UUID TAG = UUID.randomUUID();
+    private final static UUID TAG = UUID.randomUUID();
 
     @NonNull
     @Override
