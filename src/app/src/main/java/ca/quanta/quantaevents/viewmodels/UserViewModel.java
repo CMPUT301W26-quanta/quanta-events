@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import ca.quanta.quantaevents.models.User;
+
 /**
  * Class which represents a UserViewModel object.
  */
@@ -61,9 +63,9 @@ public class UserViewModel extends ViewModel {
      * Calls the getUser cloud function, getting a user's details from the database.
      * @param userId UUID identifying the user.
      * @param deviceId UUID identifying the user's device.
-     * @return Map containing the user's information.
+     * @return User object with the user's information.
      */
-    public Task<Map<String, Object>> getUser(UUID userId, UUID deviceId) {
+    public Task<User> getUser(UUID userId, UUID deviceId) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -71,10 +73,18 @@ public class UserViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getUser")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Map<String, Object>>() {
+                .continueWith(new Continuation<HttpsCallableResult, User>() {
                     @Override
-                    public Map<String, Object> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
+                    public User then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                        Map<String, Object> userData = (Map<String, Object>) task.getResult().getData();
+                        String name = (String) userData.get("name");
+                        String email = (String) userData.get("email");
+                        String phoneNumber = (String) userData.get("phone");
+                        Boolean receiveNotifications = (Boolean) userData.get("receiveNotifications");
+                        Boolean isEntrant = (Boolean) userData.get("isEntrant");
+                        Boolean isOrganizer = (Boolean) userData.get("isOrganizer");
+                        Boolean isAdmin = (Boolean) userData.get("isAdmin");
+                        User result = new User(name, email, phoneNumber, receiveNotifications, isEntrant, isOrganizer, isAdmin, userId, deviceId);
                         return result;
                     }
                 });
