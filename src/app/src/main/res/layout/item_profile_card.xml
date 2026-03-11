@@ -10,7 +10,7 @@
     app:cardCornerRadius="12dp"
     app:cardElevation="0dp"
     app:strokeColor="@color/border"
-    app:strokeWidth="1dp">
+    app:strokeWidth="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,23 +29,21 @@
             android:textSize="16sp"
             android:textColor="@color/text_color" />
 
-        <!-- Bell icon (organizer only) -->
+        <!-- Notifications icon (organizer only - visibility set to gone by the profile adapter -->
         <ImageView
-            android:id="@+id/icon_bell"
+            android:id="@+id/icon_notifications"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="12dp"
-            android:visibility="gone" />
-<!--            android:src="@drawable/ic_notifications"-->
-
+            android:src="@drawable/material_symbols_notifications_outline" />
 
         <!-- X / Delete icon -->
         <ImageView
-            android:id="@+id/icon_delete"
+            android:id="@+id/icon_close"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:contentDescription="Delete" />
-<!--            android:src="@drawable/ic_trash_can"-->
+            android:contentDescription="Delete"
+            android:src="@drawable/material_symbols_close" />
 
 
     </LinearLayout>

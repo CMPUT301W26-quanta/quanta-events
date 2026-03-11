@@ -15,7 +15,7 @@ import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentEntrantEventHistoryBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
-public class EntrantEventHistoryFragment extends Fragment {
+public class AdminNotificationHistoryFragment extends Fragment {
     private FragmentEntrantEventHistoryBinding binding;
 
     @Override
@@ -23,8 +23,8 @@ public class EntrantEventHistoryFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
-        infoStore.setTitle("History");
-        infoStore.setSubtitle("View enrolled event history");
+        infoStore.setTitle("Notification History");
+        infoStore.setSubtitle("View event notification history.");
         infoStore.setIconRes(R.drawable.material_symbols_history);
 
         binding.backButton.setOnClickListener(

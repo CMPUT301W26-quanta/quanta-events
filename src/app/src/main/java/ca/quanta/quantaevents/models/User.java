@@ -77,7 +77,7 @@ public class User {
      * @param isOrganizer Boolean that's true if the user is an Organizer, false otherwise.
      * @param isAdmin Boolean that's true if the user is an Admin, false otherwise.
      */
-    User(String name, String email, String phoneNumber, Boolean receiveNotifications,
+    public User(String name, String email, String phoneNumber, Boolean receiveNotifications,
     Boolean isEntrant, Boolean isOrganizer, Boolean isAdmin) {
         this.userId = UUID.randomUUID();
         this.deviceId = UUID.randomUUID();
@@ -114,4 +114,15 @@ public class User {
 
     }
 
+    public String getName() {
+        return this.name;
+    }
+
+    public Boolean isOrganizer() {
+        return this.organizer != null;
+    }
+
+    public Boolean isAdmin() {
+        return this.admin != null;
+    }
 }
