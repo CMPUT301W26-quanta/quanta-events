@@ -1,5 +1,5 @@
 import * as z from "zod";
-import * as util from "../util.js";
+import * as util from "../util";
 import { CallableRequest, HttpsError } from "firebase-functions/https";
 import { v4 as uuidv4 } from "uuid";
 import { getFirestore } from "firebase-admin/firestore";
