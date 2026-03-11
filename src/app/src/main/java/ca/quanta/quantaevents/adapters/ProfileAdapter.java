@@ -58,12 +58,16 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         });
 
         if (!user.isOrganizer()) {
+            holder.card.setCardBackgroundColor(
+                    ContextCompat.getColor(holder.itemView.getContext(), R.color.card_background_default)
+            );
+
             // not an organizer, remove the notifications button
             holder.buttonIconNotifications.setVisibility(View.GONE);
         } else {
             // is an organizer, set a different background colour to highlight this fact
             holder.card.setCardBackgroundColor(
-                    ContextCompat.getColor(holder.itemView.getContext(), R.color.organizer_highlight)
+                    ContextCompat.getColor(holder.itemView.getContext(), R.color.card_background_organizer)
             );
 
             // add a click listener to the notification button

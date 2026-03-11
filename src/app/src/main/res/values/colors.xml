@@ -17,5 +17,6 @@
     <color name="neutral_icon_surface">@color/color_light_gray</color>
     <color name="dark_icon_surface">@color/color_dark_purple</color>
 
-    <color name="organizer_highlight">@color/color_light_purple</color>
+    <color name="card_background_default">@color/color_light_gray</color>
+    <color name="card_background_organizer">@color/color_light_purple</color>
 </resources>
