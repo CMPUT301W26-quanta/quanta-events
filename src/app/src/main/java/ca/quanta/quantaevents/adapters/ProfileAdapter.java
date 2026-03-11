@@ -48,7 +48,12 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         holder.buttonIconClose.setOnClickListener(view -> {
             int profilePosition = holder.getBindingAdapterPosition();
 
+            if (profilePosition == RecyclerView.NO_POSITION) {
+                return;
+            }
+
             profiles.remove(profilePosition);
+            notifyItemRemoved(profilePosition);
         });
 
         if (!user.isOrganizer()) {
