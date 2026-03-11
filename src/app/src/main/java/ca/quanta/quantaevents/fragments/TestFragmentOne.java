@@ -33,7 +33,10 @@ public class TestFragmentOne extends Fragment implements Tagged {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        
+
+        UUID deviceID = getDeviceID(requireContext());
+
+
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
         infoStore.setTitle("Home");
         infoStore.setSubtitle("Receive lottery selection updates here.");
@@ -71,8 +74,8 @@ public class TestFragmentOne extends Fragment implements Tagged {
     /**
      * Method to check if device is already registered for the app, if not sets up a new ID
      */
-    public UUID getDeviceID(){
-        SharedPreferences prefs = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+    public static UUID getDeviceID(Context context){
+        SharedPreferences prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
         String id = prefs.getString("device_id", null);
 
         if (id == null) {

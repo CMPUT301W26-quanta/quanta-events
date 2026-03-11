@@ -82,7 +82,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         Boolean isOrganizer = this.isOrganizer.isChecked();
         Boolean isAdmin = this.isAdmin.isChecked();
         Boolean getNotifications = this.getNotifications.isChecked();
-        UUID deviceId = getDeviceID();
+        UUID deviceId = TestFragmentOne.getDeviceID(getContext());
         model.createUser(name, email, phone, isEntrant, isOrganizer, isAdmin, getNotifications, deviceId);
     }
 
