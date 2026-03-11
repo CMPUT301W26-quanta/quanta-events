@@ -1,5 +1,5 @@
 import { CallableRequest, HttpsError } from "firebase-functions/https";
-import * as util from "../util";
+import * as util from "../util.js";
 import * as z from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
@@ -14,13 +14,13 @@ const createEventInterface = util.standardForm(
     location: z.string(),
     registrationLimit: z.number().int().optional(),
     imageId: z.uuid().optional(),
-  })
+  }),
 );
 
 export async function createEvent(request: CallableRequest) {
   const { userId, deviceId, data } = util.parseInterface(
     createEventInterface,
-    request
+    request,
   );
 
   const {

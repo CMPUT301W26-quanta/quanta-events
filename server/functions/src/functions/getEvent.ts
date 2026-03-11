@@ -1,5 +1,5 @@
 import * as z from "zod";
-import * as util from "../util";
+import * as util from "../util.js";
 import { CallableRequest, HttpsError } from "firebase-functions/https";
 import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
@@ -7,13 +7,13 @@ import { logger } from "firebase-functions";
 const getEventInterface = util.standardForm(
   z.object({
     eventId: z.uuid(),
-  })
+  }),
 );
 
 export async function getEvent(request: CallableRequest) {
   const { userId, deviceId, data } = util.parseInterface(
     getEventInterface,
-    request
+    request,
   );
 
   const { eventId } = data;

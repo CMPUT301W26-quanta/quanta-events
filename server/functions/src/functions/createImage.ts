@@ -1,5 +1,5 @@
 import * as z from "zod";
-import * as util from "../util";
+import * as util from "../util.js";
 import { CallableRequest, HttpsError } from "firebase-functions/https";
 import { v4 as uuidv4 } from "uuid";
 import { getFirestore } from "firebase-admin/firestore";
@@ -8,13 +8,13 @@ import { logger } from "firebase-functions";
 const createImageInterface = util.standardForm(
   z.object({
     imageData: z.base64(),
-  })
+  }),
 );
 
 export async function createImage(request: CallableRequest) {
   const { userId, deviceId, data } = util.parseInterface(
     createImageInterface,
-    request
+    request,
   );
 
   const { imageData } = data;
