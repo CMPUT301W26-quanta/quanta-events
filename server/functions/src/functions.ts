@@ -5,3 +5,5 @@ export * from "./functions/createEvent";
 export * from "./functions/getEvent";
 export * from "./functions/createImage";
 export * from "./functions/getImage";
+export * from "./functions/deleteUser";
+export * from "./functions/updateUser";

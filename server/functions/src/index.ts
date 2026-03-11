@@ -43,3 +43,7 @@ export const getEvent = onCall({ maxInstances: 1 }, functions.getEvent);
 export const createImage = onCall({ maxInstances: 1 }, functions.createImage);
 
 export const getImage = onCall({ maxInstances: 1 }, functions.getImage);
+
+export const deleteUser = onCall({ maxInstances: 1}, functions.deleteUser);
+
+export const updateUser = onCall({ maxInstances: 1}, functions.updateUser);
