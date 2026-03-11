@@ -37,7 +37,7 @@ public class HomeFragment extends Fragment implements Tagged {
         infoStore.setIconRes(R.drawable.material_symbols_home_outline);
 
         binding.infoButton.setOnClickListener(_view -> {
-            NavDirections action = TestFragmentOneDirections.actionTestFragmentOneToInformationFragment();
+            NavDirections action = HomeFragmentDirections.actionTestFragmentOneToInformationFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
 

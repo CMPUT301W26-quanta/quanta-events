@@ -293,4 +293,15 @@
             app:popUpToInclusive="true" />
     </fragment>
 
+    <action
+        android:id="@+id/action_global_homeFragment"
+        app:destination="@id/homeFragment"
+        app:popUpTo="@id/nav_graph" />
+    <action
+        android:id="@+id/action_global_eventdashboardFragment"
+        app:destination="@id/eventdashboardFragment" />
+    <action
+        android:id="@+id/action_global_informationFragment"
+        app:destination="@id/informationFragment" />
+
 </navigation>

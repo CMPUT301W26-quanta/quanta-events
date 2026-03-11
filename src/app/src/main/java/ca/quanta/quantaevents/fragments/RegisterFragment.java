@@ -15,10 +15,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 
 import com.google.android.material.textfield.TextInputEditText;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.navigation.Navigation;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
@@ -77,9 +73,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         isAdmin = view.findViewById(R.id.check_admin);
         getNotifications = view.findViewById(R.id.check_notifications);
 
-        binding.saveButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_registerfragment_to_homefragment)
-        );
     }
 
     /**

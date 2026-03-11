@@ -23,7 +23,7 @@ import ca.quanta.quantaevents.stores.FragmentInfoStore;
 public class AccountFragment extends Fragment implements Tagged {
     private FragmentAccountBinding binding;
 
-    public FragmentAccount() {
+    public AccountFragment() {
         // Required empty public constructor
     }
 
