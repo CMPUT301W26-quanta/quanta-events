@@ -9,7 +9,7 @@
 
 import { setGlobalOptions } from "firebase-functions";
 import { onCall } from "firebase-functions/https";
-import * as functions from "./functions";
+import * as functions from "./functions.js";
 
 import { initializeApp } from "firebase-admin/app";
 

@@ -1,6 +1,6 @@
 import { CallableRequest } from "firebase-functions/https";
 import * as z from "zod";
-import * as util from "../util";
+import * as util from "../util.js";
 import { logger } from "firebase-functions";
 
 const getUserInterface = z.object({
