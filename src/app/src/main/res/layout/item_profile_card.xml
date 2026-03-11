@@ -45,7 +45,6 @@
             android:contentDescription="Delete"
             android:src="@drawable/material_symbols_close" />
 
-
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
