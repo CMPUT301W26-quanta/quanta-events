@@ -1,7 +1,7 @@
 import { logger } from "firebase-functions";
 import { CallableRequest, HttpsError } from "firebase-functions/https";
 import * as z from "zod";
-import * as util from "../util.js";
+import * as util from "../util";
 import { v4 as uuidv4 } from "uuid";
 import { getFirestore } from "firebase-admin/firestore";
 
