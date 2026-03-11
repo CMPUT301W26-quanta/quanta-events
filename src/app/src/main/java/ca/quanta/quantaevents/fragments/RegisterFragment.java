@@ -15,16 +15,19 @@ import android.widget.Button;
 import android.widget.CheckBox;
 
 import com.google.android.material.textfield.TextInputEditText;
-
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
+import ca.quanta.quantaevents.databinding.FragmentRegisterBinding;
+import ca.quanta.quantaevents.stores.FragmentInfoStore;
+
 
 /**
  * Class which defines the registration screen.
  */
 public class RegisterFragment extends Fragment implements View.OnClickListener {
+    private FragmentRegisterBinding binding;
 
     private TextInputEditText name;
     private TextInputEditText email;
@@ -53,6 +56,11 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         super.onViewCreated(view, savedInstanceState);
+
+        FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        infoStore.setTitle("Welcome!");
+        infoStore.setSubtitle("Get started by creating an account.");
+        infoStore.setIconRes(R.drawable.material_symbols_waving_hand_outline);
 
         Button saveButton = view.findViewById(R.id.save_button);
         saveButton.setOnClickListener(this);

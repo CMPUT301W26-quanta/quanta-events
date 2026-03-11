@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".fragments.RegisterFragment">
+    tools:context=".fragments.TestFragmentTwo">
 
     <ScrollView
         android:id="@+id/scroll_view"
         android:layout_width="0dp"
-        android:layout_height="0dp"
         android:layout_marginTop="2dp"
+        android:layout_height="0dp"
         android:fillViewport="true"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/save_button"
+        app:layout_constraintBottom_toTopOf="@id/action_row"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -24,8 +23,8 @@
             android:orientation="vertical"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="8dp">
+            android:paddingTop="8dp"
+            android:paddingBottom="12dp">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layout_name"
@@ -142,27 +141,51 @@
                 android:checked="true"
                 android:text="Allow notifications."
                 android:textColor="@color/text_color"
-                app:buttonTint="@color/color_dark_purple"
+                app:buttonTint="@color/color_dark_gray"
                 app:strokeColor="@color/border"
                 app:strokeWidth="2dp" />
-
         </LinearLayout>
     </ScrollView>
 
-    <Button
-        android:id="@+id/save_button"
-        android:layout_width="180dp"
+    <LinearLayout
+        android:id="@+id/action_row"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:backgroundTint="@color/color_dark_purple"
-        android:text="Save"
-        android:textColor="@color/text_color"
-        android:textAlignment="center"
-        app:cornerRadius="12dp"
-        app:strokeColor="@color/border"
-        app:strokeWidth="2dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="16dp"
+            android:backgroundTint="@color/color_dark_purple"
+            android:text="Save"
+            android:textColor="@color/text_color"
+            app:cornerRadius="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:strokeColor="@color/border"
+            app:strokeWidth="2dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/delete_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="@color/negative_button_surface"
+            android:text="Delete Account"
+            android:textColor="@color/text_color"
+            app:cornerRadius="12dp"
+            app:strokeColor="@color/border"
+            app:strokeWidth="2dp"
+            android:layout_weight="1" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
