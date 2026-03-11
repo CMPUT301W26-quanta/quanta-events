@@ -22,9 +22,8 @@
         android:text="Back"
         android:textColor="@color/color_dark"
         app:cornerRadius="10dp"
-        app:rippleColor="@color/color_dark"
+        app:rippleColor="@color/color_dark_purple"
         app:strokeColor="@color/color_dark"
         app:strokeWidth="2dp" />
-
 
 </FrameLayout>

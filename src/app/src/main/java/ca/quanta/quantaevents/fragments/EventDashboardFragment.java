@@ -11,11 +11,15 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import java.util.UUID;
+
 import ca.quanta.quantaevents.R;
+import ca.quanta.quantaevents.burger.SmartBurgerState;
+import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentEventDashboardBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
-public class EventDashboardFragment extends Fragment {
+public class EventDashboardFragment extends Fragment implements Tagged {
     private FragmentEventDashboardBinding binding;
 
     @Override
@@ -29,6 +33,8 @@ public class EventDashboardFragment extends Fragment {
         binding.createButton.setOnClickListener(
                 v -> Navigation.findNavController(v).navigate(R.id.action_eventdashboardfragment_to_eventeditorfragment)
         );
+
+        new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
     }
 
     @Override
@@ -36,5 +42,13 @@ public class EventDashboardFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentEventDashboardBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    private final static UUID TAG = UUID.randomUUID();
+
+    @NonNull
+    @Override
+    public UUID getUniqueTag() {
+        return TAG;
     }
 }

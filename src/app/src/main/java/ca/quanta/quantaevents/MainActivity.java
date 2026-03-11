@@ -13,6 +13,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import ca.quanta.quantaevents.burger.SmartBurger;
 import ca.quanta.quantaevents.databinding.ActivityMainBinding;
+import ca.quanta.quantaevents.fragments.EventDashboardFragment;
 import ca.quanta.quantaevents.fragments.InformationFragment;
 import ca.quanta.quantaevents.fragments.HomeFragment;
 import ca.quanta.quantaevents.fragments.AccountFragment;
@@ -53,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
                 );
 
         new SmartBurger(this, ((NavHostFragment) binding.navHost.getFragment()).getNavController(), binding.coordinator)
-                .with(new HomeFragment(), R.drawable.material_symbols_add, NavGraphDirections::actionGlobalHomeFragment)
-                .with(new AccountFragment(), R.drawable.material_symbols_dashboard_outline, NavGraphDirections::actionGlobalEventdashboardFragment)
+                .with(new HomeFragment(), R.drawable.material_symbols_home_outline, NavGraphDirections::actionGlobalHomeFragment)
+                .with(new EventDashboardFragment(), R.drawable.material_symbols_dashboard_outline, NavGraphDirections::actionGlobalEventdashboardFragment)
                 .with(new InformationFragment(), R.drawable.material_symbols_info_outline, NavGraphDirections::actionGlobalInformationFragment)
                 .inject();
     }
