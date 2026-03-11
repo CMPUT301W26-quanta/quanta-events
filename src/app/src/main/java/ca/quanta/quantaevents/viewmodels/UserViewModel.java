@@ -34,7 +34,7 @@ public class UserViewModel extends ViewModel {
      * @param deviceId UUID identifying the user's device.
      * @return UUID identifying the user's ID.
      */
-    public Task<String> createUser(String name, String email, String phone, Boolean isEntrant, Boolean isOrganizer, Boolean isAdmin, Boolean getNotifications, UUID deviceId) {
+    public Task<UUID> createUser(String name, String email, String phone, Boolean isEntrant, Boolean isOrganizer, Boolean isAdmin, Boolean getNotifications, UUID deviceId) {
         // Arguments for createUser
         Map<String, Object> data = new HashMap<>();
         data.put("deviceId", deviceId.toString());
@@ -49,12 +49,12 @@ public class UserViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("createUser")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, String>() {
+                .continueWith(new Continuation<HttpsCallableResult, UUID>() {
                     // Access return value of the function
                     @Override
-                    public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                    public UUID then(@NonNull Task<HttpsCallableResult> task) throws Exception {
                         Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
-                        return (String) result.get("userId");
+                        return UUID.fromString((String) result.get("userId"));
                     }
                 });
     }
