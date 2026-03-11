@@ -30,7 +30,6 @@ import java.time.format.DateTimeFormatter;
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentEventCreateEditorBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
-import ca.quanta.quantaevents.viewmodels.EventViewModel;
 
 public class EventCreateEditorFragment extends Fragment {
     private FragmentEventCreateEditorBinding binding;
