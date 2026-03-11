@@ -8,15 +8,10 @@
  */
 
 import { setGlobalOptions } from "firebase-functions";
-import { onCall, HttpsError } from "firebase-functions/https";
-import * as logger from "firebase-functions/logger";
-import * as z from "zod";
+import { onCall } from "firebase-functions/https";
 import * as functions from "./functions";
-import * as util from "./util";
-import { v4 as uuidv4 } from "uuid";
 
 import { initializeApp } from "firebase-admin/app";
-import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -45,64 +40,6 @@ export const createEvent = onCall({ maxInstances: 1 }, functions.createEvent);
 
 export const getEvent = onCall({ maxInstances: 1 }, functions.getEvent);
 
-const createImageInterface = z.object({
-  userId: z.string().uuid(),
-  deviceId: z.string().uuid(),
-  data: z.object({
-    imageData: z.base64(),
-  }),
-});
+export const createImage = onCall({ maxInstances: 1 }, functions.createImage);
 
-export const createImage = onCall({ maxInstances: 1 }, async (request) => {
-  const result = createImageInterface.safeParse(request.data);
-  if (!result.success) {
-    throw new HttpsError("invalid-argument", "Missing Required Fields");
-  }
-
-  const { userId, deviceId, data } = result.data;
-
-  const { imageData } = data;
-
-  await verifyUser(userId, deviceId);
-
-  const imageId = uuidv4();
-
-  const db = getFirestore();
-
-  await db.collection("images").doc(imageId).set({ imageData });
-
-  logger.info("Image Created", { imageId });
-  return { imageId };
-});
-
-const getImageInterface = z.object({
-  userId: z.string().uuid(),
-  deviceId: z.string().uuid(),
-  data: z.object({
-    imageId: z.string().uuid(),
-  }),
-});
-
-export const getImage = onCall({ maxInstances: 1 }, async (request) => {
-  const result = getImageInterface.safeParse(request.data);
-
-  if (!result.success) {
-    throw new HttpsError("invalid-argument", "Missing Required Fields");
-  }
-
-  const { userId, deviceId, data } = result.data;
-  const { imageId } = data;
-
-  await verifyUser(userId, deviceId);
-
-  const db = getFirestore();
-
-  const imageDoc = await db.collection("images").doc(imageId).get();
-
-  if (!imageDoc.exists) {
-    throw new HttpsError("not-found", "Image not found");
-  }
-
-  logger.info("Found image", { imageId });
-  return imageDoc.data();
-});
+export const getImage = onCall({ maxInstances: 1 }, functions.getImage);

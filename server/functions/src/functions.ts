@@ -3,3 +3,5 @@ export * from "./functions/createUser";
 export * from "./functions/getUser";
 export * from "./functions/createEvent";
 export * from "./functions/getEvent";
+export * from "./functions/createImage";
+export * from "./functions/getImage";
