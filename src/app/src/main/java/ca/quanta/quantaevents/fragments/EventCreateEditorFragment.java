@@ -9,13 +9,12 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -53,8 +52,9 @@ public class EventCreateEditorFragment extends Fragment {
         infoStore.setSubtitle("Create or edit an event.");
         infoStore.setIconRes(R.drawable.material_symbols_add);
 
-        binding.backButton.setOnClickListener(_view ->
-                Navigation.findNavController(binding.getRoot()).navigateUp());
+        binding.backButton.setOnClickListener(
+                v -> Navigation.findNavController(v).navigate(R.id.action_eventeditorfragment_to_eventdashboardfragment)
+        );
 
         binding.saveButton.setOnClickListener(_view -> createEvent());
         binding.inputRegistrationEnd.setOnClickListener(v -> showDateTimePicker(binding.inputRegistrationEnd));

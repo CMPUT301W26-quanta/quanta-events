@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentNotificationEditorBinding;
@@ -26,6 +27,10 @@ public class EventNotificationEditorFragment extends Fragment {
         infoStore.setTitle("Notification Editor");
         infoStore.setSubtitle("Send a push notification");
         infoStore.setIconRes(R.drawable.material_symbols_notification_add_outline);
+
+        binding.backButton.setOnClickListener(
+                v -> Navigation.findNavController(v).navigate(R.id.action_sendnotificationfragment_to_eventmanagerfragment)
+        );
     }
 
     @Override

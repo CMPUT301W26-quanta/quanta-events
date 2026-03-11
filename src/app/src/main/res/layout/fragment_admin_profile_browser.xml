@@ -9,42 +9,33 @@
         android:id="@+id/filter_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
         android:paddingTop="20dp"
         android:paddingBottom="8dp">
 
         <CheckBox
-            android:id="@+id/check_waiting_list"
-            android:layout_width="match_parent"
+            android:id="@+id/check_entrant"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="Show Waiting List Entrants"
+            android:text="Show entrants"
             android:textColor="@color/text_color"
             app:buttonTint="@color/color_dark_gray"
             app:strokeColor="@color/border"
             app:strokeWidth="2dp" />
 
         <CheckBox
-            android:id="@+id/check_selected"
-            android:layout_width="match_parent"
+            android:id="@+id/check_organizer"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="Show Selected Entrants"
+            android:text="Show organizers"
             android:textColor="@color/text_color"
-            app:buttonTint="@color/color_light_green"
-            app:strokeColor="@color/border"
-            app:strokeWidth="2dp" />
-
-        <CheckBox
-            android:id="@+id/check_cancelled"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="Show Cancelled Entrants"
-            android:textColor="@color/text_color"
-            app:buttonTint="@color/color_light_red"
+            app:buttonTint="@color/color_dark_purple"
             app:strokeColor="@color/border"
             app:strokeWidth="2dp" />
     </LinearLayout>
@@ -68,9 +59,9 @@
         android:id="@+id/back_button"
         android:layout_width="180dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="20dp"
         android:layout_marginBottom="20dp"
-        android:backgroundTint="@color/color_light_purple"
+        android:backgroundTint="@color/color_dark_purple"
         android:text="Back"
         android:textColor="@color/text_color"
         android:textAlignment="center"
@@ -80,19 +71,4 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
-        android:id="@+id/export_csv_button"
-        android:layout_width="180dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="20dp"
-        android:backgroundTint="@color/color_dark_purple"
-        android:text="Export CSV"
-        android:textColor="@color/text_color"
-        android:textAlignment="center"
-        app:cornerRadius="12dp"
-        app:strokeColor="@color/border"
-        app:strokeWidth="2dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

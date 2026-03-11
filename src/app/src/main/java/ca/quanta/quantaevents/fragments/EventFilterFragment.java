@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentEventFilterBinding;
@@ -25,6 +26,10 @@ public class EventFilterFragment extends Fragment {
         infoStore.setTitle("Filter Events");
         infoStore.setSubtitle("Apply filters to search events");
         infoStore.setIconRes(R.drawable.material_symbols_filter_alt_outline);
+
+        binding.backButton.setOnClickListener(
+                v -> Navigation.findNavController(v).navigate(R.id.action_eventfilterfragment_to_eventbrowserfragment)
+        );
     }
 
     @Override

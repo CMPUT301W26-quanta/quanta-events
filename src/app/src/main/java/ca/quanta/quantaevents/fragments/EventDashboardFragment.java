@@ -26,6 +26,9 @@ public class EventDashboardFragment extends Fragment {
         infoStore.setTitle("Event Dashboard");
         infoStore.setSubtitle("View events you have created");
         infoStore.setIconRes(R.drawable.material_symbols_dashboard_outline);
+        binding.createButton.setOnClickListener(
+                v -> Navigation.findNavController(v).navigate(R.id.action_eventdashboardfragment_to_eventeditorfragment)
+        );
     }
 
     @Override

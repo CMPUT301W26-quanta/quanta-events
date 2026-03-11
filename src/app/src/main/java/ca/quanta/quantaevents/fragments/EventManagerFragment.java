@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentEventManagerBinding;
@@ -25,6 +26,23 @@ public class EventManagerFragment extends Fragment {
         infoStore.setTitle("Event Manager");
         infoStore.setSubtitle("Manage your Events");
         infoStore.setIconRes(R.drawable.material_symbols_edit_outline);
+
+        binding.editDetailsButton.setOnClickListener(
+                v -> Navigation.findNavController(v).navigate(R.id.action_eventmanagerfragment_to_eventdetailsfragment)
+        );
+        binding.shareQrButton.setOnClickListener(
+                v -> Navigation.findNavController(v).navigate(R.id.action_eventmanagerfragment_to_showqrfragment)
+        );
+        binding.viewWaitListButton.setOnClickListener(
+                v -> Navigation.findNavController(v).navigate(R.id.action_eventmanagerfragment_to_eventwaitinglistfragment)
+        );
+        binding.sendNotificationButton.setOnClickListener(
+                v -> Navigation.findNavController(v).navigate(R.id.action_eventmanagerfragment_to_sendnotificationfragment)
+        );
+        binding.backButton.setOnClickListener(
+                v -> Navigation.findNavController(v).navigate(R.id.action_eventmanagerfragment_to_eventdetailsfragment)
+        );
+
     }
 
     @Override

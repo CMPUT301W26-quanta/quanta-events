@@ -9,17 +9,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 
 import ca.quanta.quantaevents.R;
-import ca.quanta.quantaevents.databinding.FragmentTestOneBinding;
+import ca.quanta.quantaevents.databinding.FragmentHomeBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
-public class TestFragmentOne extends Fragment {
-    private FragmentTestOneBinding binding;
+public class HomeFragment extends Fragment {
+    private FragmentHomeBinding binding;
 
-    public TestFragmentOne() {
+    public HomeFragment() {
         // Required empty public constructor
     }
 
@@ -32,22 +30,13 @@ public class TestFragmentOne extends Fragment {
         infoStore.setSubtitle("Receive lottery selection updates here.");
         infoStore.setIconRes(R.drawable.material_symbols_home_outline);
 
-        binding.accountButton.setOnClickListener(_view -> {
-            NavDirections action = TestFragmentOneDirections.actionTestFragmentOneToTestFragmentTwo();
-            Navigation.findNavController(binding.getRoot()).navigate(action);
-        });
-
-
-        binding.infoButton.setOnClickListener(_view -> {
-            NavDirections action = TestFragmentOneDirections.actionTestFragmentOneToInformationFragment();
-            Navigation.findNavController(binding.getRoot()).navigate(action);
-        });
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentTestOneBinding.inflate(inflater, container, false);
+        binding = FragmentHomeBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
+
 }

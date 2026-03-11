@@ -12,30 +12,29 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import ca.quanta.quantaevents.R;
-import ca.quanta.quantaevents.databinding.FragmentEventWaitlistBinding;
+import ca.quanta.quantaevents.databinding.FragmentAccountBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
-public class EventWaitingListFragment extends Fragment {
-    private FragmentEventWaitlistBinding binding;
+public class AccountFragment extends Fragment {
+    private FragmentAccountBinding binding;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
-        infoStore.setTitle("Event Waiting List");
-        infoStore.setSubtitle("View waiting list entrants");
-        infoStore.setIconRes(R.drawable.material_symbols_group_outline);
-
-        binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_eventwaitinglistfragment_to_eventmanagerfragment)
+        infoStore.setTitle("Account");
+        infoStore.setSubtitle("Change account details");
+        infoStore.setIconRes(R.drawable.material_symbols_person_outline);
+        binding.deleteButton.setOnClickListener(
+                v -> Navigation.findNavController(v).navigate(R.id.action_accountfragment_to_registerfragment)
         );
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentEventWaitlistBinding.inflate(inflater, container, false);
+        binding = FragmentAccountBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 }
