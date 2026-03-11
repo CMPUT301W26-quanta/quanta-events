@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
@@ -64,6 +65,12 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
             holder.card.setCardBackgroundColor(
                     ContextCompat.getColor(holder.itemView.getContext(), R.color.organizer_highlight)
             );
+
+            // add a click listener to the notification button
+
+            holder.buttonIconNotifications.setOnClickListener(view -> {
+                Navigation.findNavController(view).navigate(R.id.action_adminprofilebrowserFragment_to_adminNotificationHistoryFragment);
+            });
         }
     }
 

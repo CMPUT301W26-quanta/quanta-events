@@ -34,7 +34,7 @@ public class AdminProfileBrowserFragment extends Fragment {
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
 
         infoStore.setTitle("Admin Profile Browser");
-        infoStore.setSubtitle("Browse and Delete Profiles");
+        infoStore.setSubtitle("Browse and remove profiles.");
         infoStore.setIconRes(R.drawable.material_symbols_person_shield_outline);
 
         // **** set up the profiles recycler view

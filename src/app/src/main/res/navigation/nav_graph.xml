@@ -89,6 +89,11 @@
             app:destination="@id/adminpanelFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_adminprofilebrowserFragment_to_adminNotificationHistoryFragment"
+            app:destination="@id/adminNotificationHistoryFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -322,5 +327,20 @@
         android:id="@+id/action_global_entranteventlistFragment"
         app:destination="@id/entrantEventListFragment"
         app:popUpTo="@id/nav_graph"/>
+    <fragment
+        android:id="@+id/adminNotificationHistoryFragment"
+        android:name="ca.quanta.quantaevents.fragments.AdminNotificationHistoryFragment"
+        android:label="fragment_android_notifcation_history_panel" >
+        <action
+            android:id="@+id/action_adminNotificationHistoryFragment_to_adminprofilebrowserFragment"
+            app:destination="@id/adminprofilebrowserFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_adminNotificationHistoryFragment_to_adminprofilebrowserFragment2"
+            app:destination="@id/adminprofilebrowserFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 </navigation>
