@@ -1,5 +1,7 @@
 package ca.quanta.quantaevents.fragments;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +21,7 @@ import ca.quanta.quantaevents.burger.SmartBurgerState;
 import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentTestOneBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
+import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 public class TestFragmentOne extends Fragment implements Tagged {
     private FragmentTestOneBinding binding;
@@ -30,7 +33,7 @@ public class TestFragmentOne extends Fragment implements Tagged {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
         infoStore.setTitle("Home");
         infoStore.setSubtitle("Receive lottery selection updates here.");
@@ -62,5 +65,25 @@ public class TestFragmentOne extends Fragment implements Tagged {
     @Override
     public UUID getUniqueTag() {
         return TAG;
+    }
+
+
+    /**
+     * Method to check if device is already registered for the app, if not sets up a new ID
+     */
+    public UUID getDeviceID(){
+        SharedPreferences prefs = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+        String id = prefs.getString("device_id", null);
+
+        if (id == null) {
+            UUID newId = UUID.randomUUID();
+            prefs.edit().putString("device_id", newId.toString()).apply();
+            return newId;
+
+        }
+
+        return UUID.fromString(id);
+
+
     }
 }

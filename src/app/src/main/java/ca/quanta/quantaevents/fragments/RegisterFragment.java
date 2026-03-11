@@ -2,6 +2,8 @@ package ca.quanta.quantaevents.fragments;
 
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -80,8 +82,10 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         Boolean isOrganizer = this.isOrganizer.isChecked();
         Boolean isAdmin = this.isAdmin.isChecked();
         Boolean getNotifications = this.getNotifications.isChecked();
-        UUID deviceId = UUID.randomUUID();
+        UUID deviceId = getDeviceID();
         model.createUser(name, email, phone, isEntrant, isOrganizer, isAdmin, getNotifications, deviceId);
     }
+
+
 
 }
