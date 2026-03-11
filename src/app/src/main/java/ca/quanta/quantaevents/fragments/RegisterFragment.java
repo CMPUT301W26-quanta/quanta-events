@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
+import ca.quanta.quantaevents.databinding.FragmentAdminProfileBrowserBinding;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 import ca.quanta.quantaevents.databinding.FragmentRegisterBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
@@ -48,13 +50,12 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        model = new ViewModelProvider(this).get(UserViewModel.class);
-        return inflater.inflate(R.layout.fragment_register, container, false);
+        binding = FragmentRegisterBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
@@ -73,6 +74,11 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         isAdmin = view.findViewById(R.id.check_admin);
         getNotifications = view.findViewById(R.id.check_notifications);
 
+        // **** set up buttons
+
+        binding.saveButton.setOnClickListener(
+                v -> Navigation.findNavController(v).navigate(R.id.action_registerfragment_to_homefragment)
+        );
     }
 
     /**
@@ -91,5 +97,4 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         UUID deviceId = UUID.randomUUID();
         model.createUser(name, email, phone, isEntrant, isOrganizer, isAdmin, getNotifications, deviceId);
     }
-
 }
