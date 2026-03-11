@@ -34,7 +34,14 @@ public class TestFragmentOne extends Fragment implements Tagged {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        UUID deviceID = getDeviceID(requireContext());
+        UUID deviceId = getDeviceID(requireContext());
+        UUID userId = getUserID(requireContext());
+
+        /**
+         * Call getUser to then check if deviceID and userID exists in Firebase, if not go to register, if exists go to home fragment
+         */
+
+
 
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
@@ -74,10 +81,9 @@ public class TestFragmentOne extends Fragment implements Tagged {
     /**
      * Method to check if device is already registered for the app, if not sets up a new ID
      */
-    public static UUID getDeviceID(Context context){
+    public UUID getDeviceID(Context context){
         SharedPreferences prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
         String id = prefs.getString("device_id", null);
-
         if (id == null) {
             UUID newId = UUID.randomUUID();
             prefs.edit().putString("device_id", newId.toString()).apply();
@@ -86,6 +92,20 @@ public class TestFragmentOne extends Fragment implements Tagged {
         }
 
         return UUID.fromString(id);
+
+
+    }
+
+    public UUID getUserID(Context context){
+        SharedPreferences prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+        String userId = prefs.getString("user_id", null);
+        if (userId == null) {
+
+            return null;
+
+        }
+
+        return UUID.fromString(userId);
 
 
     }
