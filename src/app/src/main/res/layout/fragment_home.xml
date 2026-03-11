@@ -10,7 +10,7 @@
         android:id="@+id/info_button"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="8dp"
         android:background="@drawable/bg_icon_container"
         android:contentDescription="Info"
@@ -80,18 +80,5 @@
             android:padding="10dp"
             app:srcCompat="@drawable/material_symbols_dashboard_outline" />
     </LinearLayout>
-
-    <ImageButton
-        android:id="@+id/menu_toggle"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/bg_icon_container"
-        android:contentDescription="Menu"
-        android:padding="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:srcCompat="@drawable/material_symbols_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
