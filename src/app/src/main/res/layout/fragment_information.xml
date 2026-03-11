@@ -9,7 +9,9 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="228dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="12dp"
+        android:lineSpacingMultiplier="1.4"
         android:text="@string/information_lottery" />
 
     <Button
@@ -22,9 +24,8 @@
         android:text="Back"
         android:textColor="@color/color_dark"
         app:cornerRadius="10dp"
-        app:rippleColor="@color/color_dark"
+        app:rippleColor="@color/color_dark_purple"
         app:strokeColor="@color/color_dark"
         app:strokeWidth="2dp" />
-
 
 </FrameLayout>
