@@ -59,3 +59,5 @@ export const getNotification = onCall(
 );
 
 export const getEvents = onCall({ maxInstances: 1 }, functions.getEvents);
+
+export const setToken = onCall({ maxInstances: 1 }, functions.setToken);

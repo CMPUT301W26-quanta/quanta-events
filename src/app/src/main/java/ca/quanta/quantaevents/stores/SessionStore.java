@@ -17,9 +17,9 @@ import java.util.UUID;
  */
 public class SessionStore extends AndroidViewModel {
 
-    private static final String PREFS_NAME = "session_store";
-    private static final String KEY_USER_ID = "user_id";
-    private static final String KEY_DEVICE_ID = "device_id";
+    public static final String PREFS_NAME = "session_store";
+    public static final String KEY_USER_ID = "user_id";
+    public static final String KEY_DEVICE_ID = "device_id";
 
     private final SharedPreferences prefs;
     private final MutableLiveData<String> userId = new MutableLiveData<>();

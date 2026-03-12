@@ -15,6 +15,7 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.security.ProviderInstaller;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Map;
 
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
                  GooglePlayServicesNotAvailableException e) {
             throw new RuntimeException(e);
         }
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -95,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
             userModel.getUserRaw(userId, deviceId)
                     .addOnSuccessListener(data -> sessionStore.setRoleMask(extractRoleMask(data)))
                     .addOnFailureListener(_ex -> sessionStore.setRoleMask(0));
+            FirebaseMessaging.getInstance().getToken().addOnSuccessListener(
+                    token -> NotificationService.updateToken(token, userId.toString(), deviceId.toString()).addOnFailureListener(Throwable::printStackTrace)
+            );
         });
 
         sessionStore.getRoleMask().observe(this, mask -> burgerState.setGroupFilter(mask == null ? 0 : mask));
