@@ -130,6 +130,8 @@ public class SmartBurger {
         return this;
     }
 
+
+
     public void inject() {
         rootButton = createButton(R.drawable.menu_to_close);
         rootButton.setOnClickListener(_view -> this.toggle());
