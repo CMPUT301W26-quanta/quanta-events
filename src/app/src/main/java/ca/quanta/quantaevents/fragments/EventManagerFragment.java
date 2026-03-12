@@ -9,7 +9,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
+
+import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentEventManagerBinding;
@@ -17,7 +20,7 @@ import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
 public class EventManagerFragment extends Fragment {
     private FragmentEventManagerBinding binding;
-    private String eventId;
+    private UUID eventId;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -32,47 +35,31 @@ public class EventManagerFragment extends Fragment {
 
         binding.editDetailsButton.setOnClickListener(
                 v -> {
-                    Bundle args = new Bundle();
-                    if (eventId != null) {
-                        args.putString("eventId", eventId);
-                    }
-                    Navigation.findNavController(v).navigate(R.id.action_eventmanagerfragment_to_createeditorfragment, args);
+                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToCreateeditorfragment(eventId);
+                    Navigation.findNavController(v).navigate(action);
                 }
         );
         binding.shareQrButton.setOnClickListener(
                 v -> {
-                    Bundle args = new Bundle();
-                    if (eventId != null) {
-                        args.putString("eventId", eventId);
-                    }
-                    Navigation.findNavController(v).navigate(R.id.action_eventmanagerfragment_to_showqrfragment, args);
+                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToShowqrfragment(eventId);
+                    Navigation.findNavController(v).navigate(action);
                 }
         );
         binding.viewWaitListButton.setOnClickListener(
                 v -> {
-                    Bundle args = new Bundle();
-                    if (eventId != null) {
-                        args.putString("eventId", eventId);
-                    }
-                    Navigation.findNavController(v).navigate(R.id.action_eventmanagerfragment_to_eventwaitinglistfragment, args);
+                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToEventwaitinglistfragment(eventId);
+                    Navigation.findNavController(v).navigate(action);
                 }
         );
         binding.sendNotificationButton.setOnClickListener(
                 v -> {
-                    Bundle args = new Bundle();
-                    if (eventId != null) {
-                        args.putString("eventId", eventId);
-                    }
-                    Navigation.findNavController(v).navigate(R.id.action_eventmanagerfragment_to_sendnotificationfragment, args);
+                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToSendnotificationfragment(eventId);
+                    Navigation.findNavController(v).navigate(action);
                 }
         );
         binding.backButton.setOnClickListener(
                 v -> {
-                    Bundle args = new Bundle();
-                    if (eventId != null) {
-                        args.putString("eventId", eventId);
-                    }
-                    Navigation.findNavController(v).navigate(R.id.action_eventmanagerfragment_to_eventdetailsfragment, args);
+                    Navigation.findNavController(v).popBackStack();
                 }
         );
 
@@ -86,17 +73,7 @@ public class EventManagerFragment extends Fragment {
     }
 
     private void readEventId() {
-        Bundle args = getArguments();
-        if (args == null) {
-            return;
-        }
-        String eventIdValue = args.getString("eventId");
-        if (eventIdValue == null) {
-            Bundle data = args.getBundle("data");
-            if (data != null) {
-                eventIdValue = data.getString("eventId");
-            }
-        }
-        eventId = eventIdValue;
+        EventManagerFragmentArgs args = EventManagerFragmentArgs.fromBundle(getArguments());
+        eventId = args.getEventId();
     }
 }

@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -59,16 +60,15 @@ public class EventDashboardFragment extends Fragment implements Tagged {
         infoStore.setSubtitle("View events you have created");
         infoStore.setIconRes(R.drawable.material_symbols_dashboard_outline);
         binding.createButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_eventdashboardfragment_to_eventeditorfragment)
+                v -> {
+                    NavDirections action = EventDashboardFragmentDirections.actionEventdashboardFragmentToEventEditorFragment(null);
+                    Navigation.findNavController(v).navigate(action);
+                }
         );
 
         adapter = new EventCardAdapter(item -> {
-            Bundle args = new Bundle();
-            if (item.getEventId() != null) {
-                args.putString("eventId", item.getEventId().toString());
-            }
-            Navigation.findNavController(requireView())
-                    .navigate(R.id.eventDetailsFragment, args);
+            NavDirections action = EventDashboardFragmentDirections.actionEventdashboardfragmentToEventedetailsfragment(item.getEventId());
+            Navigation.findNavController(requireView()).navigate(action);
         });
         binding.eventsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.eventsRecyclerView.setAdapter(adapter);
@@ -80,7 +80,8 @@ public class EventDashboardFragment extends Fragment implements Tagged {
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
-            maybeFetchPending();
+            // TODO: Switch to use server-side getEvents
+//            maybeFetchPending();
             maybeLoadAllEvents();
         });
         handleIncomingEventId();
@@ -97,21 +98,22 @@ public class EventDashboardFragment extends Fragment implements Tagged {
 
 
     private void handleIncomingEventId() {
-        Bundle args = getArguments();
-        if (args == null) {
-            return;
-        }
-        String eventIdValue = args.getString("eventId");
-        Log.d("EventDashboard", "Incoming eventId arg: " + eventIdValue);
-        if (eventIdValue == null || eventIdValue.isEmpty()) {
-            return;
-        }
-        UUID eventId = parseUUID(eventIdValue);
-        if (eventId == null) {
-            return;
-        }
-        pendingEventId = eventId;
-        maybeFetchPending();
+        // TODO: Switch to use server-side getEvents
+//        Bundle args = getArguments();
+//        if (args == null) {
+//            return;
+//        }
+//        String eventIdValue = args.getString("eventId");
+//        Log.d("EventDashboard", "Incoming eventId arg: " + eventIdValue);
+//        if (eventIdValue == null || eventIdValue.isEmpty()) {
+//            return;
+//        }
+//        UUID eventId = parseUUID(eventIdValue);
+//        if (eventId == null) {
+//            return;
+//        }
+//        pendingEventId = eventId;
+//        maybeFetchPending();
     }
 
     private void maybeFetchPending() {
@@ -266,7 +268,8 @@ public class EventDashboardFragment extends Fragment implements Tagged {
     private void handleMissingUser() {
         sessionStore.clearSession();
         if (isAdded()) {
-            Navigation.findNavController(requireView()).navigate(R.id.registerFragment);
+            NavDirections action = EventDashboardFragmentDirections.actionGlobalRegisterFragment();
+            Navigation.findNavController(requireView()).navigate(action);
         }
     }
 

@@ -9,3 +9,4 @@ export * from "./functions/deleteUser";
 export * from "./functions/updateUser";
 export * from "./functions/createNotification";
 export * from "./functions/getNotification";
+export * from "./functions/getEvents";

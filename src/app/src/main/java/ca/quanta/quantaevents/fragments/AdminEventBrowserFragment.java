@@ -28,7 +28,7 @@ public class AdminEventBrowserFragment extends Fragment {
         infoStore.setIconRes(R.drawable.material_symbols_calendar_lock_outline);
 
         binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_admineventbrowserFragment_to_adminpanelFragment)
+                v -> Navigation.findNavController(v).popBackStack()
         );
     }
 
