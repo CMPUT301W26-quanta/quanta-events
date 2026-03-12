@@ -84,14 +84,10 @@
         tools:layout="@layout/fragment_event_dashboard">
         <action
             android:id="@+id/action_eventdashboardfragment_to_eventedetailsfragment"
-            app:destination="@id/eventDetailsFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+            app:destination="@id/eventDetailsFragment" />
         <action
-            android:id="@+id/action_eventdashboardfragment_to_eventeditorfragment"
-            app:destination="@id/eventEditorFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+            android:id="@+id/action_eventdashboardFragment_to_eventEditorFragment"
+            app:destination="@id/eventEditorFragment" />
     </fragment>
 
     <fragment
@@ -99,16 +95,10 @@
         android:name="ca.quanta.quantaevents.fragments.EventCreateEditorFragment"
         android:label="fragment_event_editor"
         tools:layout="@layout/fragment_event_create_editor">
-        <action
-            android:id="@+id/action_eventeditorfragment_to_eventdashboardfragment"
-            app:destination="@id/eventdashboardFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_eventeditorfragment_to_eventdetailsfragment"
-            app:destination="@id/eventDetailsFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+        <argument
+            android:name="eventId"
+            app:argType="java.util.UUID"
+            app:nullable="true" />
     </fragment>
 
 
@@ -118,30 +108,17 @@
         android:label="fragment_event_manager"
         tools:layout="@layout/fragment_event_manager">
         <action
-            android:id="@+id/action_eventmanagerfragment_to_eventdetailsfragment"
-            app:destination="@id/eventDetailsFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
-        <action
             android:id="@+id/action_eventmanagerfragment_to_createeditorfragment"
-            app:destination="@id/eventEditorFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+            app:destination="@id/eventEditorFragment" />
         <action
             android:id="@+id/action_eventmanagerfragment_to_showqrfragment"
-            app:destination="@id/showQRFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+            app:destination="@id/showQRFragment" />
         <action
             android:id="@+id/action_eventmanagerfragment_to_eventwaitinglistfragment"
-            app:destination="@id/eventWaitingListFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+            app:destination="@id/eventWaitingListFragment" />
         <action
             android:id="@+id/action_eventmanagerfragment_to_sendnotificationfragment"
-            app:destination="@id/eventNotificationEditorFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+            app:destination="@id/eventNotificationEditorFragment" />
         <argument
             android:name="eventId"
             app:argType="java.util.UUID" />
@@ -152,11 +129,9 @@
         android:name="ca.quanta.quantaevents.fragments.EventWaitingListFragment"
         android:label="fragment_event_waiting_list"
         tools:layout="@layout/fragment_event_waitlist">
-        <action
-            android:id="@+id/action_eventwaitinglistfragment_to_eventmanagerfragment"
-            app:destination="@id/eventManagerFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+        <argument
+            android:name="eventId"
+            app:argType="java.util.UUID" />
     </fragment>
 
     <fragment
@@ -164,11 +139,9 @@
         android:name="ca.quanta.quantaevents.fragments.EventNotificationEditorFragment"
         android:label="fragment_event_notification_editor"
         tools:layout="@layout/fragment_notification_editor">
-        <action
-            android:id="@+id/action_sendnotificationfragment_to_eventmanagerfragment"
-            app:destination="@id/eventManagerFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+        <argument
+            android:name="eventId"
+            app:argType="java.util.UUID" />
     </fragment>
 
     <fragment
@@ -176,11 +149,9 @@
         android:name="ca.quanta.quantaevents.fragments.ShowQRFragment"
         android:label="fragment_show_qr"
         tools:layout="@layout/fragment_show_qr">
-        <action
-            android:id="@+id/action_showqrfragment_to_eventmanagerfragment"
-            app:destination="@id/eventManagerFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+        <argument
+            android:name="eventId"
+            app:argType="java.util.UUID" />
     </fragment>
 
     <fragment
@@ -191,13 +162,10 @@
         <action
             android:id="@+id/action_entranteventlist_to_entranteventhistoryfragment"
             app:destination="@id/entrantEventHistoryFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_entranteventlist_to_entranteventbrowserfragment"
-            app:destination="@id/eventBrowserFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+            app:destination="@id/eventBrowserFragment" />
     </fragment>
 
     <fragment
@@ -206,18 +174,14 @@
         android:label="fragment_entrant_event_browser"
         tools:layout="@layout/fragment_entrant_event_browser">
         <action
-            android:id="@+id/action_entranteventbrowserfragment_to_entranteventlistfragment"
-            app:destination="@id/entrantEventListFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
-        <action
             android:id="@+id/action_entranteventbrowserfragment_to_eventfilterfragment"
-            app:destination="@id/eventFilterFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+            app:destination="@id/eventFilterFragment" />
         <action
             android:id="@+id/action_entranteventbrowserfragment_to_eventqrcodefragment"
             app:destination="@id/eventQRCodeFragment" />
+        <action
+            android:id="@+id/action_eventBrowserFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment" />
     </fragment>
 
     <fragment
@@ -235,26 +199,16 @@
         android:id="@+id/eventFilterFragment"
         android:name="ca.quanta.quantaevents.fragments.EventFilterFragment"
         android:label="fragment_event_filter"
-        tools:layout="@layout/fragment_event_filter">
-        <action
-            android:id="@+id/action_eventfilterfragment_to_eventbrowserfragment"
-            app:destination="@id/eventBrowserFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
-    </fragment>
+        tools:layout="@layout/fragment_event_filter" />
 
     <fragment
         android:id="@+id/entrantEventHistoryFragment"
         android:name="ca.quanta.quantaevents.fragments.EntrantEventHistoryFragment"
         android:label="fragment_entrant_event_history"
         tools:layout="@layout/fragment_entrant_event_history">
-
         <action
-            android:id="@+id/action_eventhistoryfragment_to_entranteventlistfragment"
-            app:destination="@id/entrantEventListFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
-
+            android:id="@+id/action_entrantEventHistoryFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment" />
     </fragment>
 
     <fragment
@@ -264,29 +218,7 @@
         tools:layout="@layout/fragment_event_details">
         <action
             android:id="@+id/action_eventdetailsfragment_to_eventmanagerfragment"
-            app:destination="@id/eventManagerFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_eventdetailsfragment_to_eventhistoryfragment"
-            app:destination="@id/entrantEventHistoryFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_eventdetailsfragment_to_eventlistfragment"
-            app:destination="@id/entrantEventListFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_eventdetailsfragment_to_eventbrowserfragment"
-            app:destination="@id/eventBrowserFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_eventdetailsfragment_to_eventdashboardfragment"
-            app:destination="@id/eventdashboardFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+            app:destination="@id/eventManagerFragment" />
         <argument
             android:name="eventId"
             app:argType="java.util.UUID" />
@@ -315,5 +247,10 @@
         android:id="@+id/action_global_entranteventlistFragment"
         app:destination="@id/entrantEventListFragment"
         app:popUpTo="@id/nav_graph" />
+    <action
+        android:id="@+id/action_global_registerFragment"
+        app:destination="@id/registerFragment"
+        app:popUpTo="@id/nav_graph"
+        app:popUpToInclusive="true" />
 
 </navigation>

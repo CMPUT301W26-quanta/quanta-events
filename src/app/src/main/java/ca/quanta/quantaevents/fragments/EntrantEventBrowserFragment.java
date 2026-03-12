@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import ca.quanta.quantaevents.R;
@@ -28,13 +29,19 @@ public class EntrantEventBrowserFragment extends Fragment {
         infoStore.setIconRes(R.drawable.material_symbols_search_outline);
 
         binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_entranteventbrowserfragment_to_entranteventlistfragment)
+                v -> Navigation.findNavController(v).popBackStack()
         );
         binding.filterButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_entranteventbrowserfragment_to_eventfilterfragment)
+                v -> {
+                    NavDirections action = EntrantEventBrowserFragmentDirections.actionEntranteventbrowserfragmentToEventfilterfragment();
+                    Navigation.findNavController(v).navigate(action);
+                }
         );
         binding.qrButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_entranteventbrowserfragment_to_eventqrcodefragment)
+                v -> {
+                    NavDirections action = EntrantEventBrowserFragmentDirections.actionEntranteventbrowserfragmentToEventqrcodefragment();
+                    Navigation.findNavController(v).navigate(action);
+                }
         );
     }
 

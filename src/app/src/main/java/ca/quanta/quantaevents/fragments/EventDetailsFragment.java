@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import java.time.ZoneId;
@@ -51,15 +52,15 @@ public class EventDetailsFragment extends Fragment {
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
         eventModel = new ViewModelProvider(this).get(EventViewModel.class);
         imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
+        readEventId();
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
-            maybeLoadEvent();
+            loadEvent();
         });
-        readEventId();
 
         binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_eventdetailsfragment_to_eventbrowserfragment)
+                v -> Navigation.findNavController(v).popBackStack()
         );
     }
 
@@ -73,17 +74,22 @@ public class EventDetailsFragment extends Fragment {
     private void readEventId() {
         EventDetailsFragmentArgs args = EventDetailsFragmentArgs.fromBundle(getArguments());
         eventId = args.getEventId();
-        maybeLoadEvent();
     }
 
-    private void maybeLoadEvent() {
-        if (eventId == null || userId == null || deviceId == null) {
+    private void loadEvent() {
+        if (userId == null || deviceId == null) {
+            NavDirections action = EventDetailsFragmentDirections.actionGlobalRegisterFragment();
+            Navigation.findNavController(requireView()).navigate(action);
             return;
         }
         eventModel.getEvent(eventId, userId, deviceId)
                 .addOnSuccessListener(this::bindEvent)
-                .addOnFailureListener(ex ->
-                        Toast.makeText(requireContext(), "Failed to load event", Toast.LENGTH_LONG).show()
+                .addOnFailureListener(ex -> {
+                            if (isAdded()) {
+                                Toast.makeText(requireContext(), "Failed to load event", Toast.LENGTH_LONG).show();
+                                Navigation.findNavController(requireView()).popBackStack();
+                            }
+                        }
                 );
     }
 
@@ -102,7 +108,6 @@ public class EventDetailsFragment extends Fragment {
 
         binding.textDescription.setText(stringValue(event.getEventDescription(), ""));
 
-        updateBackButton(organizer);
         updateManageButton(organizer);
 
         UUID imageUuid = event.getImageId();
@@ -125,21 +130,8 @@ public class EventDetailsFragment extends Fragment {
             binding.enrollButton.setText("Manage");
             binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
             binding.enrollButton.setOnClickListener(v -> {
-                Bundle args = new Bundle();
-                if (eventId != null) {
-                    args.putString("eventId", eventId.toString());
-                }
-                Navigation.findNavController(v)
-                        .navigate(R.id.action_eventdetailsfragment_to_eventmanagerfragment, args);
-            });
-        }
-    }
-
-    private void updateBackButton(String organizerId) {
-        if (userId != null && organizerId != null && organizerId.equals(userId.toString())) {
-            binding.backButton.setOnClickListener(v -> {
-                Navigation.findNavController(v)
-                        .navigate(R.id.action_eventdetailsfragment_to_eventdashboardfragment);
+                NavDirections action = EventDetailsFragmentDirections.actionEventdetailsfragmentToEventmanagerfragment(eventId);
+                Navigation.findNavController(v).navigate(action);
             });
         }
     }
@@ -164,17 +156,6 @@ public class EventDetailsFragment extends Fragment {
         try {
             byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
             return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        } catch (IllegalArgumentException ex) {
-            return null;
-        }
-    }
-
-    private static UUID parseUUID(@Nullable String value) {
-        if (value == null || value.isEmpty()) {
-            return null;
-        }
-        try {
-            return UUID.fromString(value);
         } catch (IllegalArgumentException ex) {
             return null;
         }
