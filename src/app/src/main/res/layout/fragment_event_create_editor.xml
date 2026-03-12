@@ -102,11 +102,11 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_end_time"
+                android:id="@+id/layout_registration_start"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="Event Ends at"
+                android:hint="Registration Starts"
                 android:focusable="false"
                 android:clickable="true"
                 app:boxCornerRadiusTopStart="12dp"
@@ -120,7 +120,7 @@
                 app:boxBackgroundColor="@color/color_light_gray"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/inputEndTime"
+                    android:id="@+id/inputRegistrationStart"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="none"
@@ -134,7 +134,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="Date of Registration Deadline"
+                android:hint="Registration Ends"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
@@ -269,7 +269,7 @@
                     app:boxBackgroundColor="@color/color_light_gray"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputRegistrationLimit"
+                        android:id="@+id/inputEventLimit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
@@ -277,7 +277,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/layout_waiting_capacity"
+                    android:id="@+id/layout_registration_capacity"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -296,7 +296,7 @@
                     app:boxBackgroundColor="@color/color_light_gray"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputWaitingCapacity"
+                        android:id="@+id/inputRegistrationCapacity"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
