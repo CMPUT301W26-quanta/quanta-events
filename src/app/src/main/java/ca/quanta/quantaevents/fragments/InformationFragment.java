@@ -38,7 +38,7 @@ public class InformationFragment extends Fragment implements Tagged {
         infoStore.setIconRes(R.drawable.material_symbols_info_outline);
 
         binding.backButton.setOnClickListener(_view -> {
-            NavDirections action = InformationFragmentDirections.actionGlobalHomeFragment();
+            NavDirections action = ca.quanta.quantaevents.fragments.InformationFragmentDirections.actionGlobalHomeFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
     }
