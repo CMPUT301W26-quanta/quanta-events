@@ -10,3 +10,4 @@ export * from "./functions/updateUser";
 export * from "./functions/createNotification";
 export * from "./functions/getNotification";
 export * from "./functions/getEvents";
+export * from "./functions/setToken";

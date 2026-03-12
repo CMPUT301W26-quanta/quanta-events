@@ -1,9 +1,13 @@
 import { HttpsError } from "firebase-functions/https";
+import { UserDocument, WithRole } from "../schema";
+import { Messaging } from "firebase-admin/messaging";
 
 export type ReceiveNotifications = "yes" | "no";
 
-export async function pushNotifications(entrantData: any, receiveNotifications: ReceiveNotifications) {
-  if (!entrantData[receiveNotifications]) {
-    throw new HttpsError("failed-precondition", `User does not want to receive notifications`);
+export async function pushNotifications(
+  entrantData: WithRole<UserDocument, "entrant">,
+  receiveNotifications: ReceiveNotifications
+) {
+  if (entrantData.entrant.receiveNotifications) {
   }
 }
