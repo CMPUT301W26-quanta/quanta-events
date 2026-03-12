@@ -57,9 +57,11 @@ public class EventCreateEditorFragment extends Fragment {
     private UUID userId;
     private UUID deviceId;
     private UUID eventId;
+
     public EventCreateEditorFragment() {
         // Required empty public constructor
     }
+
     private SessionStore sessionStore;
 
     @Override
@@ -82,7 +84,7 @@ public class EventCreateEditorFragment extends Fragment {
         infoStore.setIconRes(R.drawable.material_symbols_add);
 
         binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_eventeditorfragment_to_eventdashboardfragment)
+                v -> Navigation.findNavController(v).popBackStack()
         );
 
         binding.saveButton.setOnClickListener(_view -> createEvent());
@@ -122,6 +124,7 @@ public class EventCreateEditorFragment extends Fragment {
     }
 
     private void createEvent() {
+        // TODO: Handle event updates
         String name = safeText(binding.inputName.getText());
         String description = safeText(binding.inputDescription.getText());
         String start = getUtcValue(binding.inputStartTime);
@@ -189,18 +192,8 @@ public class EventCreateEditorFragment extends Fragment {
     }
 
     private void readEventId() {
-        Bundle args = getArguments();
-        if (args == null) {
-            return;
-        }
-        String eventIdValue = args.getString("eventId");
-        if (eventIdValue == null) {
-            Bundle data = args.getBundle("data");
-            if (data != null) {
-                eventIdValue = data.getString("eventId");
-            }
-        }
-        eventId = parseUUID(eventIdValue);
+        EventCreateEditorFragmentArgs args = EventCreateEditorFragmentArgs.fromBundle(getArguments());
+        eventId = args.getEventId();
         maybeLoadEventForEdit();
     }
 
@@ -292,10 +285,7 @@ public class EventCreateEditorFragment extends Fragment {
                     binding.saveButton.setEnabled(true);
                     Toast.makeText(requireContext(), "Event created", Toast.LENGTH_LONG).show();
                     if (isAdded()) {
-                        Bundle args = new Bundle();
-                        args.putString("eventId", eventId.toString());
-                        Navigation.findNavController(requireView())
-                                .navigate(R.id.action_eventeditorfragment_to_eventdashboardfragment, args);
+                        Navigation.findNavController(requireView()).popBackStack();
                     }
                 })
                 .addOnFailureListener(ex -> {
@@ -338,6 +328,7 @@ public class EventCreateEditorFragment extends Fragment {
             return null;
         }
     }
+
     private static Integer parseInt(@Nullable CharSequence text) {
         if (text == null) {
             return null;

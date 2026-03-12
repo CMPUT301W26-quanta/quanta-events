@@ -27,7 +27,7 @@ public class AdminProfileBrowserFragment extends Fragment {
         infoStore.setSubtitle("Browse and Delete Profiles");
         infoStore.setIconRes(R.drawable.material_symbols_person_shield_outline);
         binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_adminprofilebrowserFragment_to_adminpanelFragment)
+                v -> Navigation.findNavController(v).popBackStack()
         );
     }
 

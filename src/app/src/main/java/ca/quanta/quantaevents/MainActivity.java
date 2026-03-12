@@ -11,17 +11,22 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.security.ProviderInstaller;
+import com.google.firebase.FirebaseApp;
+
 import java.util.Map;
 
 import ca.quanta.quantaevents.burger.SmartBurger;
 import ca.quanta.quantaevents.burger.SmartBurgerState;
 import ca.quanta.quantaevents.databinding.ActivityMainBinding;
+import ca.quanta.quantaevents.fragments.AccountFragment;
 import ca.quanta.quantaevents.fragments.AdminPanelFragment;
 import ca.quanta.quantaevents.fragments.EntrantEventListFragment;
 import ca.quanta.quantaevents.fragments.EventDashboardFragment;
-import ca.quanta.quantaevents.fragments.InformationFragment;
 import ca.quanta.quantaevents.fragments.HomeFragment;
-import ca.quanta.quantaevents.fragments.AccountFragment;
+import ca.quanta.quantaevents.fragments.InformationFragment;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
@@ -34,11 +39,21 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        try {
+            ProviderInstaller.installIfNeeded(this);
+        } catch (GooglePlayServicesRepairableException |
+                 GooglePlayServicesNotAvailableException e) {
+            throw new RuntimeException(e);
+        }
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        FirebaseApp.initializeApp(this);
 
         FragmentInfoStore infoStore = new ViewModelProvider(this).get(FragmentInfoStore.class);
         SessionStore sessionStore = new ViewModelProvider(this).get(SessionStore.class);
