@@ -46,6 +46,8 @@ public class UserViewModel extends ViewModel {
         data.put("isOrganizer", isOrganizer);
         data.put("isAdmin", isAdmin);
 
+        System.out.println(data);
+
         return functions
                 .getHttpsCallable("createUser")
                 .call(data)
@@ -86,6 +88,28 @@ public class UserViewModel extends ViewModel {
                         Boolean isAdmin = (Boolean) userData.get("isAdmin");
                         User result = new User(name, email, phoneNumber, receiveNotifications, isEntrant, isOrganizer, isAdmin, userId, deviceId);
                         return result;
+                    }
+                });
+    }
+
+    /**
+     * Calls the getUser cloud function, returning the raw user map.
+     * @param userId UUID identifying the user.
+     * @param deviceId UUID identifying the user's device.
+     * @return Map containing the user's data.
+     */
+    public Task<Map<String, Object>> getUserRaw(UUID userId, UUID deviceId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        return functions
+                .getHttpsCallable("getUser")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, Map<String, Object>>() {
+                    @Override
+                    public Map<String, Object> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                        return (Map<String, Object>) task.getResult().getData();
                     }
                 });
     }

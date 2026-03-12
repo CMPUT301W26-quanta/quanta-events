@@ -78,7 +78,7 @@ public class User {
      * @param isAdmin Boolean that's true if the user is an Admin, false otherwise.
      */
     public User(String name, String email, String phoneNumber, Boolean receiveNotifications,
-    Boolean isEntrant, Boolean isOrganizer, Boolean isAdmin) {
+                Boolean isEntrant, Boolean isOrganizer, Boolean isAdmin) {
         this.userId = UUID.randomUUID();
         this.deviceId = UUID.randomUUID();
         this.name = name;
