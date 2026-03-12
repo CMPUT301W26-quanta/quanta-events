@@ -19,7 +19,7 @@ export async function getNotification(request: CallableRequest) {
   const { notificationId } = data;
 
   const userData = await util.verifyUser(userId, deviceId);
-  await util.requireRole(userData, "yes");
+  await util.pushNotifications(userData, "yes");
 
   const db = getFirestore();
 
