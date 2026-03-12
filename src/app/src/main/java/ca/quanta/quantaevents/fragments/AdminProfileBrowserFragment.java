@@ -68,7 +68,7 @@ public class AdminProfileBrowserFragment extends Fragment {
         // **** set up the buttons
 
         binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_adminprofilebrowserFragment_to_adminpanelFragment)
+                v -> Navigation.findNavController(v).popBackStack()
         );
     }
 

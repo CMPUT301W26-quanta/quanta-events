@@ -18,20 +18,20 @@ import ca.quanta.quantaevents.models.User;
  * Class which represents a UserViewModel object.
  */
 public class UserViewModel extends ViewModel {
-
     // Initialize an instance of cloud functions
-    private FirebaseFunctions functions = FirebaseFunctions.getInstance();
+
 
     /**
      * Calls the createUser cloud function, adding a user to the database.
-     * @param name Name of the user.
-     * @param email Email address of the user.
-     * @param phone Phone number of the user.
-     * @param isEntrant Boolean that's true when the user selects to be an Entrant.
-     * @param isOrganizer Boolean that's true when the user selects to be an Organizer.
-     * @param isAdmin Boolean that's true when the user selects to be an Admin.
+     *
+     * @param name             Name of the user.
+     * @param email            Email address of the user.
+     * @param phone            Phone number of the user.
+     * @param isEntrant        Boolean that's true when the user selects to be an Entrant.
+     * @param isOrganizer      Boolean that's true when the user selects to be an Organizer.
+     * @param isAdmin          Boolean that's true when the user selects to be an Admin.
      * @param getNotifications Boolean that's true when the user selects to receive notifications.
-     * @param deviceId UUID identifying the user's device.
+     * @param deviceId         UUID identifying the user's device.
      * @return UUID identifying the user's ID.
      */
     public Task<UUID> createUser(String name, String email, String phone, Boolean isEntrant, Boolean isOrganizer, Boolean isAdmin, Boolean getNotifications, UUID deviceId) {
@@ -46,22 +46,24 @@ public class UserViewModel extends ViewModel {
         data.put("isOrganizer", isOrganizer);
         data.put("isAdmin", isAdmin);
 
-        return functions
+        return FirebaseFunctions.getInstance()
                 .getHttpsCallable("createUser")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, UUID>() {
                     // Access return value of the function
                     @Override
-                    public UUID then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                    public UUID then(@NonNull Task<HttpsCallableResult> task) {
                         Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
-                        return UUID.fromString((String) result.get("userId"));
+                        UUID userId = UUID.fromString((String) result.get("userId"));
+                        return userId;
                     }
                 });
     }
 
     /**
      * Calls the getUser cloud function, getting a user's details from the database.
-     * @param userId UUID identifying the user.
+     *
+     * @param userId   UUID identifying the user.
      * @param deviceId UUID identifying the user's device.
      * @return User object with the user's information.
      */
@@ -70,22 +72,39 @@ public class UserViewModel extends ViewModel {
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
-        return functions
+        System.out.println("GET USER");
+
+        return FirebaseFunctions.getInstance()
                 .getHttpsCallable("getUser")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, User>() {
+                .continueWith(task -> {
+                    Map<String, Object> userData = (Map<String, Object>) task.getResult().getData();
+                    User result = new User(userData, userId, deviceId);
+                    System.out.println("TASK COMPLETE");
+                    System.out.println("GOT " + result);
+                    return result;
+                });
+    }
+
+    /**
+     * Calls the getUser cloud function, returning the raw user map.
+     *
+     * @param userId   UUID identifying the user.
+     * @param deviceId UUID identifying the user's device.
+     * @return Map containing the user's data.
+     */
+    public Task<Map<String, Object>> getUserRaw(UUID userId, UUID deviceId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        return FirebaseFunctions.getInstance()
+                .getHttpsCallable("getUser")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, Map<String, Object>>() {
                     @Override
-                    public User then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        Map<String, Object> userData = (Map<String, Object>) task.getResult().getData();
-                        String name = (String) userData.get("name");
-                        String email = (String) userData.get("email");
-                        String phoneNumber = (String) userData.get("phone");
-                        Boolean receiveNotifications = (Boolean) userData.get("receiveNotifications");
-                        Boolean isEntrant = (Boolean) userData.get("isEntrant");
-                        Boolean isOrganizer = (Boolean) userData.get("isOrganizer");
-                        Boolean isAdmin = (Boolean) userData.get("isAdmin");
-                        User result = new User(name, email, phoneNumber, receiveNotifications, isEntrant, isOrganizer, isAdmin, userId, deviceId);
-                        return result;
+                    public Map<String, Object> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                        return (Map<String, Object>) task.getResult().getData();
                     }
                 });
     }

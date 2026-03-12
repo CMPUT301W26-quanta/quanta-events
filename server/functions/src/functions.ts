@@ -7,3 +7,5 @@ export * from "./functions/createImage";
 export * from "./functions/getImage";
 export * from "./functions/deleteUser";
 export * from "./functions/updateUser";
+export * from "./functions/createNotification";
+export * from "./functions/getEvents";

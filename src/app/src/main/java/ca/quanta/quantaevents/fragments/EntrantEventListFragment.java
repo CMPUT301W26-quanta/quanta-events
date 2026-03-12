@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import java.util.UUID;
@@ -32,10 +33,16 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
         infoStore.setIconRes(R.drawable.material_symbols_event_list_outline);
 
         binding.historyButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_entranteventlist_to_entranteventhistoryfragment)
+                v -> {
+                    NavDirections action = EntrantEventListFragmentDirections.actionEntranteventlistToEntranteventhistoryfragment();
+                    Navigation.findNavController(v).navigate(action);
+                }
         );
         binding.searchButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_entranteventlist_to_entranteventbrowserfragment)
+                v -> {
+                    NavDirections action = EntrantEventListFragmentDirections.actionEntranteventlistToEntranteventbrowserfragment();
+                    Navigation.findNavController(v).navigate(action);
+                }
         );
 
         new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);

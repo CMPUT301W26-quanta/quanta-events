@@ -37,8 +37,8 @@ public class HomeFragment extends Fragment implements Tagged {
         infoStore.setIconRes(R.drawable.material_symbols_home_outline);
 
         binding.infoButton.setOnClickListener(_view -> {
-            NavDirections action = HomeFragmentDirections.actionTestFragmentOneToInformationFragment();
-            Navigation.findNavController(binding.getRoot()).navigate(action);
+            NavDirections action = ca.quanta.quantaevents.fragments.HomeFragmentDirections.actionTestFragmentOneToInformationFragment();
+            Navigation.findNavController(requireView()).navigate(action);
         });
 
         new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
