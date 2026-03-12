@@ -37,7 +37,7 @@
         android:clipToPadding="false"
         android:scrollbars="vertical"
         android:overScrollMode="ifContentScrolls"
-        app:layout_constraintTop_toBottomOf="@id/history_button"
+        app:layout_constraintTop_toBottomOf="@id/create_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

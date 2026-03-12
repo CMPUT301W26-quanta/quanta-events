@@ -7,6 +7,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import android.util.Log;
+import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,13 +16,22 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+
 import com.google.android.material.textfield.TextInputEditText;
+
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 import ca.quanta.quantaevents.databinding.FragmentRegisterBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
+import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 
 /**
@@ -28,6 +39,7 @@ import ca.quanta.quantaevents.stores.FragmentInfoStore;
  */
 public class RegisterFragment extends Fragment implements View.OnClickListener {
     private FragmentRegisterBinding binding;
+    private static final String TAG = "RegisterFragment";
 
     private TextInputEditText name;
     private TextInputEditText email;
@@ -37,6 +49,10 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
     private CheckBox isAdmin;
     private CheckBox getNotifications;
     private UserViewModel model;
+
+    private SessionStore sessionStore;
+    private Button saveButton;
+    private boolean redirectedToHome = false;
 
     /**
      * Constructor for a RegisterFragment object.
@@ -57,12 +73,15 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
 
         super.onViewCreated(view, savedInstanceState);
 
+        sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
+        observeSessionAndRedirect();
+
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
         infoStore.setTitle("Welcome!");
         infoStore.setSubtitle("Get started by creating an account.");
         infoStore.setIconRes(R.drawable.material_symbols_waving_hand_outline);
 
-        Button saveButton = view.findViewById(R.id.save_button);
+        saveButton = view.findViewById(R.id.save_button);
         saveButton.setOnClickListener(this);
 
         name = view.findViewById(R.id.input_name);
@@ -81,15 +100,58 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
      */
     @Override
     public void onClick(View v) {
-        String name = this.name.getText().toString();
-        String email = this.email.getText().toString();
-        String phone = this.phone.getText().toString();
+        if (redirectedToHome) {
+            return;
+        }
+        String name = normalizeEmpty(this.name.getText().toString().trim());
+        String email = normalizeEmpty(this.email.getText().toString().trim());
+        String phone = normalizeEmpty(this.phone.getText().toString().trim());
+
         Boolean isEntrant = this.isEntrant.isChecked();
         Boolean isOrganizer = this.isOrganizer.isChecked();
         Boolean isAdmin = this.isAdmin.isChecked();
         Boolean getNotifications = this.getNotifications.isChecked();
         UUID deviceId = UUID.randomUUID();
-        model.createUser(name, email, phone, isEntrant, isOrganizer, isAdmin, getNotifications, deviceId);
+        saveButton.setEnabled(false);
+        model.createUser(name, email, phone, isEntrant, isOrganizer, isAdmin, getNotifications, deviceId)
+                .addOnSuccessListener(userId -> {
+                    sessionStore.setSession(userId, deviceId);
+                    saveButton.setEnabled(true);
+                    android.widget.Toast.makeText(requireContext(), "Account created", android.widget.Toast.LENGTH_LONG).show();
+                    tryRedirect();
+                })
+                .addOnFailureListener(ex -> {
+                    saveButton.setEnabled(true);
+                    Log.e(TAG, "Failed to create account", ex);
+                    android.widget.Toast.makeText(requireContext(), "Failed to create account", android.widget.Toast.LENGTH_LONG).show();
+                });
     }
 
+    private void observeSessionAndRedirect() {
+        sessionStore.getUserId().observe(getViewLifecycleOwner(), userId -> tryRedirect());
+        sessionStore.getDeviceId().observe(getViewLifecycleOwner(), deviceId -> tryRedirect());
+    }
+
+    @Nullable
+    private static String normalizeEmpty(@Nullable String value) {
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+        return value;
+    }
+
+    private void tryRedirect() {
+        if (redirectedToHome) {
+            return;
+        }
+        if (sessionStore.hasSession() && isAdded()) {
+            androidx.navigation.NavController navController = Navigation.findNavController(requireView());
+            if (navController.getCurrentDestination() == null
+                    || navController.getCurrentDestination().getId() != R.id.registerFragment) {
+                return;
+            }
+            redirectedToHome = true;
+            navController.navigate(R.id.action_registerfragment_to_homefragment);
+        }
+    }
 }
