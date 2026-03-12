@@ -86,7 +86,7 @@ public class HomeFragment extends Fragment implements Tagged {
             FirebaseFunctionsException.Code code = ((FirebaseFunctionsException) ex).getCode();
             return code == FirebaseFunctionsException.Code.NOT_FOUND;
         }
-        return false;
+        throw new RuntimeException(ex);
     }
 
     private void handleMissingUser() {
