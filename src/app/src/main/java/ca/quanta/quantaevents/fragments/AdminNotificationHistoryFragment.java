@@ -55,9 +55,7 @@ public class AdminNotificationHistoryFragment extends Fragment {
         // **** set up the buttons
 
         binding.backButton.setOnClickListener(
-                v -> {
-                    Navigation.findNavController(v).popBackStack();
-                }
+                v -> Navigation.findNavController(v).popBackStack()
         );
     }
 

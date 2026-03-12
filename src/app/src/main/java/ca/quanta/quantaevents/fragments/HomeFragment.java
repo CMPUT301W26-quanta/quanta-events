@@ -36,6 +36,8 @@ public class HomeFragment extends Fragment implements Tagged {
         infoStore.setSubtitle("Receive lottery selection updates here.");
         infoStore.setIconRes(R.drawable.material_symbols_home_outline);
 
+        Navigation.findNavController(requireView()).navigate(R.id.action_global_adminpanelFragment);
+
         binding.infoButton.setOnClickListener(_view -> {
             NavDirections action = ca.quanta.quantaevents.fragments.HomeFragmentDirections.actionTestFragmentOneToInformationFragment();
             Navigation.findNavController(requireView()).navigate(action);
