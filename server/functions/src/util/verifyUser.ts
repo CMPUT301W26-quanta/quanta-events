@@ -1,10 +1,17 @@
-import { getFirestore } from "firebase-admin/firestore";
+import { DocumentSnapshot, getFirestore } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/https";
+import { UserDocument } from "../schema";
 
-export async function verifyUser(userId: string, deviceId: string) {
+export async function verifyUser(
+  userId: string,
+  deviceId: string
+): Promise<UserDocument> {
   const db = getFirestore();
 
-  const userDoc = await db.collection("users").doc(userId).get();
+  const userDoc: DocumentSnapshot<UserDocument, UserDocument> = (await db
+    .collection("users")
+    .doc(userId)
+    .get()) as DocumentSnapshot<UserDocument, UserDocument>;
 
   if (!userDoc.exists) {
     throw new HttpsError("not-found", "User does not exist");
