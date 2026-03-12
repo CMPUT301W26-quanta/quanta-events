@@ -156,6 +156,9 @@
             app:destination="@id/eventNotificationEditorFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+        <argument
+            android:name="eventId"
+            app:argType="java.util.UUID" />
     </fragment>
 
     <fragment
@@ -228,9 +231,7 @@
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_entranteventbrowserfragment_to_eventqrcodefragment"
-            app:destination="@id/eventQRCodeFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+            app:destination="@id/eventQRCodeFragment" />
     </fragment>
 
     <fragment
@@ -239,10 +240,9 @@
         android:label="fragment_event_qr_code"
         tools:layout="@layout/fragment_event_qr_code">
         <action
-            android:id="@+id/action_eventqrcodefragment_to_eventbrowserfragment"
-            app:destination="@id/eventBrowserFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+            android:id="@+id/action_eventQRCodeFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment"
+            app:popUpTo="@id/eventBrowserFragment" />
     </fragment>
 
     <fragment
@@ -261,7 +261,7 @@
         android:id="@+id/entrantEventHistoryFragment"
         android:name="ca.quanta.quantaevents.fragments.EntrantEventHistoryFragment"
         android:label="fragment_entrant_event_history"
-        tools:layout="@layout/fragment_entrant_event_history" >
+        tools:layout="@layout/fragment_entrant_event_history">
 
         <action
             android:id="@+id/action_eventhistoryfragment_to_entranteventlistfragment"
@@ -301,6 +301,9 @@
             app:destination="@id/eventdashboardFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+        <argument
+            android:name="eventId"
+            app:argType="java.util.UUID" />
     </fragment>
 
     <action
@@ -310,22 +313,22 @@
     <action
         android:id="@+id/action_global_eventdashboardFragment"
         app:destination="@id/eventdashboardFragment"
-        app:popUpTo="@id/nav_graph"/>
+        app:popUpTo="@id/nav_graph" />
     <action
         android:id="@+id/action_global_informationFragment"
         app:destination="@id/informationFragment"
-        app:popUpTo="@id/nav_graph"/>
+        app:popUpTo="@id/nav_graph" />
     <action
         android:id="@+id/action_global_adminpanelFragment"
         app:destination="@id/adminpanelFragment"
-        app:popUpTo="@id/nav_graph"/>
+        app:popUpTo="@id/nav_graph" />
     <action
         android:id="@+id/action_global_accountFragment"
         app:destination="@id/accountFragment"
-        app:popUpTo="@id/nav_graph"/>
+        app:popUpTo="@id/nav_graph" />
     <action
         android:id="@+id/action_global_entranteventlistFragment"
         app:destination="@id/entrantEventListFragment"
-        app:popUpTo="@id/nav_graph"/>
+        app:popUpTo="@id/nav_graph" />
 
 </navigation>

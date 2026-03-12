@@ -71,18 +71,8 @@ public class EventDetailsFragment extends Fragment {
     }
 
     private void readEventId() {
-        Bundle args = getArguments();
-        if (args == null) {
-            return;
-        }
-        String eventIdValue = args.getString("eventId");
-        if (eventIdValue == null) {
-            Bundle data = args.getBundle("data");
-            if (data != null) {
-                eventIdValue = data.getString("eventId");
-            }
-        }
-        eventId = parseUUID(eventIdValue);
+        EventDetailsFragmentArgs args = EventDetailsFragmentArgs.fromBundle(getArguments());
+        eventId = args.getEventId();
         maybeLoadEvent();
     }
 
