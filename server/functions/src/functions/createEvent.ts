@@ -9,11 +9,12 @@ const createEventInterface = util.standardForm(
   z.object({
     registrationStartTime: z.iso.datetime({ offset: true }),
     registrationEndTime: z.iso.datetime({ offset: true }),
+    eventTime: z.iso.datetime({ offset: true }),
     eventName: z.string(),
     eventDescription: z.string(),
     location: z.string(),
-    registrationLimit: z.number().int().optional(),
-    imageId: z.uuid().optional(),
+    registrationLimit: z.number().int().nullable(),
+    imageId: z.uuid().nullable(),
   })
 );
 
@@ -26,6 +27,7 @@ export async function createEvent(request: CallableRequest) {
   const {
     registrationStartTime,
     registrationEndTime,
+    eventTime,
     eventName,
     eventDescription,
     location,
@@ -46,17 +48,19 @@ export async function createEvent(request: CallableRequest) {
       .collection("events")
       .doc(eventId)
       .create({
+        eventId,
         organizer: userId,
         waitList: [],
         cancelledList: [],
         finalList: [],
-        registrationStartTime,
-        registrationEndTime,
+        registrationStartTime: util.toTimestamp(registrationStartTime),
+        registrationEndTime: util.toTimestamp(registrationEndTime),
+        eventTime: util.toTimestamp(eventTime),
         eventName,
         eventDescription,
         location,
-        registrationLimit: registrationLimit || null,
-        imageId: imageId || null,
+        registrationLimit: registrationLimit,
+        imageId: imageId,
       });
   } catch (_) {
     throw new HttpsError("already-exists", "Event already exists");
