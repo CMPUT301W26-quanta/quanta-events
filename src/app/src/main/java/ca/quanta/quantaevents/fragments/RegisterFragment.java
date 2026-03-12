@@ -1,18 +1,10 @@
 package ca.quanta.quantaevents.fragments;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,13 +13,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
-import com.google.android.material.textfield.TextInputEditText;
-
+import java.util.Optional;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
-import ca.quanta.quantaevents.databinding.FragmentAdminProfileBrowserBinding;
-import ca.quanta.quantaevents.viewmodels.UserViewModel;
 import ca.quanta.quantaevents.databinding.FragmentRegisterBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
@@ -37,21 +26,12 @@ import ca.quanta.quantaevents.viewmodels.UserViewModel;
 /**
  * Class which defines the registration screen.
  */
-public class RegisterFragment extends Fragment implements View.OnClickListener {
+public class RegisterFragment extends Fragment {
     private FragmentRegisterBinding binding;
     private static final String TAG = "RegisterFragment";
-
-    private TextInputEditText name;
-    private TextInputEditText email;
-    private TextInputEditText phone;
-    private CheckBox isEntrant;
-    private CheckBox isOrganizer;
-    private CheckBox isAdmin;
-    private CheckBox getNotifications;
     private UserViewModel model;
 
     private SessionStore sessionStore;
-    private Button saveButton;
     private boolean redirectedToHome = false;
 
     /**
@@ -80,25 +60,12 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         infoStore.setSubtitle("Get started by creating an account.");
         infoStore.setIconRes(R.drawable.material_symbols_waving_hand_outline);
 
-        saveButton = view.findViewById(R.id.save_button);
-        saveButton.setOnClickListener(this);
+        model = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
-        name = view.findViewById(R.id.input_name);
-        email = view.findViewById(R.id.input_email);
-        phone = view.findViewById(R.id.input_phone);
-        isEntrant = view.findViewById(R.id.check_entrant);
-        isOrganizer = view.findViewById(R.id.check_organizer);
-        isAdmin = view.findViewById(R.id.check_admin);
-        getNotifications = view.findViewById(R.id.check_notifications);
 
         // **** set up buttons
 
-        binding.saveButton.setOnClickListener(
-                v -> {
-                    NavDirections action = RegisterFragmentDirections.actionRegisterfragmentToHomefragment();
-                    Navigation.findNavController(v).navigate(action);
-                }
-        );
+        binding.saveButton.setOnClickListener(this::onSaveClick);
     }
 
     /**
@@ -106,33 +73,33 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
      *
      * @param v The fragment which the button is associated with.
      */
-    @Override
-    public void onClick(View v) {
+    public void onSaveClick(View v) {
         if (redirectedToHome) {
             return;
         }
-        String name = normalizeEmpty(this.name.getText().toString().trim());
-        String email = normalizeEmpty(this.email.getText().toString().trim());
-        String phone = normalizeEmpty(this.phone.getText().toString().trim());
+        String name = normalizeEmpty(Optional.ofNullable(binding.inputName.getText()).map(e -> e.toString().trim()).orElse(null));
+        String email = normalizeEmpty(Optional.ofNullable(binding.inputEmail.getText()).map(e -> e.toString().trim()).orElse(null));
+        String phone = normalizeEmpty(Optional.ofNullable(binding.inputPhone.getText()).map(e -> e.toString().trim()).orElse(null));
 
-        Boolean isEntrant = this.isEntrant.isChecked();
-        Boolean isOrganizer = this.isOrganizer.isChecked();
-        Boolean isAdmin = this.isAdmin.isChecked();
-        Boolean getNotifications = this.getNotifications.isChecked();
+        Boolean isEntrant = binding.checkEntrant.isChecked();
+        Boolean isOrganizer = binding.checkOrganizer.isChecked();
+        Boolean isAdmin = binding.checkAdmin.isChecked();
+        Boolean getNotifications = binding.checkNotifications.isChecked();
         UUID deviceId = UUID.randomUUID();
-        saveButton.setEnabled(false);
+        binding.saveButton.setEnabled(false);
         model.createUser(name, email, phone, isEntrant, isOrganizer, isAdmin, getNotifications, deviceId)
                 .addOnSuccessListener(userId -> {
                     sessionStore.setSession(userId, deviceId);
-                    saveButton.setEnabled(true);
+                    binding.saveButton.setEnabled(true);
                     android.widget.Toast.makeText(requireContext(), "Account created", android.widget.Toast.LENGTH_LONG).show();
                     tryRedirect();
                 })
                 .addOnFailureListener(ex -> {
-                    saveButton.setEnabled(true);
+                    binding.saveButton.setEnabled(true);
                     Log.e(TAG, "Failed to create account", ex);
                     android.widget.Toast.makeText(requireContext(), "Failed to create account", android.widget.Toast.LENGTH_LONG).show();
                 });
+
     }
 
     private void observeSessionAndRedirect() {
