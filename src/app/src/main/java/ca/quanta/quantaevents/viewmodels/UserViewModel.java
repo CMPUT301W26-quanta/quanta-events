@@ -8,6 +8,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -37,6 +38,7 @@ public class UserViewModel extends ViewModel {
     public Task<UUID> createUser(String name, String email, String phone, Boolean isEntrant, Boolean isOrganizer, Boolean isAdmin, Boolean getNotifications, UUID deviceId) {
         // Arguments for createUser
         Map<String, Object> data = new HashMap<>();
+
         data.put("deviceId", deviceId.toString());
         data.put("name", name);
         data.put("email", email);
@@ -59,6 +61,32 @@ public class UserViewModel extends ViewModel {
                 });
     }
 
+    public Task<ArrayList<User>> getAllUsers() {
+       return functions
+               .getHttpsCallable("getAllUsers")
+               .call(new HashMap<>())
+               .continueWith(new Continuation<HttpsCallableResult, ArrayList<User>>() {
+                   @Override
+                   public ArrayList<User> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                       ArrayList<Map<String, Object>> userObjects = (ArrayList<Map<String, Object>>) task.getResult().getData();
+                       ArrayList<User> users = new ArrayList<User>();
+
+                       for (Map<String, Object> userObject : userObjects) {
+                           // we only get a limited amount of info back about each user
+
+                           String name = (String) userObject.get("name");
+                           Boolean isEntrant = (Boolean) userObject.get("isEntrant");
+                           Boolean isOrganizer = (Boolean) userObject.get("isOrganizer");
+                           Boolean isAdmin = (Boolean) userObject.get("isAdmin");
+
+                           users.add(new User(name, null, null, null, isEntrant, isOrganizer, isAdmin));
+                       }
+
+                       return users;
+                   }
+               });
+    }
+
     /**
      * Calls the getUser cloud function, getting a user's details from the database.
      * @param userId UUID identifying the user.
@@ -67,6 +95,7 @@ public class UserViewModel extends ViewModel {
      */
     public Task<User> getUser(UUID userId, UUID deviceId) {
         Map<String, Object> data = new HashMap<>();
+
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
@@ -77,6 +106,7 @@ public class UserViewModel extends ViewModel {
                     @Override
                     public User then(@NonNull Task<HttpsCallableResult> task) throws Exception {
                         Map<String, Object> userData = (Map<String, Object>) task.getResult().getData();
+
                         String name = (String) userData.get("name");
                         String email = (String) userData.get("email");
                         String phoneNumber = (String) userData.get("phone");
@@ -84,10 +114,11 @@ public class UserViewModel extends ViewModel {
                         Boolean isEntrant = (Boolean) userData.get("isEntrant");
                         Boolean isOrganizer = (Boolean) userData.get("isOrganizer");
                         Boolean isAdmin = (Boolean) userData.get("isAdmin");
+
                         User result = new User(name, email, phoneNumber, receiveNotifications, isEntrant, isOrganizer, isAdmin, userId, deviceId);
+
                         return result;
                     }
                 });
     }
-
 }
