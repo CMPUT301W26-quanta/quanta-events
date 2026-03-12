@@ -183,7 +183,6 @@ public class User {
         } else {
             this.admin = null;
         }
-
     }
 
     public boolean isEntrant() {
