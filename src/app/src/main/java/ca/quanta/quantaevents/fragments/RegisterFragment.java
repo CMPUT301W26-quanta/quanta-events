@@ -94,7 +94,10 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         // **** set up buttons
 
         binding.saveButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_registerfragment_to_homefragment)
+                v -> {
+                    NavDirections action = RegisterFragmentDirections.actionRegisterfragmentToHomefragment();
+                    Navigation.findNavController(v).navigate(action);
+                }
         );
     }
 

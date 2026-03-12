@@ -185,14 +185,6 @@ public class User {
         }
     }
 
-    public String getName() {
-        return this.name;
-    }
-
-    public Boolean isOrganizer() {
-        return this.organizer != null;
-    }
-
     public boolean isEntrant() {
         return entrant != null;
     }
