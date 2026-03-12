@@ -2,7 +2,7 @@ package ca.quanta.quantaevents.models;
 
 import androidx.annotation.Nullable;
 
-import java.util.ArrayList;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -15,8 +15,6 @@ public class User {
      * Class which defines an Entrant.
      */
     public static class Entrant {
-
-        private ArrayList<UUID> enteredEvents;
         private Boolean receiveNotifications;
 
         /**
@@ -25,12 +23,21 @@ public class User {
          * @param receiveNotifications Boolean that's true when the entrant wants to receive notifications, false otherwise.
          */
         Entrant(Boolean receiveNotifications) {
-            this.enteredEvents = new ArrayList<>();
             this.receiveNotifications = receiveNotifications;
         }
 
         public boolean getReceiveNotifications() {
             return receiveNotifications;
+        }
+
+        @Nullable
+        static Entrant fromMap(@Nullable Map<String, Object> map) {
+            if (map == null) {
+                return null;
+            } else {
+                System.out.println(map);
+                return new Entrant((Boolean) map.get("receiveNotifications"));
+            }
         }
     }
 
@@ -38,24 +45,28 @@ public class User {
      * Class which defines an Organizer.
      */
     public static class Organizer {
-
-        private ArrayList<UUID> createdEvents;
-        private ArrayList<UUID> sentNotifications;
-
-        /**
-         * Constructor for an Organizer object.
-         */
-        Organizer() {
-            this.createdEvents = new ArrayList<>();
-            this.sentNotifications = new ArrayList<>();
+        @Nullable
+        static Organizer fromMap(@Nullable Map<String, Object> map) {
+            if (map == null) {
+                return null;
+            } else {
+                return new Organizer();
+            }
         }
-
     }
 
     /**
      * Class which defines an Admin.
      */
     public static class Admin {
+        @Nullable
+        static Admin fromMap(@Nullable Map<String, Object> map) {
+            if (map == null) {
+                return null;
+            } else {
+                return new Admin();
+            }
+        }
     }
 
     @Nullable
@@ -115,6 +126,17 @@ public class User {
             this.admin = null;
         }
 
+    }
+
+    public User(Map<String, Object> httpsResult, UUID userId, UUID deviceId) {
+        this.userId = userId;
+        this.deviceId = deviceId;
+        this.name = (String) httpsResult.get("name");
+        this.email = (String) httpsResult.get("email");
+        this.phoneNumber = (String) httpsResult.get("phone");
+        this.entrant = Entrant.fromMap((Map<String, Object>) httpsResult.get("entrant"));
+        this.organizer = Organizer.fromMap((Map<String, Object>) httpsResult.get("organizer"));
+        this.admin = Admin.fromMap((Map<String, Object>) httpsResult.get("admin"));
     }
 
     /**

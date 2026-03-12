@@ -38,7 +38,7 @@ public class HomeFragment extends Fragment implements Tagged {
 
         binding.infoButton.setOnClickListener(_view -> {
             NavDirections action = ca.quanta.quantaevents.fragments.HomeFragmentDirections.actionTestFragmentOneToInformationFragment();
-            Navigation.findNavController(binding.getRoot()).navigate(action);
+            Navigation.findNavController(requireView()).navigate(action);
         });
 
         new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);

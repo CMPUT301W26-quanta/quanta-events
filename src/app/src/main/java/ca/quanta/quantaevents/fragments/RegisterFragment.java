@@ -1,15 +1,7 @@
 package ca.quanta.quantaevents.fragments;
 
-import androidx.lifecycle.ViewModelProvider;
-
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.util.Log;
-import androidx.navigation.Navigation;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -27,7 +20,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
-import ca.quanta.quantaevents.viewmodels.UserViewModel;
 import ca.quanta.quantaevents.databinding.FragmentRegisterBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
@@ -96,6 +88,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Listener for the save button that extracts text input and check box values.
+     *
      * @param v The fragment which the button is associated with.
      */
     @Override
@@ -151,7 +144,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
                 return;
             }
             redirectedToHome = true;
-            navController.navigate(R.id.action_registerfragment_to_homefragment);
+            NavDirections action = RegisterFragmentDirections.actionRegisterfragmentToHomefragment();
+            navController.navigate(action);
         }
     }
 }

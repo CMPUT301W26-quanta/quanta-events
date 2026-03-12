@@ -14,7 +14,6 @@ import androidx.navigation.Navigation;
 
 import com.google.firebase.functions.FirebaseFunctionsException;
 
-import java.util.Map;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
@@ -61,7 +60,7 @@ public class AccountFragment extends Fragment implements Tagged {
         );
         binding.saveButton.setOnClickListener(
                 v -> {
-                    NavDirections action = AccountFragmentDirections.actionAccountfragmentToHomefragment()
+                    NavDirections action = AccountFragmentDirections.actionAccountfragmentToHomefragment();
                     Navigation.findNavController(v).navigate(action);
                 }
         );
@@ -85,10 +84,11 @@ public class AccountFragment extends Fragment implements Tagged {
                     if (isUserNotFound(ex)) {
                         handleMissingUser();
                     }
-                });
+                }).addOnCanceledListener(this::handleMissingUser);
     }
 
     private void populateFields(@NonNull User user) {
+        System.out.println(user);
 
         binding.inputName.setText(user.getName());
         binding.inputEmail.setText(user.getEmail());
@@ -97,10 +97,11 @@ public class AccountFragment extends Fragment implements Tagged {
         binding.checkEntrant.setChecked(user.isEntrant());
         binding.checkOrganizer.setChecked(user.isOrganizer());
         binding.checkAdmin.setChecked(user.isAdmin());
-        
+
         User.Entrant entrant = user.getEntrant();
-        assert entrant != null;
-        binding.checkNotifications.setChecked(entrant.getReceiveNotifications());
+        if (entrant != null) {
+            binding.checkNotifications.setChecked(entrant.getReceiveNotifications());
+        }
     }
 
     private static String stringValue(Object value) {
@@ -115,12 +116,14 @@ public class AccountFragment extends Fragment implements Tagged {
         if (ex instanceof FirebaseFunctionsException) {
             FirebaseFunctionsException.Code code = ((FirebaseFunctionsException) ex).getCode();
             return code == FirebaseFunctionsException.Code.NOT_FOUND;
+        } else {
+            throw new RuntimeException(ex);
         }
-        return false;
     }
 
     private void handleMissingUser() {
         sessionStore.clearSession();
+        System.out.println("MISSING USER");
         if (isAdded()) {
             NavDirections action = AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
             Navigation.findNavController(requireView()).navigate(action);
