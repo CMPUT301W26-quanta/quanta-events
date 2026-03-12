@@ -59,6 +59,6 @@ export async function deleteUser(request: CallableRequest) {
 
   await db.collection("users").doc(target).delete();
 
-  logger.info("Deleted user and all references", { userId, target });
+  logger.info("Deleted user and all references", { target });
   return {};
 };
