@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import com.google.firebase.functions.FirebaseFunctionsException;
@@ -19,6 +20,7 @@ import java.util.UUID;
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentAccountBinding;
+import ca.quanta.quantaevents.models.User;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
@@ -52,10 +54,16 @@ public class AccountFragment extends Fragment implements Tagged {
         });
 
         binding.deleteButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_accountfragment_to_registerfragment)
+                v -> {
+                    NavDirections action = AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
+                    Navigation.findNavController(v).navigate(action);
+                }
         );
         binding.saveButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_accountfragment_to_homefragment)
+                v -> {
+                    NavDirections action = AccountFragmentDirections.actionAccountfragmentToHomefragment()
+                    Navigation.findNavController(v).navigate(action);
+                }
         );
 
     }
@@ -71,7 +79,7 @@ public class AccountFragment extends Fragment implements Tagged {
         if (userId == null || deviceId == null) {
             return;
         }
-        userModel.getUserRaw(userId, deviceId)
+        userModel.getUser(userId, deviceId)
                 .addOnSuccessListener(this::populateFields)
                 .addOnFailureListener(ex -> {
                     if (isUserNotFound(ex)) {
@@ -80,32 +88,19 @@ public class AccountFragment extends Fragment implements Tagged {
                 });
     }
 
-    @SuppressWarnings("unchecked")
-    private void populateFields(Map<String, Object> userData) {
-        if (userData == null) {
-            return;
-        }
+    private void populateFields(@NonNull User user) {
 
-        binding.inputName.setText(stringValue(userData.get("name")));
-        binding.inputEmail.setText(stringValue(userData.get("email")));
-        binding.inputPhone.setText(stringValue(userData.get("phone")));
+        binding.inputName.setText(user.getName());
+        binding.inputEmail.setText(user.getEmail());
+        binding.inputPhone.setText(user.getPhoneNumber());
 
-        Object entrant = userData.get("entrant");
-        Object organizer = userData.get("organizer");
-        Object admin = userData.get("admin");
-
-        binding.checkEntrant.setChecked(entrant instanceof Map);
-        binding.checkOrganizer.setChecked(organizer instanceof Map);
-        binding.checkAdmin.setChecked(admin instanceof Map);
-
-        boolean receiveNotifications = false;
-        if (entrant instanceof Map) {
-            Object receive = ((Map<String, Object>) entrant).get("receiveNotifications");
-            if (receive instanceof Boolean) {
-                receiveNotifications = (Boolean) receive;
-            }
-        }
-        binding.checkNotifications.setChecked(receiveNotifications);
+        binding.checkEntrant.setChecked(user.isEntrant());
+        binding.checkOrganizer.setChecked(user.isOrganizer());
+        binding.checkAdmin.setChecked(user.isAdmin());
+        
+        User.Entrant entrant = user.getEntrant();
+        assert entrant != null;
+        binding.checkNotifications.setChecked(entrant.getReceiveNotifications());
     }
 
     private static String stringValue(Object value) {
@@ -114,17 +109,6 @@ public class AccountFragment extends Fragment implements Tagged {
         }
         String result = value.toString().trim();
         return result;
-    }
-
-    private static UUID parseUUID(@Nullable String value) {
-        if (value == null || value.isEmpty()) {
-            return null;
-        }
-        try {
-            return UUID.fromString(value);
-        } catch (IllegalArgumentException ex) {
-            return null;
-        }
     }
 
     private boolean isUserNotFound(Exception ex) {
@@ -138,7 +122,8 @@ public class AccountFragment extends Fragment implements Tagged {
     private void handleMissingUser() {
         sessionStore.clearSession();
         if (isAdded()) {
-            Navigation.findNavController(requireView()).navigate(R.id.registerFragment);
+            NavDirections action = AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
+            Navigation.findNavController(requireView()).navigate(action);
         }
     }
 
