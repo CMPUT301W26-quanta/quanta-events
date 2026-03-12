@@ -8,10 +8,10 @@ const updateUserInterface = z.object({
   userId: z.uuid(),
   deviceId: z.uuid(),
   data: z.object({
-    name: z.string(),
-    email: z.email(),
-    phone: z.string().optional(),
-    receiveNotifications: z.boolean().optional(),
+    name: z.string().nullable(),
+    email: z.email().nullable(),
+    phone: z.string().nullable(),
+    receiveNotifications: z.boolean().nullable(),
   }),
 });
 
