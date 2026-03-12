@@ -48,19 +48,22 @@ public class SmartBurger {
 
         @Nullable
         final Integer group;
+        final String label;
 
-        ItemData(Navigator navigator, @DrawableRes int icon, int order) {
+        ItemData(Navigator navigator, @DrawableRes int icon, int order, String label) {
             this.navigator = navigator;
             this.icon = icon;
             this.order = order;
             group = null;
+            this.label = label;
         }
 
-        ItemData(Navigator navigator, @DrawableRes int icon, int group, int order) {
+        ItemData(Navigator navigator, @DrawableRes int icon, int group, int order, String label) {
             this.navigator = navigator;
             this.icon = icon;
             this.order = order;
             this.group = group;
+            this.label = label;
         }
 
         Navigator getNavigator() {
@@ -80,6 +83,7 @@ public class SmartBurger {
         public Integer getGroup() {
             return group;
         }
+
     }
 
     private final AppCompatActivity activity;
@@ -109,10 +113,11 @@ public class SmartBurger {
      * @param fragment  The fragment to register
      * @param icon      The icon to associate with this fragment
      * @param navigator The {@link NavDirections} provider to navigate to the given fragment
+     * @param label     The label for this fragments burger menu button
      * @return The same {@link SmartBurger} to allow method chaining
      */
-    public <F extends Fragment & Tagged> SmartBurger with(F fragment, @DrawableRes int icon, Navigator navigator) {
-        items.put(fragment.getUniqueTag(), new ItemData(navigator, icon, this.items.size()));
+    public <F extends Fragment & Tagged> SmartBurger with(F fragment, @DrawableRes int icon, String label, Navigator navigator) {
+        items.put(fragment.getUniqueTag(), new ItemData(navigator, icon, this.items.size(), label));
         return this;
     }
 
@@ -123,10 +128,11 @@ public class SmartBurger {
      * @param icon      The icon to associate with this fragment
      * @param group     The group of this fragment. Should be either the bitmasks {@link #ENTRANT_GROUP}, {@link #ORGANIZER_GROUP}, or {@link #ADMIN_GROUP}
      * @param navigator The {@link NavDirections} provider to navigate to the given fragment
+     * @param label     The label for this fragments burger menu button
      * @return The same {@link SmartBurger} to allow method chaining
      */
-    public <F extends Fragment & Tagged> SmartBurger with(F fragment, @DrawableRes int icon, int group, Navigator navigator) {
-        items.put(fragment.getUniqueTag(), new ItemData(navigator, icon, group, this.items.size()));
+    public <F extends Fragment & Tagged> SmartBurger with(F fragment, @DrawableRes int icon, int group, String label, Navigator navigator) {
+        items.put(fragment.getUniqueTag(), new ItemData(navigator, icon, group, this.items.size(), label));
         return this;
     }
 
@@ -134,6 +140,7 @@ public class SmartBurger {
 
     public void inject() {
         rootButton = createButton(R.drawable.menu_to_close);
+        rootButton.setContentDescription("Open Menu");
         rootButton.setOnClickListener(_view -> this.toggle());
         rootButton.setVisibility(GONE);
         layout.addView(rootButton);
@@ -205,6 +212,7 @@ public class SmartBurger {
                 Integer group = entry.getValue().getGroup();
                 if (group == null || ((group & groupFilter) > 0)) {
                     ImageButton button = createButton(entry.getValue().getIcon());
+                    button.setContentDescription(entry.getValue().label);
                     button.setScaleX(0.8f);
                     button.setScaleY(0.8f);
                     button.setAlpha(0.8f);
