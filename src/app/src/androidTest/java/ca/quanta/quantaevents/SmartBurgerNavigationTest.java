@@ -2,6 +2,8 @@ package ca.quanta.quantaevents;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
@@ -34,8 +36,13 @@ public class SmartBurgerNavigationTest {
     public void skipRegistration() {
         try {
             waitForView(withId(R.id.save_button));
+
+            onView(withId(R.id.input_name)).perform(typeText("Test User"), closeSoftKeyboard());
+
+            onView(withId(R.id.input_email)).perform(typeText("test@example.com"), closeSoftKeyboard());
+
             onView(withId(R.id.save_button)).perform(click());
-        } catch (Exception e) {
+        } catch (Throwable e) {
 
         }
     }
