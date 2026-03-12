@@ -29,7 +29,7 @@ public class EventNotificationEditorFragment extends Fragment {
         infoStore.setIconRes(R.drawable.material_symbols_notification_add_outline);
 
         binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_sendnotificationfragment_to_eventmanagerfragment)
+                v -> Navigation.findNavController(v).popBackStack()
         );
     }
 

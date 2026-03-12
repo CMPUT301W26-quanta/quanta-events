@@ -7,13 +7,13 @@ import { getFirestore } from "firebase-admin/firestore";
 
 const createUserInterface = z.object({
   deviceId: z.uuid(),
-  name: z.string().optional(),
-  email: z.email().optional(),
-  phone: z.string().optional(),
-  receiveNotifications: z.boolean().optional(),
-  isEntrant: z.boolean().optional(),
-  isOrganizer: z.boolean().optional(),
-  isAdmin: z.boolean().optional(),
+  name: z.string().nullable(),
+  email: z.email().nullable(),
+  phone: z.string().nullable(),
+  receiveNotifications: z.boolean().nullable(),
+  isEntrant: z.boolean().nullable(),
+  isOrganizer: z.boolean().nullable(),
+  isAdmin: z.boolean().nullable(),
 });
 
 export async function createUser(request: CallableRequest) {
@@ -37,12 +37,13 @@ export async function createUser(request: CallableRequest) {
       .doc(userId)
       .create({
         deviceId,
-        ...(name && { name }),
-        ...(email && { email }),
-        ...(phone && { phone }),
+        name: name,
+        email: email,
+        phone: phone,
         entrant: isEntrant
           ? {
               enteredEvents: [],
+              history: [],
               receiveNotifications: receiveNotifications ?? false,
             }
           : null,

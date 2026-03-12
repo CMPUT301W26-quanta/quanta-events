@@ -9,7 +9,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
+
+import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentEventManagerBinding;
@@ -17,6 +20,7 @@ import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
 public class EventManagerFragment extends Fragment {
     private FragmentEventManagerBinding binding;
+    private UUID eventId;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -27,20 +31,36 @@ public class EventManagerFragment extends Fragment {
         infoStore.setSubtitle("Manage your Events");
         infoStore.setIconRes(R.drawable.material_symbols_edit_outline);
 
+        readEventId();
+
         binding.editDetailsButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_eventmanagerfragment_to_eventdetailsfragment)
+                v -> {
+                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToCreateeditorfragment(eventId);
+                    Navigation.findNavController(v).navigate(action);
+                }
         );
         binding.shareQrButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_eventmanagerfragment_to_showqrfragment)
+                v -> {
+                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToShowqrfragment(eventId);
+                    Navigation.findNavController(v).navigate(action);
+                }
         );
         binding.viewWaitListButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_eventmanagerfragment_to_eventwaitinglistfragment)
+                v -> {
+                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToEventwaitinglistfragment(eventId);
+                    Navigation.findNavController(v).navigate(action);
+                }
         );
         binding.sendNotificationButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_eventmanagerfragment_to_sendnotificationfragment)
+                v -> {
+                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToSendnotificationfragment(eventId);
+                    Navigation.findNavController(v).navigate(action);
+                }
         );
         binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_eventmanagerfragment_to_eventdetailsfragment)
+                v -> {
+                    Navigation.findNavController(v).popBackStack();
+                }
         );
 
     }
@@ -50,5 +70,10 @@ public class EventManagerFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentEventManagerBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    private void readEventId() {
+        EventManagerFragmentArgs args = EventManagerFragmentArgs.fromBundle(getArguments());
+        eventId = args.getEventId();
     }
 }

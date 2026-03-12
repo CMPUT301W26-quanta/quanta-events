@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import java.util.UUID;
@@ -37,9 +36,8 @@ public class InformationFragment extends Fragment implements Tagged {
         infoStore.setSubtitle("Lottery selection information here.");
         infoStore.setIconRes(R.drawable.material_symbols_info_outline);
 
-        binding.backButton.setOnClickListener(_view -> {
-            NavDirections action = InformationFragmentDirections.actionGlobalHomeFragment();
-            Navigation.findNavController(binding.getRoot()).navigate(action);
+        binding.backButton.setOnClickListener(v -> {
+            Navigation.findNavController(requireView()).popBackStack();
         });
     }
 
