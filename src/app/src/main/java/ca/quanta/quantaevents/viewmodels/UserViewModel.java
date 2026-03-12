@@ -87,6 +87,67 @@ public class UserViewModel extends ViewModel {
     }
 
     /**
+     * Calls the deleteUser cloud function, deleting a user.
+     * @param userId UUID identifying the user.
+     * @param deviceId UUID identifying the user's device.
+     * @return True when delete completes.
+     */
+    public Task<Boolean> deleteUser(UUID userId, UUID deviceId, UUID targetUserId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("target", targetUserId.toString());
+        data.put("data", payload);
+
+        return FirebaseFunctions.getInstance()
+                .getHttpsCallable("deleteUser")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, Boolean>() {
+                    @Override
+                    public Boolean then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                        return true;
+                    }
+                });
+    }
+
+    /**
+     * Calls the updateUser cloud function, updating a user's details.
+     * @param userId UUID identifying the user.
+     * @param deviceId UUID identifying the user's device.
+     * @param name Updated user name.
+     * @param email Updated user email.
+     * @param phone Updated phone (optional).
+     * @param receiveNotifications Updated notification preference (optional).
+     * @return UUID identifying the user's ID.
+     */
+    public Task<String> updateUser(UUID userId, UUID deviceId, String name, String email,
+                                   String phone, Boolean receiveNotifications) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("name", name);
+        payload.put("email", email);
+        payload.put("phone", phone);
+        payload.put("receiveNotifications", receiveNotifications);
+        data.put("data", payload);
+
+        return FirebaseFunctions.getInstance()
+                .getHttpsCallable("updateUser")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, String>() {
+                    @Override
+                    public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
+                        return (String) result.get("userId");
+                    }
+                });
+    }
+
+    /**
      * Calls the getUser cloud function, returning the raw user map.
      *
      * @param userId   UUID identifying the user.
