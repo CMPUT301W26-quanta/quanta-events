@@ -8,7 +8,7 @@ import { getFirestore } from "firebase-admin/firestore";
 const createNotificationInterface = util.standardForm(
   z.object({
     senderId: z.uuid(),
-    recipientIds: z.array(z.uuid()).optional(),
+    recipients: z.enum(["wonLottery", "lostLottery", "waiting", "cancelled", "selectedFromWaitlist"]).nullable(),
     message: z.string().optional(),
     title: z.string().optional(),
   })
@@ -16,12 +16,13 @@ const createNotificationInterface = util.standardForm(
 
 export async function createNotification(request: CallableRequest) {
 
+  // TODO Find a way to send the notification
   const { userId, deviceId, data } = util.parseInterface(
       createNotificationInterface,
       request
     );
   
-    const { senderId, recipientIds, message, title } = data;
+    const { senderId, recipients, message, title } = data;
   
     const userData = await util.verifyUser(userId, deviceId);
     await util.requireRole(userData, "organizer");
@@ -36,7 +37,7 @@ export async function createNotification(request: CallableRequest) {
       .doc(notificationId)
       .create({
         senderId,
-        recipientIds,
+        recipients,
         message,
         title,
       });
