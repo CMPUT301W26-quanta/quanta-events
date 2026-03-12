@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import java.util.UUID;
@@ -31,10 +32,16 @@ public class AdminPanelFragment extends Fragment implements Tagged {
         infoStore.setSubtitle("Access moderation tools");
         infoStore.setIconRes(R.drawable.material_symbols_security);
         binding.adminBrowseEventsButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_adminpanelFragment_to_admineventbrowserFragment)
+                v -> {
+                    NavDirections action = AdminPanelFragmentDirections.actionAdminpanelFragmentToAdmineventbrowserFragment();
+                    Navigation.findNavController(v).navigate(action);
+                }
         );
         binding.adminBrowseProfilesButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_adminpanelFragment_to_adminprofilebrowserFragment)
+                v -> {
+                    NavDirections action = AdminPanelFragmentDirections.actionAdminpanelFragmentToAdminprofilebrowserFragment();
+                    Navigation.findNavController(v).navigate(action);
+                }
         );
         new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
     }

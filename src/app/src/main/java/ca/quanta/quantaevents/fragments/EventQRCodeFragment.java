@@ -1,5 +1,9 @@
 package ca.quanta.quantaevents.fragments;
 
+import static android.view.View.GONE;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,9 +11,14 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
+
+import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentEventQrCodeBinding;
@@ -27,8 +36,46 @@ public class EventQRCodeFragment extends Fragment {
         infoStore.setSubtitle("Scan a promotional QR code");
         infoStore.setIconRes(R.drawable.material_symbols_qr_code_outline);
         binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_eventqrcodefragment_to_eventbrowserfragment)
+                v -> Navigation.findNavController(binding.getRoot()).popBackStack()
         );
+
+        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    new String[]{Manifest.permission.CAMERA},
+                    100
+            );
+        }
+
+        binding.qrCodeScanner.getStatusView().setVisibility(GONE);
+
+        binding.qrCodeScanner.decodeContinuous(result -> {
+            String text = result.getText();
+            if (text.startsWith("quanta-events:")) {
+                String uuidStr = text.substring(14);
+                try {
+                    UUID uuid = UUID.fromString(uuidStr);
+                    NavDirections action = EventQRCodeFragmentDirections.actionEventQRCodeFragmentToEventDetailsFragment(uuid);
+                    Navigation.findNavController(binding.getRoot()).navigate(action);
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        binding.qrCodeScanner.resume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        binding.qrCodeScanner.pause();
     }
 
     @Override
