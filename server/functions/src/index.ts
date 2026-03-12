@@ -49,3 +49,5 @@ export const deleteUser = onCall({ maxInstances: 1}, functions.deleteUser);
 export const updateUser = onCall({ maxInstances: 1}, functions.updateUser);
 
 export const createNotification = onCall({ maxInstances: 1}, functions.createNotification);
+
+export const getNotification = onCall({ maxInstances: 1}, functions.getNotification);
