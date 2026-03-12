@@ -1,7 +1,15 @@
 package ca.quanta.quantaevents.fragments;
 
+import androidx.lifecycle.ViewModelProvider;
+
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import android.util.Log;
+import androidx.navigation.Navigation;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +27,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
+import ca.quanta.quantaevents.viewmodels.UserViewModel;
 import ca.quanta.quantaevents.databinding.FragmentRegisterBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
