@@ -58,8 +58,6 @@ public class HomeFragment extends Fragment implements Tagged {
         });
 
         new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
-
-        Navigation.findNavController(requireView()).navigate(R.id.action_global_adminpanelFragment);
     }
 
     @Override
