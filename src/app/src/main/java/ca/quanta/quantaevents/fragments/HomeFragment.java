@@ -35,7 +35,6 @@ public class HomeFragment extends Fragment implements Tagged {
         // Required empty public constructor
     }
 
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -59,6 +58,8 @@ public class HomeFragment extends Fragment implements Tagged {
         });
 
         new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
+
+        Navigation.findNavController(requireView()).navigate(R.id.action_global_adminpanelFragment);
     }
 
     @Override
