@@ -10,6 +10,7 @@ import com.google.firebase.functions.HttpsCallableResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,7 +21,6 @@ import ca.quanta.quantaevents.models.User;
  */
 public class UserViewModel extends ViewModel {
     // Initialize an instance of cloud functions
-
 
     /**
      * Calls the createUser cloud function, adding a user to the database.
@@ -63,13 +63,13 @@ public class UserViewModel extends ViewModel {
     }
 
     public Task<ArrayList<User>> getAllUsers() {
-       return functions
+       return FirebaseFunctions.getInstance()
                .getHttpsCallable("getAllUsers")
                .call(new HashMap<>())
                .continueWith(new Continuation<HttpsCallableResult, ArrayList<User>>() {
                    @Override
                    public ArrayList<User> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                       ArrayList<Map<String, Object>> userObjects = (ArrayList<Map<String, Object>>) task.getResult().getData();
+                       List<Map<String, Object>> userObjects = (List<Map<String, Object>>) task.getResult().getData();
                        ArrayList<User> users = new ArrayList<User>();
 
                        for (Map<String, Object> userObject : userObjects) {

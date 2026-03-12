@@ -185,18 +185,6 @@ public class User {
         }
     }
 
-<<<<<<< HEAD
-    public String getName() {
-        return this.name;
-    }
-
-    public Boolean isOrganizer() {
-        return this.organizer != null;
-    }
-
-    public Boolean isAdmin() {
-        return this.admin != null;
-=======
     public boolean isEntrant() {
         return entrant != null;
     }
@@ -233,6 +221,5 @@ public class User {
     @Nullable
     public String getPhoneNumber() {
         return phoneNumber;
->>>>>>> main
     }
 }
