@@ -28,7 +28,7 @@ public class EventWaitingListFragment extends Fragment {
         infoStore.setIconRes(R.drawable.material_symbols_group_outline);
 
         binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_eventwaitinglistfragment_to_eventmanagerfragment)
+                v -> Navigation.findNavController(v).popBackStack()
         );
     }
 

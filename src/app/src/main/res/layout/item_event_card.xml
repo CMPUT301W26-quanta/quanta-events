@@ -14,22 +14,22 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="12dp"
         android:gravity="center_vertical">
 
         <!-- Event Image -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/event_image"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
             android:scaleType="centerCrop"
             android:src="@drawable/material_symbols_image_rounded"
             app:shapeAppearanceOverlay="@style/RoundedImage" />
 
         <!-- Event Information-->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
@@ -54,19 +54,17 @@
                     android:maxLines="1"
                     android:ellipsize="end" />
 
-                <TextView
+                <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="↗"
-                    android:textSize="16sp"
-                    android:textColor="@color/text_color" />
+                    android:src="@drawable/material_symbols_arrow_north_east"/>
 
             </LinearLayout>
 
             <!-- Time -->
             <TextView
                 android:id="@+id/event_time"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="🕐 Some Time"
@@ -76,7 +74,7 @@
             <!-- Location -->
             <TextView
                 android:id="@+id/event_location"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:text="🗺️ Some location"

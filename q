@@ -1,4 +1,4 @@
-[33mbea2d86[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mcreate_some_unadded_adapters_and_fragments[m[33m, [m[1;32mget_all_users_feature_impl[m[33m)[m merge main into branch
+[33mbea2d86[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mcreate_some_unadded_adapters_and_fragments[m[33m)[m merge main into branch
 [33m6ee2f47[m[33m ([m[1;31morigin/update_register_save_button[m[33m, [m[1;32mupdate_register_save_button[m[33m, [m[1;32mmain[m[33m)[m make register page save button take you to home page
 [33m68c262d[m Added deleteUser() and updateUser() (#76)
 [33m7c86d86[m[33m ([m[1;31morigin/create_profile_adapter_and_some_unadded_fragments[m[33m)[m create notification cars and notification adapter; update some of the ui to match the storyboards better

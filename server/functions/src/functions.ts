@@ -8,4 +8,5 @@ export * from "./functions/getImage";
 export * from "./functions/getUser";
 export * from "./functions/health";
 export * from "./functions/updateUser";
-
+export * from "./functions/createNotification";
+export * from "./functions/getEvents";

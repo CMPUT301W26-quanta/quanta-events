@@ -28,7 +28,7 @@ public class EventFilterFragment extends Fragment {
         infoStore.setIconRes(R.drawable.material_symbols_filter_alt_outline);
 
         binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_eventfilterfragment_to_eventbrowserfragment)
+                v -> Navigation.findNavController(v).popBackStack()
         );
     }
 

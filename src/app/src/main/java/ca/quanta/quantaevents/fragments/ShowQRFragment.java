@@ -12,6 +12,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import java.util.UUID;
+
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentShowQrBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
@@ -19,9 +21,13 @@ import ca.quanta.quantaevents.stores.FragmentInfoStore;
 public class ShowQRFragment extends Fragment {
     private FragmentShowQrBinding binding;
 
+    private UUID eventId;
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        eventId = ShowQRFragmentArgs.fromBundle(getArguments()).getEventId();
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
         infoStore.setTitle("QR Code");
@@ -29,7 +35,7 @@ public class ShowQRFragment extends Fragment {
         infoStore.setIconRes(R.drawable.material_symbols_group_outline);
 
         binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_showqrfragment_to_eventmanagerfragment)
+                v -> Navigation.findNavController(v).popBackStack()
         );
 
         binding.shareButton.setOnClickListener(v -> {

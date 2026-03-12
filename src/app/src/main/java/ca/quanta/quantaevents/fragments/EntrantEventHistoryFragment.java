@@ -28,7 +28,7 @@ public class EntrantEventHistoryFragment extends Fragment {
         infoStore.setIconRes(R.drawable.material_symbols_history);
 
         binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).navigate(R.id.action_eventhistoryfragment_to_entranteventlistfragment)
+                v -> Navigation.findNavController(v).popBackStack()
         );
     }
 
