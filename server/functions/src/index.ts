@@ -58,6 +58,8 @@ export const joinWaitlist = onCall({ maxInstances: 1}, functions.joinWaitlist);
 
 export const leaveWaitlist = onCall({ maxInstances: 1}, functions.leaveWaitlist);
 
+export const inWaitlist = onCall({ maxInstances:1 }, functions.inWaitlist);
+
 export const createNotification = onCall(
   { maxInstances: 1 },
   functions.createNotification
