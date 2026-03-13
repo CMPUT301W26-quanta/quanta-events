@@ -181,9 +181,6 @@ public class EventDetailsFragment extends Fragment {
             return;
         }
 
-        UUID organizerId = event.getOrganizerId();
-        UUID organizerDeviceId = event.getOrganizerDeviceId();
-
         binding.textOrganizer.setText(" Loading organizer name...");
 
         eventModel.getOrganizerName(userId, deviceId, eventId)
