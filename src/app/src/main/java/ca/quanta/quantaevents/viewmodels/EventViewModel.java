@@ -11,6 +11,7 @@ import com.google.firebase.functions.HttpsCallableResult;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,23 +25,64 @@ public class EventViewModel extends ViewModel {
     // Initialize an instance of cloud functions
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
+    public enum Fetch {
+        ALL("all"),
+        CREATED("created"),
+        AVAILABLE("available"),
+        IN("in"),
+        HISTORY("history");
+
+        private final String value;
+
+        Fetch(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    public enum SortBy {
+        REGISTRATION_END("registrationEnd"),
+        REGISTRATION_START("registrationStart"),
+        NAME("name");
+
+        private final String value;
+
+        SortBy(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
     /**
      * Calls the createEvent cloud function, adding an event to the database.
      * @param userId UUID identifying the organizer user.
      * @param deviceId UUID identifying the user's device.
      * @param registrationStartTime ISO-8601 datetime with offset (UTC preferred).
      * @param registrationEndTime ISO-8601 datetime with offset (UTC preferred).
+     * @param eventTime ISO-8601 datetime with offset (UTC preferred).
      * @param eventName Name of the event.
      * @param eventDescription Description of the event.
+     * @param eventCategory Category (optional).
+     * @param eventGuidelines Guidelines (optional).
+     * @param geolocation Whether geolocation is enabled.
+     * @param eventCapacity Entrant capacity.
      * @param location Location of the event.
-     * @param registrationLimit Maximum number of entrants allowed to join the event (optional).
+     * @param registrationLimit Waitlist capacity (optional).
      * @param imageId UUID identifying the image for the event (optional).
      * @return UUID identifying the event's ID.
      */
     public Task<String> createEvent(UUID userId, UUID deviceId, String registrationStartTime,
-                                    String registrationEndTime, String eventName,
-                                    String eventDescription, String location,
-                                    Integer registrationLimit, UUID imageId) {
+                                    String registrationEndTime, String eventTime,
+                                    String eventName, String eventDescription,
+                                    String eventCategory, String eventGuidelines,
+                                    boolean geolocation, int eventCapacity,
+                                    String location, Integer registrationLimit, UUID imageId) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -48,15 +90,16 @@ public class EventViewModel extends ViewModel {
         Map<String, Object> payload = new HashMap<>();
         payload.put("registrationStartTime", registrationStartTime);
         payload.put("registrationEndTime", registrationEndTime);
+        payload.put("eventTime", eventTime);
         payload.put("eventName", eventName);
         payload.put("eventDescription", eventDescription);
+        payload.put("eventCategory", eventCategory);
+        payload.put("eventGuidelines", eventGuidelines);
+        payload.put("geolocation", geolocation);
+        payload.put("eventCapacity", eventCapacity);
         payload.put("location", location);
-        if (registrationLimit != null) {
-            payload.put("registrationLimit", registrationLimit);
-        }
-        if (imageId != null) {
-            payload.put("imageId", imageId.toString());
-        }
+        payload.put("registrationLimit", registrationLimit);
+        payload.put("imageId", imageId == null ? null : imageId.toString());
         data.put("data", payload);
 
         return functions
@@ -99,6 +142,62 @@ public class EventViewModel extends ViewModel {
                 });
     }
 
+    /**
+     * Calls the getEvents cloud function, returning a list of Event models.
+     * @param userId UUID identifying the user.
+     * @param deviceId UUID identifying the user's device.
+     * @param max Max number of events to return.
+     * @param startFrom Event ID to start after (optional).
+     * @param fetch Filter mode.
+     * @param startDate ISO-8601 datetime with offset (optional).
+     * @param endDate ISO-8601 datetime with offset (optional).
+     * @param search Search string (optional).
+     * @param sortBy Sort mode.
+     * @return List of Event objects.
+     */
+    public Task<List<Event>> getEvents(UUID userId, UUID deviceId, int max,
+                                       UUID startFrom, Fetch fetch,
+                                       String startDate, String endDate,
+                                       String search, SortBy sortBy) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> filter = new HashMap<>();
+        filter.put("fetch", fetch.getValue());
+        filter.put("startDate", startDate);
+        filter.put("endDate", endDate);
+        filter.put("search", search);
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("max", max);
+        payload.put("startFrom", startFrom == null ? null : startFrom.toString());
+        payload.put("filter", filter);
+        payload.put("sortBy", sortBy.getValue());
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("getEvents")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, List<Event>>() {
+                    @Override
+                    public List<Event> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                        List<Map<String, Object>> result = (List<Map<String, Object>>) task.getResult().getData();
+                        ArrayList<Event> events = new ArrayList<>();
+                        if (result == null) {
+                            return events;
+                        }
+                        for (Map<String, Object> item : result) {
+                            Event event = mapToEvent(item);
+                            if (event != null) {
+                                events.add(event);
+                            }
+                        }
+                        return events;
+                    }
+                });
+    }
+
 
     @SuppressWarnings("unchecked")
     private static Event mapToEvent(UUID eventId, Map<String, Object> data) {
@@ -112,15 +211,33 @@ public class EventViewModel extends ViewModel {
 
         ZonedDateTime start = parseZonedDateTime(valueToString(data.get("registrationStartTime")));
         ZonedDateTime end = parseZonedDateTime(valueToString(data.get("registrationEndTime")));
+        ZonedDateTime eventTime = parseZonedDateTime(valueToString(data.get("eventTime")));
 
         String eventName = valueToString(data.get("eventName"));
         String eventDescription = valueToString(data.get("eventDescription"));
         String location = valueToString(data.get("location"));
+        String eventCategory = valueToString(data.get("eventCategory"));
+        String eventGuidelines = valueToString(data.get("eventGuidelines"));
+        boolean geolocation = Boolean.TRUE.equals(data.get("geolocation"));
+        Integer eventCapacity = parseInteger(data.get("eventCapacity"));
         Integer registrationLimit = parseInteger(data.get("registrationLimit"));
         UUID imageId = parseUUID(valueToString(data.get("imageId")));
 
         return new Event(eventId, organizerId, waitList, cancelledList, finalList,
-                start, end, eventName, eventDescription, location, registrationLimit, imageId);
+                start, end, eventTime, eventName, eventDescription, location,
+                eventCategory, eventGuidelines, geolocation, eventCapacity,
+                registrationLimit, imageId);
+    }
+
+    private static Event mapToEvent(Map<String, Object> data) {
+        if (data == null) {
+            return null;
+        }
+        UUID eventId = parseUUID(valueToString(data.get("eventId")));
+        if (eventId == null) {
+            return null;
+        }
+        return mapToEvent(eventId, data);
     }
 
     private static String valueToString(Object value) {
