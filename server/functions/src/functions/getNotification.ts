@@ -18,8 +18,7 @@ export async function getNotification(request: CallableRequest) {
 
   const { notificationId } = data;
 
-  const userData = await util.verifyUser(userId, deviceId);
-  await util.pushNotifications(userData, "yes");
+  await util.verifyUser(userId, deviceId);
 
   const db = getFirestore();
 

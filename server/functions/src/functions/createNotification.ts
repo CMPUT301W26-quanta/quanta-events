@@ -83,22 +83,21 @@ export async function createNotification(request: CallableRequest) {
       }
     }
 
-    // TODO get the FCM tokens by querying the user objects in the recipient list
-    // NOTE: requires a token field in the UserDocument, so currently this would be wrong
+    // Get the FCM tokens by querying the user objects in the recipient list
     const tokens: string[] = [];
     const userDocuments = db.collection("users") as CollectionReference<UserDocument, UserDocument>;
     for (const entrantId of recipients) {
       const userDocument = (await userDocuments.doc(entrantId).get()).data();
-      const token = userDocument?.token;
+      const token = userDocument?.notifToken;
       if (token != null) {
         tokens.push(token);
       }
     }
 
-    // TODO Send notification to the recipients
+    // TODO Send notification to the recipients, but only if they wish to receive notifications
     if (tokens.length > 0) {
       const ms = getMessaging();
-    await ms.sendEachForMulticast({tokens: tokens, notification: {title: title, body: message}});
+      await ms.sendEachForMulticast({tokens: tokens, notification: {title: title, body: message}});
     }
 
     logger.info("Notification Created and sent succesfully", { notificationId });
