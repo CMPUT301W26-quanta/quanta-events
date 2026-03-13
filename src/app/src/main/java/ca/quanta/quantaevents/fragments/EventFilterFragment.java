@@ -23,6 +23,8 @@ public class EventFilterFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        // set title of the page to Filter Events and the subtitle.
+        // also sets the icon for the page
         infoStore.setTitle("Filter Events");
         infoStore.setSubtitle("Apply filters to search events");
         infoStore.setIconRes(R.drawable.material_symbols_filter_alt_outline);

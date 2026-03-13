@@ -20,9 +20,7 @@ import java.util.UUID;
 import ca.quanta.quantaevents.models.Event;
 
 /**
- * This class represents an EventViewModel and has
- * methods to call cloud functions related to events,
- * such as creating, fetching, and updating events, as well as leaving/joining a waitlists.
+ * View-model for managing event-related data and cloud functions.
  */
 public class EventViewModel extends ViewModel {
 
@@ -79,7 +77,7 @@ public class EventViewModel extends ViewModel {
      * @param location Location of the event.
      * @param registrationLimit Waitlist capacity (optional).
      * @param imageId UUID identifying the image for the event (optional).
-     * @return returns the UUID assigned the the newly created event.
+     * @return UUID assigned to the newly created event.
      */
     public Task<String> createEvent(UUID userId, UUID deviceId, String registrationStartTime,
                                     String registrationEndTime, String eventTime,
@@ -119,8 +117,8 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
-     * Calls the getEvent cloud function, and fetches an event from the database and maps it to the Event model we have.
-     * @param eventId UUID identifying the event.
+     * Calls the getEvent cloud function, fetches an event from the database, and maps it to an Event model.
+     * @param eventId UUID identify the event.
      * @param userId UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @return Event object.
@@ -147,9 +145,7 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
-     * Calls the getEvents cloud function, returning a list of Event models.
-     * Used for filtering events for different fragments like admin
-     * eventlist, eventdashboard etc.
+     * Calls the getEvents cloud function, filtering events for different fragments.
      * @param userId UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @param max Max number of events to return. Set to -1 for no maximum.
@@ -158,8 +154,8 @@ public class EventViewModel extends ViewModel {
      * @param startDate ISO-8601 datetime with offset (optional).
      * @param endDate ISO-8601 datetime with offset (optional).
      * @param search Search string (optional).
-     * @param sortBy Sort mode (optional).
-     * @return Returns List of Event objects after processing the search/filter query.
+     * @param sortBy Sort mode.
+     * @return List of Event objects after processing the search/filter query.
      */
     public Task<List<Event>> getEvents(UUID userId, UUID deviceId, int max,
                                        UUID startFrom, Fetch fetch,
@@ -222,11 +218,11 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
-     * Calls the getOrganizerName cloud function and fetchers the organizer name for an event.
+     * Calls the getOrganizerName cloud function and fetches the organizer name for an event.
      * @param userId UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @param eventId UUID to identify the event.
-     * @return Returns List of Event objects after processing the search/filter query.
+     * @return String representing organizer name.
      */
     public Task<String> getOrganizerName(UUID userId, UUID deviceId, UUID eventId) {
         Map<String, Object> data = new HashMap<>();
@@ -251,11 +247,11 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
-     * Calls the getWaitlistCount cloud funciton to get number of users on waitlist of an event.
+     * Calls the getWaitlistCount cloud function to get the number of users on the waitlist of an event.
      * @param userId UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @param eventId UUID to identify event.
-     * @return Returns an integer (number of people on waitlist).
+     * @return Integer count of people on waitlist.
      */
     public Task<Integer> getWaitlistCount(UUID userId, UUID deviceId, UUID eventId) {
         Map<String, Object> data = new HashMap<>();
@@ -280,11 +276,11 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
-     * Calls the checkWaitlist cloud funciton to check if the user is in waitlist of an event.
+     * Calls the checkWaitlist cloud function to check if a user is in waitlist of an event.
      * @param userId UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @param eventId UUID to identify event.
-     * @return Returns an boolean value true if user is in wait list, returns false otherwise.
+     * @return Boolean value of true if user is in waitlist, false otherwise.
      */
     public Task<Boolean> checkWaitlist(UUID userId, UUID deviceId, UUID eventId) {
         Map<String, Object> data = new HashMap<>();
@@ -313,11 +309,11 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
-     * Calls the joinWaitlist cloud funciton to join an events waitlist.
+     * Calls the joinWaitlist cloud function to add a user to an event waitlist.
      * @param userId UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @param eventId UUID to identify event.
-     * @return Returns nothing if joining was successful, otherwise returns error.
+     * @return null if successful, an error if unsuccessful.
      */
     public Task<Void> joinWaitlist(UUID userId, UUID deviceId, UUID eventId) {
         Map<String, Object> data = new HashMap<>();
@@ -344,11 +340,11 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
-     * Calls the leaveWaitlist cloud funciton to leave an events waitlist.
+     * Calls the leaveWaitlist cloud function to remove a user from an event waitlist.
      * @param userId UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @param eventId UUID to identify event.
-     * @return Returns nothing if leaving was successful, otherwise returns error.
+     * @return null if successful, an error if unsuccessful.
      */
     public Task<Void> leaveWaitlist(UUID userId, UUID deviceId, UUID eventId) {
         Map<String, Object> data = new HashMap<>();
@@ -375,7 +371,7 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
-     * Calls the updateEvent cloud funciton to update the event.
+     * Calls the updateEvent cloud function to update an event.
      * @param userId UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @param registrationStartTime ISO-8601 datetime with offset (UTC preferred).
@@ -390,7 +386,7 @@ public class EventViewModel extends ViewModel {
      * @param location Location of the event.
      * @param registrationLimit Waitlist capacity (optional).
      * @param imageId UUID identifying the image for the event (optional).
-     * @return Returns nothing if updating the event was successful, other wise returns an error,
+     * @return null if successful, an error if unsuccessful.
      */
     public Task<Void> updateEvent(UUID userId, UUID deviceId, UUID eventId,
                                   String registrationStartTime, String registrationEndTime, String eventTime,
@@ -430,10 +426,10 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
-     * Calls the constructor for event and creates an event by mapping the map to event class.
+     * Calls the constructor for an event and creates an event by mapping data to an event model.
      * @param eventId UUID to identify event.
-     * @param data Map of Object identified using String(key) which holds the data related to event.
-     * @return Returns the newly maped event class object
+     * @param data Map of Object identified using String(key) which holds the event data.
+     * @return Mapped Event object.
      */
     @SuppressWarnings("unchecked")
     private static Event mapToEvent(UUID eventId, Map<String, Object> data) {
@@ -479,9 +475,9 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
-     * Converts the value of the object passed to string
+     * Converts a value to a string.
      * @param value Object to convert to string.
-     * @return Returns the string or null
+     * @return String representation of value if value is not null, null otherwise.
      */
     private static String valueToString(Object value) {
         if (value == null) {
@@ -492,9 +488,9 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
-     * To convert the the time received as string to ZonedDateTime object
-     * @param value Time to convert in string format
-     * @return Returns the newly converted ZonedDateTime or null
+     * Converts a string representation of time to a ZonedDateTime object.
+     * @param value Time string to be converted.
+     * @return Converted ZonedDateTime if value is not null, null otherwise.
      */
     private static ZonedDateTime parseZonedDateTime(String value) {
         if (value == null) {
@@ -508,10 +504,9 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
-     * To convert the value of object to integer
-     * @param eventId UUID to identify event.
-     * @param data Map of Object identified using String(key) which holds the data related to event.
-     * @return Returns the newly maped event class object
+     * Converts the value of an object to an integer.
+     * @param value Object value to be converted.
+     * @return Integer representation of value if value is not null, null otherwise.
      */
     private static Integer parseInteger(Object value) {
         if (value == null) {
@@ -528,9 +523,9 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
-     * Converts the list of objects to a list of UUIDs
-     * @param value Object to convert to list of UUIDs.
-     * @return Returns a list of UUIDs
+     * Converts a list of objects to a list of UUIDs.
+     * @param value Object to be converted.
+     * @return List of converted UUIDs.
      */
     @SuppressWarnings("unchecked")
     private static ArrayList<UUID> parseUuidList(Object value) {
@@ -548,9 +543,9 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
-     * To convert the string to UUID
-     * @param value String to convert to a UUID
-     * @return Returns the UUID converted from a strring.
+     * Converts a string to a UUID.
+     * @param value String to be converted.
+     * @return UUID converted from input string.
      */
 
     private static UUID parseUUID(String value) {

@@ -53,6 +53,8 @@ public class EntrantEventHistoryFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        // set title of the page to History and the subtitle.
+        // also sets the icon for the page
         infoStore.setTitle("History");
         infoStore.setSubtitle("View enrolled event history");
         infoStore.setIconRes(R.drawable.material_symbols_history);
@@ -61,6 +63,8 @@ public class EntrantEventHistoryFragment extends Fragment {
                 v -> Navigation.findNavController(v).popBackStack()
         );
 
+        // Initialize the adapter with a click listener to navigate to event details
+        // for the event which is clicked
         adapter = new EventCardAdapter(item -> {
             NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventHistoryFragmentDirections.actionEntrantEventHistoryFragmentToEventDetailsFragment(item.getEventId());
             Navigation.findNavController(requireView()).navigate(action);
@@ -71,6 +75,7 @@ public class EntrantEventHistoryFragment extends Fragment {
         eventModel = new ViewModelProvider(this).get(EventViewModel.class);
         imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
+        // check session
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
@@ -85,6 +90,7 @@ public class EntrantEventHistoryFragment extends Fragment {
         return binding.getRoot();
     }
 
+    // load events where the user was in the waitlist
     private void loadHistoryEvents() {
         if (userId == null || deviceId == null) {
             Log.d("EntrantEventHistory", "Session missing: userId/deviceId null");
@@ -116,6 +122,8 @@ public class EntrantEventHistoryFragment extends Fragment {
                 });
     }
 
+    // bind the data to the view
+    // The following function is from/based off OpenAI, ChatGPT, "bindEventList implementation for EntrantEventHistory", 2026-03-11
     private void bindEventList(List<Event> events) {
         if (events == null) {
             Log.d("EntrantEventHistory", "Event list is null");
@@ -147,6 +155,7 @@ public class EntrantEventHistoryFragment extends Fragment {
         }
     }
 
+    // attach the image to the view after fetching it from the database
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
@@ -156,7 +165,7 @@ public class EntrantEventHistoryFragment extends Fragment {
                     }
                     Bitmap bitmap = decodeBase64ToBitmap(imageData.toString());
                     if (bitmap != null) {
-                        adapter.upsert(item.withImage(bitmap));
+                        adapter.updateInsert(item.withImage(bitmap));
                     }
                 });
     }
@@ -177,6 +186,7 @@ public class EntrantEventHistoryFragment extends Fragment {
         return local.format(displayFormatter);
     }
 
+    // The following function is from/based off OpenAI, ChatGPT, "decodeBase64ToBitmap which decodes base64 to a bitmap", 2026-03-11
     private static Bitmap decodeBase64ToBitmap(String base64) {
         try {
             byte[] bytes = Base64.decode(base64, Base64.DEFAULT);

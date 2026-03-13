@@ -32,6 +32,11 @@ import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
+/**
+ * Entry point of app, sets up appropriate buttons for smart burger menu based on user role
+ * this where all the fragments will load up after the end of infoStore view
+ */
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
