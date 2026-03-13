@@ -3,6 +3,7 @@ package ca.quanta.quantaevents.viewmodels;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.Continuation;
@@ -171,8 +172,11 @@ public class UserViewModel extends ViewModel {
      * @param receiveNotifications Updated notification preference (optional).
      * @return UUID identifying the user's ID.
      */
-    public Task<String> updateUser(UUID userId, UUID deviceId, String name, String email,
-                                   String phone, Boolean receiveNotifications) {
+    public Task<String> updateUser(UUID userId, UUID deviceId,
+                                   @Nullable String name,
+                                   @Nullable String email,
+                                   @Nullable String phone,
+                                   @Nullable Boolean receiveNotifications) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -183,6 +187,9 @@ public class UserViewModel extends ViewModel {
         payload.put("phone", phone);
         payload.put("receiveNotifications", receiveNotifications);
         data.put("data", payload);
+
+        System.out.println("updateUser payload type=" + data.getClass().getName());
+        System.out.println("updateUser payload=" + data);
 
         return FirebaseFunctions.getInstance()
                 .getHttpsCallable("updateUser")
