@@ -19,9 +19,7 @@ import ca.quanta.quantaevents.databinding.FragmentInformationBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
 public class InformationFragment extends Fragment implements Tagged {
-
     public FragmentInformationBinding binding;
-
 
     public InformationFragment() {
         // Required empty public constructor

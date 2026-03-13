@@ -277,16 +277,8 @@
         android:label="fragment_android_notifcation_history_panel" >
         <action
             android:id="@+id/action_adminNotificationHistoryFragment_to_adminprofilebrowserFragment"
-            app:destination="@id/adminprofilebrowserFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_adminNotificationHistoryFragment_to_adminprofilebrowserFragment2"
-            app:destination="@id/adminprofilebrowserFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
+            app:destination="@id/adminprofilebrowserFragment" />
     </fragment>
-        app:popUpTo="@id/nav_graph" />
     <action
         android:id="@+id/action_global_registerFragment"
         app:destination="@id/registerFragment"

@@ -1,6 +1,12 @@
 package ca.quanta.quantaevents.fragments;
 
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +23,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
+import ca.quanta.quantaevents.databinding.FragmentAdminProfileBrowserBinding;
+import ca.quanta.quantaevents.viewmodels.UserViewModel;
 import ca.quanta.quantaevents.databinding.FragmentRegisterBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;

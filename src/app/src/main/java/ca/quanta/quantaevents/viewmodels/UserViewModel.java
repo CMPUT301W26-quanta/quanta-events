@@ -1,5 +1,7 @@
 package ca.quanta.quantaevents.viewmodels;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
@@ -8,7 +10,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -19,7 +23,6 @@ import ca.quanta.quantaevents.models.User;
  */
 public class UserViewModel extends ViewModel {
     // Initialize an instance of cloud functions
-
 
     /**
      * Calls the createUser cloud function, adding a user to the database.
@@ -37,6 +40,7 @@ public class UserViewModel extends ViewModel {
     public Task<UUID> createUser(String name, String email, String phone, Boolean isEntrant, Boolean isOrganizer, Boolean isAdmin, Boolean getNotifications, UUID deviceId) {
         // Arguments for createUser
         Map<String, Object> data = new HashMap<>();
+
         data.put("deviceId", deviceId.toString());
         data.put("name", name);
         data.put("email", email);
@@ -60,6 +64,34 @@ public class UserViewModel extends ViewModel {
                 });
     }
 
+    public Task<ArrayList<User>> getAllUsers() {
+        FirebaseFunctions functions = FirebaseFunctions.getInstance();
+
+       return functions
+               .getHttpsCallable("getAllUsers")
+               .call(new HashMap<>())
+               .continueWith(new Continuation<HttpsCallableResult, ArrayList<User>>() {
+                   @Override
+                   public ArrayList<User> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                       List<Map<String, Object>> userObjects = (List<Map<String, Object>>) task.getResult().getData();
+                       ArrayList<User> users = new ArrayList<User>();
+
+                       for (Map<String, Object> userObject : userObjects) {
+                           // we only get a limited amount of info back about each user
+
+                           String name = (String) userObject.get("name");
+                           Boolean isEntrant = (Boolean) userObject.get("isEntrant");
+                           Boolean isOrganizer = (Boolean) userObject.get("isOrganizer");
+                           Boolean isAdmin = (Boolean) userObject.get("isAdmin");
+
+                           users.add(new User(name, null, null, null, isEntrant, isOrganizer, isAdmin));
+                       }
+
+                       return users;
+                   }
+               });
+    }
+
     /**
      * Calls the getUser cloud function, getting a user's details from the database.
      *
@@ -69,6 +101,7 @@ public class UserViewModel extends ViewModel {
      */
     public Task<User> getUser(UUID userId, UUID deviceId) {
         Map<String, Object> data = new HashMap<>();
+
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
