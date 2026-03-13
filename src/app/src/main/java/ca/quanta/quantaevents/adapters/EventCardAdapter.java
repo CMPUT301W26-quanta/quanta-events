@@ -75,6 +75,12 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
         notifyItemInserted(0);
     }
 
+    public void setItems(List<EventCardItem> newItems) {
+        items.clear();
+        items.addAll(newItems);
+        notifyDataSetChanged();
+    }
+
     static class EventViewHolder extends RecyclerView.ViewHolder {
         final ShapeableImageView image;
         final TextView title;

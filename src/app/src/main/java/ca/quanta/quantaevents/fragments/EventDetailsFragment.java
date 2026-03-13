@@ -22,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
+import ca.quanta.quantaevents.burger.SmartBurger;
 import ca.quanta.quantaevents.databinding.FragmentEventDetailsBinding;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
@@ -37,6 +38,8 @@ public class EventDetailsFragment extends Fragment {
     private UUID userId;
     private UUID deviceId;
     private UUID eventId;
+    private boolean isAdmin = false;
+    private boolean fromAdmin = false;
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
@@ -58,6 +61,10 @@ public class EventDetailsFragment extends Fragment {
             deviceId = did;
             loadEvent();
         });
+        sessionStore.getRoleMask().observe(getViewLifecycleOwner(), mask -> {
+            isAdmin = mask != null && (mask & SmartBurger.ADMIN_GROUP) != 0;
+            updateManageButton(null);
+        });
 
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
@@ -74,6 +81,7 @@ public class EventDetailsFragment extends Fragment {
     private void readEventId() {
         EventDetailsFragmentArgs args = EventDetailsFragmentArgs.fromBundle(getArguments());
         eventId = args.getEventId();
+        fromAdmin = args.getFromAdmin();
     }
 
     private void loadEvent() {
@@ -99,12 +107,12 @@ public class EventDetailsFragment extends Fragment {
         }
         binding.textEventTitle.setText(stringValue(event.getEventName(), "Event"));
         String organizer = event.getOrganizerId() == null ? "Unknown" : event.getOrganizerId().toString();
-        binding.textOrganizer.setText("👤 Organized by " + organizer);
-        binding.textDateTime.setText("🕐 " + formatLocalTime(event.getRegistrationStartTime()));
-        binding.textLocation.setText("📍 " + stringValue(event.getLocation(), "TBD"));
+        binding.textOrganizer.setText(" Organized by " + organizer);
+        binding.textDateTime.setText(" " + formatLocalTime(event.getRegistrationStartTime()));
+        binding.textLocation.setText(" " + stringValue(event.getLocation(), "TBD"));
 
         int waitCount = event.getWaitList() == null ? 0 : event.getWaitList().size();
-        binding.textWaitingList.setText("🤝 Wait list: " + waitCount);
+        binding.textWaitingList.setText(" Wait list: " + waitCount);
 
         binding.textDescription.setText(stringValue(event.getEventDescription(), ""));
 
@@ -126,6 +134,11 @@ public class EventDetailsFragment extends Fragment {
     }
 
     private void updateManageButton(String organizerId) {
+        if (isAdmin && fromAdmin) {
+            binding.enrollButton.setText("Delete");
+            binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
+            return;
+        }
         if (userId != null && organizerId != null && organizerId.equals(userId.toString())) {
             binding.enrollButton.setText("Manage");
             binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));

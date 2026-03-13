@@ -22,10 +22,18 @@ public class Event {
 
     private ZonedDateTime registrationStartTime;
     private ZonedDateTime registrationEndTime;
+    @Nullable
+    private ZonedDateTime eventTime;
 
     private String eventName;
     private String eventDescription;
     private String location;
+    @Nullable
+    private String eventCategory;
+    @Nullable
+    private String eventGuidelines;
+    private boolean geolocation;
+    private Integer eventCapacity;
 
     @Nullable
     private Integer registrationLimit;
@@ -42,8 +50,8 @@ public class Event {
      * @param eventDescription Description of the event.
      */
     public Event(ZonedDateTime registrationStartTime, ZonedDateTime registrationEndTime,
-          String eventName, String eventDescription, Float price, Integer registrationLimit,
-          UUID imageId) {
+                 String eventName, String eventDescription, Float price, Integer registrationLimit,
+                 UUID imageId) {
         this.eventId = UUID.randomUUID();
         this.organizerId = null;
         this.waitList = new ArrayList<>();
@@ -51,9 +59,14 @@ public class Event {
         this.finalList = new ArrayList<>();
         this.registrationStartTime = registrationStartTime;
         this.registrationEndTime = registrationEndTime;
+        this.eventTime = null;
         this.eventName = eventName;
         this.eventDescription = eventDescription;
         this.location = "";
+        this.eventCategory = null;
+        this.eventGuidelines = null;
+        this.geolocation = false;
+        this.eventCapacity = 0;
         this.registrationLimit = registrationLimit;
         this.imageId = imageId;
     }
@@ -75,9 +88,14 @@ public class Event {
         this.finalList = new ArrayList<>();
         this.registrationStartTime = registrationStartTime;
         this.registrationEndTime = registrationEndTime;
+        this.eventTime = null;
         this.eventName = eventName;
         this.eventDescription = eventDescription;
         this.location = "";
+        this.eventCategory = null;
+        this.eventGuidelines = null;
+        this.geolocation = false;
+        this.eventCapacity = 0;
         this.registrationLimit = registrationLimit;
         this.imageId = null;
     }
@@ -99,9 +117,14 @@ public class Event {
         this.finalList = new ArrayList<>();
         this.registrationStartTime = registrationStartTime;
         this.registrationEndTime = registrationEndTime;
+        this.eventTime = null;
         this.eventName = eventName;
         this.eventDescription = eventDescription;
         this.location = "";
+        this.eventCategory = null;
+        this.eventGuidelines = null;
+        this.geolocation = false;
+        this.eventCapacity = 0;
         this.registrationLimit = null;
         this.imageId = imageId;
     }
@@ -123,9 +146,14 @@ public class Event {
         this.finalList = new ArrayList<>();
         this.registrationStartTime = registrationStartTime;
         this.registrationEndTime = registrationEndTime;
+        this.eventTime = null;
         this.eventName = eventName;
         this.eventDescription = eventDescription;
         this.location = "";
+        this.eventCategory = null;
+        this.eventGuidelines = null;
+        this.geolocation = false;
+        this.eventCapacity = 0;
         this.registrationLimit = null;
         this.imageId = null;
     }
@@ -136,7 +164,9 @@ public class Event {
     public Event(UUID eventId, @Nullable UUID organizerId,
                  ArrayList<UUID> waitList, ArrayList<UUID> cancelledList, ArrayList<UUID> finalList,
                  ZonedDateTime registrationStartTime, ZonedDateTime registrationEndTime,
-                 String eventName, String eventDescription, String location,
+                 @Nullable ZonedDateTime eventTime, String eventName, String eventDescription,
+                 String location, @Nullable String eventCategory, @Nullable String eventGuidelines,
+                 boolean geolocation, @Nullable Integer eventCapacity,
                  @Nullable Integer registrationLimit, @Nullable UUID imageId) {
         this.eventId = eventId;
         this.organizerId = organizerId;
@@ -145,9 +175,14 @@ public class Event {
         this.finalList = finalList == null ? new ArrayList<>() : finalList;
         this.registrationStartTime = registrationStartTime;
         this.registrationEndTime = registrationEndTime;
+        this.eventTime = eventTime;
         this.eventName = eventName;
         this.eventDescription = eventDescription;
         this.location = location;
+        this.eventCategory = eventCategory;
+        this.eventGuidelines = eventGuidelines;
+        this.geolocation = geolocation;
+        this.eventCapacity = eventCapacity == null ? 0 : eventCapacity;
         this.registrationLimit = registrationLimit;
         this.imageId = imageId;
     }
@@ -181,6 +216,11 @@ public class Event {
         return registrationEndTime;
     }
 
+    @Nullable
+    public ZonedDateTime getEventTime() {
+        return eventTime;
+    }
+
     public String getEventName() {
         return eventName;
     }
@@ -191,6 +231,24 @@ public class Event {
 
     public String getLocation() {
         return location;
+    }
+
+    @Nullable
+    public String getEventCategory() {
+        return eventCategory;
+    }
+
+    @Nullable
+    public String getEventGuidelines() {
+        return eventGuidelines;
+    }
+
+    public boolean isGeolocationEnabled() {
+        return geolocation;
+    }
+
+    public Integer getEventCapacity() {
+        return eventCapacity;
     }
 
     @Nullable
