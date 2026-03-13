@@ -62,32 +62,6 @@ public class AdminProfileBrowserFragment extends Fragment {
                         Log.e("AdminProfileBrowserFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
                     }
                 });;
-
-//        // TODO: fetch all profiles from the database instead
-//
-//        List<User> profiles = new ArrayList<User>();
-//
-//        profiles.add(new User("Robert Smith", null, null, null, false, true, false));
-//        profiles.add(new User("Christian Vasquez", null, null, null, false, true, false));
-//        profiles.add(new User("Sandra Thomas", null, null, null, false, false, false));
-//        profiles.add(new User("Some Admin", null, null, null, false, false, true));
-//
-//        // filter out admins
-//
-//        List<User> nonAdminProfiles = new ArrayList<User>();
-//
-//        for (User profile : profiles) {
-//            if (!profile.isAdmin()) {
-//                nonAdminProfiles.add(profile);
-//            }
-//        }
-//
-//        // use the adapter to display them
-//
-//        ProfileAdapter profilesAdapter = new ProfileAdapter(nonAdminProfiles);
-//
-//        binding.profilesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-//        binding.profilesRecyclerView.setAdapter(profilesAdapter);
     }
 
     @Override
