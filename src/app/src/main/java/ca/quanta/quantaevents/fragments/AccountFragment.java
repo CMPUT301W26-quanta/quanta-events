@@ -122,7 +122,7 @@ public class AccountFragment extends Fragment implements Tagged {
                     binding.deleteButton.setEnabled(true);
                     android.widget.Toast.makeText(requireContext(), "Account deleted", android.widget.Toast.LENGTH_LONG).show();
                     if (isAdded()) {
-                        NavDirections action = AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
+                        NavDirections action = ca.quanta.quantaevents.fragments.AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
                         Navigation.findNavController(requireView()).navigate(action);
                     }
                 })
@@ -151,7 +151,7 @@ public class AccountFragment extends Fragment implements Tagged {
                 .addOnSuccessListener(_userId -> {
                     binding.saveButton.setEnabled(true);
                     android.widget.Toast.makeText(requireContext(), "Account updated", android.widget.Toast.LENGTH_LONG).show();
-                    NavDirections action = AccountFragmentDirections.actionAccountfragmentToHomefragment();
+                    NavDirections action = ca.quanta.quantaevents.fragments.AccountFragmentDirections.actionAccountfragmentToHomefragment();
                     Navigation.findNavController(requireView()).navigate(action);
                 })
                 .addOnFailureListener(ex -> {
@@ -164,7 +164,7 @@ public class AccountFragment extends Fragment implements Tagged {
         sessionStore.clearSession();
         System.out.println("MISSING USER");
         if (isAdded()) {
-            NavDirections action = AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
+            NavDirections action = ca.quanta.quantaevents.fragments.AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
             Navigation.findNavController(requireView()).navigate(action);
         }
     }

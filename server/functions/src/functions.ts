@@ -14,5 +14,6 @@ export * from "./functions/getOrganizerName";
 export * from "./functions/getWaitlistCount";
 export * from "./functions/leaveWaitlist";
 export * from "./functions/joinWaitlist";
-export * from "./functions/inWaitlist";
+export * from "./functions/checkWaitlist";
 export * from "./functions/updateEvent";
+export * from "./functions/getWaitlist";
