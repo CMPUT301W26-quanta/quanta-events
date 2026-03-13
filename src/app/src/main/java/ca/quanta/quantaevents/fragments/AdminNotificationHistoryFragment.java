@@ -33,7 +33,7 @@ public class AdminNotificationHistoryFragment extends Fragment {
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
 
         infoStore.setTitle("Notification History");
-        infoStore.setSubtitle("View event notification history.");
+        infoStore.setSubtitle("View user notification history.");
         infoStore.setIconRes(R.drawable.material_symbols_history);
 
         // set up the notification recycler view

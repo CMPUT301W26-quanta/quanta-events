@@ -148,9 +148,9 @@ public class EventViewModel extends ViewModel {
      * Calls the getEvents cloud function, filtering events for different fragments.
      * @param userId UUID to identify user.
      * @param deviceId UUID to identify user's device.
-     * @param max Max number of events to return.
+     * @param max Max number of events to return. Set to -1 for no maximum.
      * @param startFrom Event ID to start after (optional).
-     * @param fetch Filter mode.
+     * @param fetch Filter mode (optional).
      * @param startDate ISO-8601 datetime with offset (optional).
      * @param endDate ISO-8601 datetime with offset (optional).
      * @param search Search string (optional).
@@ -162,8 +162,15 @@ public class EventViewModel extends ViewModel {
                                        String startDate, String endDate,
                                        String search, SortBy sortBy) {
         Map<String, Object> data = new HashMap<>();
+
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
+
+        // we represent no maximum by sending the largest possible integer value,
+        // which is effectively no max
+        if (max == -1) {
+            max = Integer.MAX_VALUE;
+        }
 
         if (fetch == null) {
             fetch = Fetch.AVAILABLE;

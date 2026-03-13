@@ -17,22 +17,27 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.firebase.functions.FirebaseFunctionsException;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.ProfileAdapter;
 import ca.quanta.quantaevents.databinding.FragmentAdminProfileBrowserBinding;
 import ca.quanta.quantaevents.models.User;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
+import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 public class AdminProfileBrowserFragment extends Fragment {
     private FragmentAdminProfileBrowserBinding binding;
 
-    private UserViewModel model;
+    private UserViewModel userModel;
+
+    private UUID userId;
+    private UUID deviceId;
 
     // lists all profiles to show to admin and adds them to the array
     private void listProfiles() {
-        model.getAllUsers()
+        this.userModel.getAllUsers()
                 .addOnSuccessListener(users -> {
                     // filter out admins
 
@@ -56,7 +61,6 @@ public class AdminProfileBrowserFragment extends Fragment {
 
                     Toast.makeText(requireContext(), "Failed to fetch users: " + exception.getMessage(), Toast.LENGTH_LONG).show();
 
-                    // added during debugging, but keeping it bc its useful
                     if (exception instanceof FirebaseFunctionsException) {
                         Log.e("AdminProfileBrowserFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
                     }
@@ -77,14 +81,24 @@ public class AdminProfileBrowserFragment extends Fragment {
         infoStore.setIconRes(R.drawable.material_symbols_person_shield_outline);
 
         // set up the view model
+        // **** set up the view models
 
-        this.model = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        this.userModel = new ViewModelProvider(this.requireActivity()).get(UserViewModel.class);
+
+        // **** set up the session store
+
+        SessionStore sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
 
         /**
          * set up the profiles recycler view
          */
+        sessionStore.observeSession(getViewLifecycleOwner(), (userId, deviceId) -> {
+            this.userId = userId;
+            this.deviceId = deviceId;
 
-        this.listProfiles();
+            // set up the profiles recycler view once the userId and deviceId are ready
+            this.listProfiles();
+        });
 
         // *set up the backbuttons on click listener
 

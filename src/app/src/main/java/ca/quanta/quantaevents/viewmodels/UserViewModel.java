@@ -69,7 +69,13 @@ public class UserViewModel extends ViewModel {
      * @return List of User Objects.
      */
     public Task<ArrayList<User>> getAllUsers() {
-       return functions
+//        TODO: pass user information and verify the user is an admin when calling this
+//        Map<String, Object> data = new HashMap<>();
+//
+//        data.put("userId", userId.toString());
+//        data.put("deviceId", deviceId.toString());
+
+        return functions
                .getHttpsCallable("getAllUsers")
                .call(new HashMap<>())
                .continueWith(new Continuation<HttpsCallableResult, ArrayList<User>>() {
@@ -82,23 +88,20 @@ public class UserViewModel extends ViewModel {
                            // we only get a limited amount of info back about each user
 
                            String userId = (String) userObject.get("userId");
-                           String deviceId = (String) userObject.get("deviceId");
                            String name = (String) userObject.get("name");
                            Boolean isEntrant = (Boolean) userObject.get("isEntrant");
                            Boolean isOrganizer = (Boolean) userObject.get("isOrganizer");
                            Boolean isAdmin = (Boolean) userObject.get("isAdmin");
 
-                           // verify that they have a userId and deviceId
-                           // otherwise just skip them
+                           // verify that they have a userId, otherwise just skip them
 
                            if (userId == null) {
                                continue;
                            }
 
                            UUID userUUID = UUID.fromString(userId);
-                           UUID deviceUUID = UUID.fromString(deviceId);
 
-                           users.add(new User(name, null, null, null, isEntrant, isOrganizer, isAdmin, userUUID, deviceUUID));
+                           users.add(new User(name, null, null, null, isEntrant, isOrganizer, isAdmin, userUUID, null));
                        }
 
                        return users;
