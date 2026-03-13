@@ -28,21 +28,25 @@ public class AdminPanelFragment extends Fragment implements Tagged {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        //set the title as Admin Panel
+        // set the icon and subtitle for the page
 
         infoStore.setTitle("Admin Panel");
         infoStore.setSubtitle("Access moderation tools.");
         infoStore.setIconRes(R.drawable.material_symbols_security);
+        // setup the on click listener for the browse event button
 
         binding.adminBrowseEventsButton.setOnClickListener(
                 v -> {
-                    NavDirections action = ca.quanta.quantaevents.fragments.AdminPanelFragmentDirections.actionAdminpanelFragmentToAdmineventbrowserFragment();
+                    NavDirections action = AdminPanelFragmentDirections.actionAdminpanelFragmentToAdmineventbrowserFragment();
                     Navigation.findNavController(v).navigate(action);
                 }
         );
+        // setup the on click listener for the browse profile button
 
         binding.adminBrowseProfilesButton.setOnClickListener(
                 v -> {
-                    NavDirections action = ca.quanta.quantaevents.fragments.AdminPanelFragmentDirections.actionAdminpanelFragmentToAdminprofilebrowserFragment();
+                    NavDirections action = AdminPanelFragmentDirections.actionAdminpanelFragmentToAdminprofilebrowserFragment();
                     Navigation.findNavController(v).navigate(action);
                 });
 

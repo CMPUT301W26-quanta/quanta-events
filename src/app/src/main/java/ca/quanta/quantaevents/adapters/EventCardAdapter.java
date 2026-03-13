@@ -64,12 +64,22 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
         });
     }
 
+    /**
+     * No parameters needed
+     * @return Returns size of the list of events
+     */
     @Override
     public int getItemCount() {
         return items.size();
     }
 
-    public void upsert(EventCardItem item) {
+    /**
+     * checks if event exists in list if it does update it else add another (similar to upsert in sql databases)
+     * @param item
+     * No return value
+     */
+
+    public void updateInsert(EventCardItem item) {
         for (int i = 0; i < items.size(); i++) {
             EventCardItem current = items.get(i);
             UUID currentId = current.getEventId();
@@ -83,6 +93,10 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
         notifyItemInserted(0);
     }
 
+    /**
+     * clear the existing list and return a new list of events to the fragment
+     * @param newItems
+     */
     public void setItems(List<EventCardItem> newItems) {
         items.clear();
         items.addAll(newItems);

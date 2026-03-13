@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+
+
 public class FragmentInfoStore extends ViewModel {
     MutableLiveData<Integer> iconRes = new MutableLiveData<>();
 

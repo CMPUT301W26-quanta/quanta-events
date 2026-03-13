@@ -30,10 +30,13 @@ public class InformationFragment extends Fragment implements Tagged {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        // set title of the page to Information and the subtitle to what the page has
+        // also sets the icon for the page
         infoStore.setTitle("Information");
         infoStore.setSubtitle("Lottery selection information here.");
         infoStore.setIconRes(R.drawable.material_symbols_info_outline);
 
+        //sets up the back buttton listener
         binding.backButton.setOnClickListener(v -> {
             // popBackStack was not working; fix it this way until someone can fix it properly
             Navigation.findNavController(requireView()).navigate(R.id.action_informationFragment_to_homeFragment);

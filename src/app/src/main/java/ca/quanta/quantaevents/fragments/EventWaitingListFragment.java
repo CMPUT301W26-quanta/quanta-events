@@ -23,6 +23,8 @@ public class EventWaitingListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        // set title of the page to QR code and the subtitle to share an event qr code.
+        // also sets the icon for the page
         infoStore.setTitle("Event Waiting List");
         infoStore.setSubtitle("View waiting list entrants");
         infoStore.setIconRes(R.drawable.material_symbols_group_outline);
