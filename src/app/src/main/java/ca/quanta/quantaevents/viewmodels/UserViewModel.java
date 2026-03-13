@@ -1,7 +1,5 @@
 package ca.quanta.quantaevents.viewmodels;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModel;

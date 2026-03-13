@@ -50,17 +50,19 @@ export const deleteUser = onCall({ maxInstances: 1 }, functions.deleteUser);
 
 export const updateUser = onCall({ maxInstances: 1 }, functions.updateUser);
 
-export const getOrganizerName = onCall({ maxInstances: 1}, functions.getOrganizerName);
+export const getOrganizerName = onCall({ maxInstances: 1 }, functions.getOrganizerName);
 
-export const getWaitlistCount = onCall({ maxInstances: 1}, functions.getWaitlistCount);
+export const getWaitlistCount = onCall({ maxInstances: 1 }, functions.getWaitlistCount);
 
-export const joinWaitlist = onCall({ maxInstances: 1}, functions.joinWaitlist);
+export const joinWaitlist = onCall({ maxInstances: 1 }, functions.joinWaitlist);
 
-export const leaveWaitlist = onCall({ maxInstances: 1}, functions.leaveWaitlist);
+export const leaveWaitlist = onCall({ maxInstances: 1 }, functions.leaveWaitlist);
 
-export const inWaitlist = onCall({ maxInstances:1 }, functions.inWaitlist);
+export const checkWaitlist = onCall({ maxInstances: 1 }, functions.checkWaitlist);
 
-export const updateEvent = onCall({ maxInstances: 1}, functions.updateEvent);
+export const updateEvent = onCall({ maxInstances: 1 }, functions.updateEvent);
+
+export const getWaitlist = onCall({ maxInstances: 1}, functions.getWaitlist)
 
 export const createNotification = onCall(
   { maxInstances: 1 },

@@ -35,25 +35,25 @@ public class EventManagerFragment extends Fragment {
 
         binding.editDetailsButton.setOnClickListener(
                 v -> {
-                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToCreateeditorfragment(eventId);
+                    NavDirections action = ca.quanta.quantaevents.fragments.EventManagerFragmentDirections.actionEventmanagerfragmentToCreateeditorfragment(eventId);
                     Navigation.findNavController(v).navigate(action);
                 }
         );
         binding.shareQrButton.setOnClickListener(
                 v -> {
-                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToShowqrfragment(eventId);
+                    NavDirections action = ca.quanta.quantaevents.fragments.EventManagerFragmentDirections.actionEventmanagerfragmentToShowqrfragment(eventId);
                     Navigation.findNavController(v).navigate(action);
                 }
         );
         binding.viewWaitListButton.setOnClickListener(
                 v -> {
-                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToEventwaitinglistfragment(eventId);
+                    NavDirections action = ca.quanta.quantaevents.fragments.EventManagerFragmentDirections.actionEventmanagerfragmentToEventwaitinglistfragment(eventId);
                     Navigation.findNavController(v).navigate(action);
                 }
         );
         binding.sendNotificationButton.setOnClickListener(
                 v -> {
-                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToSendnotificationfragment(eventId);
+                    NavDirections action = ca.quanta.quantaevents.fragments.EventManagerFragmentDirections.actionEventmanagerfragmentToSendnotificationfragment(eventId);
                     Navigation.findNavController(v).navigate(action);
                 }
         );
@@ -73,7 +73,7 @@ public class EventManagerFragment extends Fragment {
     }
 
     private void readEventId() {
-        EventManagerFragmentArgs args = EventManagerFragmentArgs.fromBundle(getArguments());
+        ca.quanta.quantaevents.fragments.EventManagerFragmentArgs args = ca.quanta.quantaevents.fragments.EventManagerFragmentArgs.fromBundle(getArguments());
         eventId = args.getEventId();
     }
 }

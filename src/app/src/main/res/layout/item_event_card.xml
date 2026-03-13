@@ -78,7 +78,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:drawableStart="@drawable/material_symbols_event_outline"
+                android:drawableStart="@drawable/ic_round_schedule"
                 app:drawableTint="@color/color_dark_gray"
                 android:text="Some Time"
                 android:textSize="16sp"
