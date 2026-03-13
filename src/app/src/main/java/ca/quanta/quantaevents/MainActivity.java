@@ -84,11 +84,12 @@ public class MainActivity extends AppCompatActivity {
                 );
 
         new SmartBurger(this, ((NavHostFragment) binding.navHost.getFragment()).getNavController(), binding.coordinator)
-                .with(new EventDashboardFragment(), R.drawable.material_symbols_dashboard_outline, SmartBurger.ORGANIZER_GROUP, NavGraphDirections::actionGlobalEventdashboardFragment)
-                .with(new EntrantEventListFragment(), R.drawable.material_symbols_event_list_outline, SmartBurger.ENTRANT_GROUP, NavGraphDirections::actionGlobalEntranteventlistFragment)
-                .with(new AccountFragment(), R.drawable.material_symbols_person_outline, NavGraphDirections::actionGlobalAccountFragment)
-                .with(new AdminPanelFragment(), R.drawable.material_symbols_security, SmartBurger.ADMIN_GROUP, NavGraphDirections::actionGlobalAdminpanelFragment)
-                .with(new HomeFragment(), R.drawable.material_symbols_home_outline, NavGraphDirections::actionGlobalHomeFragment)
+                .with(new InformationFragment(), R.drawable.material_symbols_info_outline,"Information", NavGraphDirections::actionGlobalInformationFragment)
+                .with(new EventDashboardFragment(), R.drawable.material_symbols_dashboard_outline, "Dashboard", NavGraphDirections::actionGlobalEventdashboardFragment)
+                .with(new EntrantEventListFragment(), R.drawable.material_symbols_event_list_outline, "Event List", NavGraphDirections::actionGlobalEntranteventlistFragment)
+                .with(new AccountFragment(), R.drawable.material_symbols_person_outline, "Account", NavGraphDirections::actionGlobalAccountFragment)
+                .with(new AdminPanelFragment(), R.drawable.material_symbols_security, "Admin Panel", NavGraphDirections::actionGlobalAdminpanelFragment)
+                .with(new HomeFragment(), R.drawable.material_symbols_home_outline, "Home", NavGraphDirections::actionGlobalHomeFragment)
                 .inject();
 
         sessionStore.observeSession(this, (userId, deviceId) -> {
