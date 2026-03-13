@@ -1,5 +1,7 @@
 package ca.quanta.quantaevents.viewmodels;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
@@ -63,7 +65,9 @@ public class UserViewModel extends ViewModel {
     }
 
     public Task<ArrayList<User>> getAllUsers() {
-       return FirebaseFunctions.getInstance()
+        FirebaseFunctions functions = FirebaseFunctions.getInstance();
+
+       return functions
                .getHttpsCallable("getAllUsers")
                .call(new HashMap<>())
                .continueWith(new Continuation<HttpsCallableResult, ArrayList<User>>() {
