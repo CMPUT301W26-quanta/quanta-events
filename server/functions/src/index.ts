@@ -60,6 +60,8 @@ export const leaveWaitlist = onCall({ maxInstances: 1}, functions.leaveWaitlist)
 
 export const inWaitlist = onCall({ maxInstances:1 }, functions.inWaitlist);
 
+export const updateEvent = onCall({ maxInstances: 1}, functions.updateEvent);
+
 export const createNotification = onCall(
   { maxInstances: 1 },
   functions.createNotification
