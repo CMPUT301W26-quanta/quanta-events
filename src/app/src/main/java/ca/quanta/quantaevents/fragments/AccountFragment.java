@@ -139,6 +139,11 @@ public class AccountFragment extends Fragment implements Tagged {
         String name = binding.inputName.getText().toString().trim();
         String email = binding.inputEmail.getText().toString().trim();
         String phone = binding.inputPhone.getText().toString().trim();
+
+        name = name.isEmpty() ? null : name;
+        email = email.isEmpty() ? null : email;
+        phone = phone.isEmpty() ? null : phone;
+
         Boolean receiveNotifications = binding.checkNotifications.isChecked();
 
         binding.saveButton.setEnabled(false);
