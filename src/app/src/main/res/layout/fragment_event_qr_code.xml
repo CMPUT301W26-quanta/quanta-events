@@ -4,9 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Replace with a scanner -->
-    <com.journeyapps.barcodescanner.DecoratedBarcodeView
-        android:id="@+id/qr_code_scanner"
+    <FrameLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginLeft="24dp"
@@ -14,12 +12,22 @@
         android:layout_marginBottom="24dp"
         android:layout_marginTop="26dp"
         android:scaleType="fitCenter"
-        android:background="@color/color_light_gray"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/back_button"
-        app:layout_constraintDimensionRatio="1:1" />
+        app:layout_constraintDimensionRatio="1:1"
+        android:background="@drawable/rounded_border_box"
+        android:clipToOutline="true"
+        android:outlineProvider="background">
+
+        <com.journeyapps.barcodescanner.DecoratedBarcodeView
+            android:id="@+id/qr_code_scanner"
+
+            android:layout_height="match_parent"
+            android:layout_width="match_parent" />
+    </FrameLayout>
+
 
     <Button
         android:id="@+id/back_button"
