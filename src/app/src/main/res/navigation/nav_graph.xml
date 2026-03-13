@@ -66,6 +66,10 @@
         <action
             android:id="@+id/action_admineventbrowserfragment_to_eventedetailsfragment"
             app:destination="@id/eventDetailsFragment" />
+        <action
+            android:id="@+id/action_adminpanelFragment_to_adminImageBrowserFragment"
+            app:destination="@id/adminImageBrowserFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -279,5 +283,14 @@
         app:destination="@id/registerFragment"
         app:popUpTo="@id/nav_graph"
         app:popUpToInclusive="true" />
+    <fragment
+        android:id="@+id/adminImageBrowserFragment"
+        android:name="ca.quanta.quantaevents.fragments.AdminImageBrowserFragment"
+        android:label="AdminImageBrowserFragment" >
+        <action
+            android:id="@+id/action_adminImageBrowserFragment_to_adminpanelFragment"
+            app:destination="@id/adminpanelFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 </navigation>

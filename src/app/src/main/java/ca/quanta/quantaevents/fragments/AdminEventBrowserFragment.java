@@ -68,6 +68,7 @@ public class AdminEventBrowserFragment extends Fragment {
             Navigation.findNavController(requireView())
                     .navigate(R.id.action_admineventbrowserfragment_to_eventdetailsfragment, args);
         });
+
         binding.eventsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.eventsRecyclerView.setAdapter(adapter);
 
@@ -93,11 +94,13 @@ public class AdminEventBrowserFragment extends Fragment {
             Log.d("AdminEventBrowser", "Session missing: userId/deviceId null");
             return;
         }
+
         Log.d("AdminEventBrowser", "Loading all events for admin " + userId);
+
         eventModel.getEvents(
                         userId,
                         deviceId,
-                        200,
+                        -1,
                         null,
                         EventViewModel.Fetch.ALL,
                         null,
@@ -124,24 +127,31 @@ public class AdminEventBrowserFragment extends Fragment {
             Log.d("AdminEventBrowser", "Event list is null");
             return;
         }
+
         Log.d("AdminEventBrowser", "Loaded events count=" + events.size());
+
         if (events.isEmpty()) {
             Toast.makeText(requireContext(), "No events found", Toast.LENGTH_LONG).show();
             adapter.setItems(new ArrayList<>());
             return;
         }
+
         ArrayList<EventCardItem> items = new ArrayList<>();
+
         for (Event event : events) {
             if (event == null) {
                 continue;
             }
+
             UUID eventId = event.getEventId();
             String title = stringValue(event.getEventName(), "Event");
             String time = formatLocalTime(event.getRegistrationStartTime());
             String location = stringValue(event.getLocation(), "TBD");
             items.add(new EventCardItem(eventId, title, time, location, null));
         }
+
         adapter.setItems(items);
+
         for (int i = 0; i < events.size(); i++) {
             Event event = events.get(i);
             if (event != null && event.getImageId() != null && i < items.size()) {
