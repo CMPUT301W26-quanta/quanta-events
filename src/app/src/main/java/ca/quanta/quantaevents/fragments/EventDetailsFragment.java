@@ -138,7 +138,7 @@ public class EventDetailsFragment extends Fragment {
         binding.textDescription.setText(stringValue(event.getEventDescription(), ""));
 
         updateManageButton(organizer);
-        fetchOrganizerName(event);
+        fetchOrganizerName();
         updateWaitlistState();
         refreshWaitlistCount();
 
