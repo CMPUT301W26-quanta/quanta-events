@@ -2,6 +2,7 @@ package ca.quanta.quantaevents;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,17 +16,17 @@ import ca.quanta.quantaevents.models.User;
 
 
 public class UserUnitTest {
-    private static String NAME = "TestUser";
-    private static String EMAIL = "test.user@gmail.com";
-    private static String PHONE = "1234567890";
+    private static final String NAME = "TestUser";
+    private static final String EMAIL = "test.user@gmail.com";
+    private static final String PHONE = "1234567890";
 
     @Test
     public void UserBasicCreationTest() {
         User user = new User(NAME, EMAIL, PHONE, true, true, true, true);
 
-        assertEquals(user.getName(), NAME, "Failed with name");
-        assertEquals(user.getEmail(), EMAIL, "Failed with email");
-        assertEquals(user.getPhoneNumber(), PHONE, "Failed with phone");
+        assertEquals(NAME, user.getName(), "Failed with name");
+        assertEquals(EMAIL, user.getEmail(), "Failed with email");
+        assertEquals(PHONE, user.getPhoneNumber(), "Failed with phone");
         assertTrue(user.isEntrant());
         assertTrue(user.isOrganizer());
         assertTrue(user.isAdmin());
@@ -105,5 +106,17 @@ public class UserUnitTest {
         User user = new User(NAME, EMAIL, PHONE, false, false, false, false, userId, deviceId);
         assertEquals(user.getUserId(), userId, "Failed with userId");
         assertEquals(user.getDeviceId(), deviceId, "Failed with deviceId");
+    }
+
+    @Test
+    public void UserEqualityTest() {
+        UUID userId = UUID.randomUUID();
+        UUID deviceId = UUID.randomUUID();
+        User userA = new User(NAME, EMAIL, PHONE, false, false, false, false, userId, deviceId);
+        User userB = new User(NAME, EMAIL, PHONE, false, false, false, false, userId, deviceId);
+        User userC = new User(NAME, EMAIL, PHONE, false, false, false, false);
+        assertEquals(userA, userB);
+        assertNotEquals(userA, userC);
+        assertNotEquals(new Object(), userA);
     }
 }
