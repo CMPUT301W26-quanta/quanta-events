@@ -12,12 +12,20 @@ public class ExternalUser {
 
     /**
      * Constructor for an ExternalUser object.
+     *
      * @param userId Unique ID of the user.
-     * @param name Name of the user.
+     * @param name   Name of the user.
      */
-    ExternalUser(UUID userId, String name) {
+    public ExternalUser(UUID userId, String name) {
         this.userId = userId;
         this.name = name;
     }
 
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public String getName() {
+        return name;
+    }
 }
