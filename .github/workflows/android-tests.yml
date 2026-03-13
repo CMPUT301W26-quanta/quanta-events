@@ -1,4 +1,4 @@
-name: Run Tests And Instrumented Tests
+name: Run Tests
 
 on:
   pull_request:
@@ -17,11 +17,12 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: gradle
-        
-      - name: Give gradlew permission
-        run: chmod +x gradlew
-        working-directory: src
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: Run test
         run: ./gradlew test
         working-directory: src
+
+# TODO: Add instrumented tests
