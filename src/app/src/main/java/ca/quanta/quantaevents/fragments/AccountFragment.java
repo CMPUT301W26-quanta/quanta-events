@@ -95,10 +95,12 @@ public class AccountFragment extends Fragment implements Tagged {
 
         binding.inputName.setText(user.getName());
         binding.inputEmail.setText(user.getEmail());
+
         binding.inputPhone.setText(user.getPhoneNumber());
 
         binding.checkEntrant.setChecked(user.isEntrant());
         binding.checkOrganizer.setChecked(user.isOrganizer());
+
         binding.checkAdmin.setChecked(user.isAdmin());
 
         User.Entrant entrant = user.getEntrant();
@@ -129,7 +131,7 @@ public class AccountFragment extends Fragment implements Tagged {
                     binding.deleteButton.setEnabled(true);
                     android.widget.Toast.makeText(requireContext(), "Account deleted", android.widget.Toast.LENGTH_LONG).show();
                     if (isAdded()) {
-                        NavDirections action = ca.quanta.quantaevents.fragments.AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
+                        NavDirections action = AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
                         Navigation.findNavController(requireView()).navigate(action);
                     }
                 })
@@ -160,7 +162,7 @@ public class AccountFragment extends Fragment implements Tagged {
                 .addOnSuccessListener(_userId -> {
                     binding.saveButton.setEnabled(true);
                     android.widget.Toast.makeText(requireContext(), "Account updated", android.widget.Toast.LENGTH_LONG).show();
-                    NavDirections action = ca.quanta.quantaevents.fragments.AccountFragmentDirections.actionAccountfragmentToHomefragment();
+                    NavDirections action = AccountFragmentDirections.actionAccountfragmentToHomefragment();
                     Navigation.findNavController(requireView()).navigate(action);
                 })
                 .addOnFailureListener(ex -> {
@@ -173,7 +175,7 @@ public class AccountFragment extends Fragment implements Tagged {
         sessionStore.clearSession();
         System.out.println("MISSING USER");
         if (isAdded()) {
-            NavDirections action = ca.quanta.quantaevents.fragments.AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
+            NavDirections action = AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
             Navigation.findNavController(requireView()).navigate(action);
         }
     }

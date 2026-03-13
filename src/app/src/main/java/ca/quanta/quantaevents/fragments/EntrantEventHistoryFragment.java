@@ -123,6 +123,7 @@ public class EntrantEventHistoryFragment extends Fragment {
     }
 
     // bind the data to the view
+    // The following function is from/based off OpenAI, ChatGPT, "bindEventList implementation for EntrantEventHistory", 2026-03-11
     private void bindEventList(List<Event> events) {
         if (events == null) {
             Log.d("EntrantEventHistory", "Event list is null");
@@ -185,6 +186,7 @@ public class EntrantEventHistoryFragment extends Fragment {
         return local.format(displayFormatter);
     }
 
+    // The following function is from/based off OpenAI, ChatGPT, "decodeBase64ToBitmap which decodes base64 to a bitmap", 2026-03-11
     private static Bitmap decodeBase64ToBitmap(String base64) {
         try {
             byte[] bytes = Base64.decode(base64, Base64.DEFAULT);

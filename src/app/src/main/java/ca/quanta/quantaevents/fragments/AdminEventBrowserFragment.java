@@ -127,6 +127,7 @@ public class AdminEventBrowserFragment extends Fragment {
     }
 
     // binds the event list to the view
+    // The following function is from OpenAI, ChatGPT, "bindEventList implementation under AdminEventBrowser", 2026-03-12
     private void bindEventList(List<Event> events) {
         if (events == null) {
             Log.d("AdminEventBrowser", "Event list is null");
@@ -208,7 +209,7 @@ public class AdminEventBrowserFragment extends Fragment {
     private void handleMissingUser() {
         sessionStore.clearSession();
         if (isAdded()) {
-            NavDirections action = ca.quanta.quantaevents.fragments.AdminEventBrowserFragmentDirections.actionGlobalRegisterFragment();
+            NavDirections action = AdminEventBrowserFragmentDirections.actionGlobalRegisterFragment();
             Navigation.findNavController(requireView()).navigate(action);
         }
     }

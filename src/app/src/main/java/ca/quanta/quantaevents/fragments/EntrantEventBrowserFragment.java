@@ -160,6 +160,8 @@ public class EntrantEventBrowserFragment extends Fragment {
                 });
     }
     //bind the events to the array adapter and the card item
+    // The following function is from OpenAI, ChatGPT, "bindEventList implementation for EntrantEventBrowser", 2026-03-11
+
     private void bindEventList(List<Event> events) {
         if (events == null) {
             Log.d("EntrantEventBrowser", "Event list is null");
@@ -221,6 +223,7 @@ public class EntrantEventBrowserFragment extends Fragment {
         return local.format(displayFormatter);
     }
 
+    // The following function is from OpenAI, ChatGPT, "decodeBase64ToBitmap which decodes base64 to a bitmap", 2026-03-11
     private static Bitmap decodeBase64ToBitmap(String base64) {
         try {
             byte[] bytes = Base64.decode(base64, Base64.DEFAULT);

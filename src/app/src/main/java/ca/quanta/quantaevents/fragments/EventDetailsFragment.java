@@ -309,6 +309,9 @@ public class EventDetailsFragment extends Fragment {
         }
     }
 
+    /** formats the time returned from server to show in a user readble format
+     * i.e. converts the time zone
+    */
     private String formatLocalTime(@Nullable ZonedDateTime value) {
         if (value == null) {
             return "TBD";
@@ -324,7 +327,7 @@ public class EventDetailsFragment extends Fragment {
         String result = value.toString().trim();
         return result.isEmpty() ? fallback : result;
     }
-
+    // The following function is from/based off OpenAI, ChatGPT, "decodeBase64ToBitmap which decodes base64 to a bitmap", 2026-03-11
     private static Bitmap decodeBase64ToBitmap(String base64) {
         try {
             byte[] bytes = Base64.decode(base64, Base64.DEFAULT);

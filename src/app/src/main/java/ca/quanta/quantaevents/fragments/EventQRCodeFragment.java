@@ -63,7 +63,7 @@ public class EventQRCodeFragment extends Fragment {
                 String uuidStr = text.substring(14);
                 try {
                     UUID uuid = UUID.fromString(uuidStr);
-                    NavDirections action = ca.quanta.quantaevents.fragments.EventQRCodeFragmentDirections.actionEventQRCodeFragmentToEventDetailsFragment(uuid);
+                    NavDirections action = EventQRCodeFragmentDirections.actionEventQRCodeFragmentToEventDetailsFragment(uuid);
                     Navigation.findNavController(binding.getRoot()).navigate(action);
                 } catch (IllegalArgumentException ignored) {
                 }

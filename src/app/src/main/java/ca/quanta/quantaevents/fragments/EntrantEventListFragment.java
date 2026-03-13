@@ -195,6 +195,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
         return local.format(displayFormatter);
     }
 
+    // The following function is from/based off OpenAI, ChatGPT, "decodeBase64ToBitmap which decodes base64 to a bitmap", 2026-03-11
     private static Bitmap decodeBase64ToBitmap(String base64) {
         try {
             byte[] bytes = Base64.decode(base64, Base64.DEFAULT);

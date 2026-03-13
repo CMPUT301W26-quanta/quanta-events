@@ -59,7 +59,7 @@ public class HomeFragment extends Fragment implements Tagged {
         // listener for info button
 
         binding.infoButton.setOnClickListener(_view -> {
-            NavDirections action = ca.quanta.quantaevents.fragments.HomeFragmentDirections.actionTestFragmentOneToInformationFragment();
+            NavDirections action = HomeFragmentDirections.actionTestFragmentOneToInformationFragment();
             Navigation.findNavController(requireView()).navigate(action);
         });
 
