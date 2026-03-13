@@ -34,6 +34,7 @@ export async function getWaitlist(
 
   }
 
+  
   const { organizer, waitList = [] } = eventDoc.data() as EventDocument;
 
   if (organizer !== userId) {
