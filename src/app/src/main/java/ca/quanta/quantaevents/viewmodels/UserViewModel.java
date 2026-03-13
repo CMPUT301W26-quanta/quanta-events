@@ -18,7 +18,8 @@ import java.util.UUID;
 import ca.quanta.quantaevents.models.User;
 
 /**
- * Class which represents a UserViewModel object.
+ * Class which represents a UserViewModel object for the project and
+ * import all user related functions.
  */
 public class UserViewModel extends ViewModel {
     // Initialize an instance of cloud functions
@@ -26,20 +27,20 @@ public class UserViewModel extends ViewModel {
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
     /**
-     * Calls the createUser cloud function, adding a user to the database.
+     * Calls the createUser cloud function and adds a user to the database
      *
      * @param name             Name of the user.
      * @param email            Email address of the user.
      * @param phone            Phone number of the user.
-     * @param isEntrant        Boolean that's true when the user selects to be an Entrant.
-     * @param isOrganizer      Boolean that's true when the user selects to be an Organizer.
-     * @param isAdmin          Boolean that's true when the user selects to be an Admin.
-     * @param getNotifications Boolean that's true when the user selects to receive notifications.
-     * @param deviceId         UUID identifying the user's device.
-     * @return UUID identifying the user's ID.
+     * @param isEntrant        Boolean that's true when the user selects to be an Entrant. (Will be removed in fina checkpoint)
+     * @param isOrganizer      Boolean that's true when the user selects to be an Organizer. (Will be removed in fina checkpoint)
+     * @param isAdmin          Boolean that's true when the user selects to be an Admin. (Will be removed in fina checkpoint)
+     * @param getNotifications Boolean that's true when the user selects to receive notifications. (Will be removed in fina checkpoint)
+     * @param deviceId         UUID identifying to identify the users device.
+     * @return UUID which is used to locate the user on firestore.
      */
     public Task<UUID> createUser(String name, String email, String phone, Boolean isEntrant, Boolean isOrganizer, Boolean isAdmin, Boolean getNotifications, UUID deviceId) {
-        // Arguments for createUser
+        // Arguments for createUser passed in data Map
         Map<String, Object> data = new HashMap<>();
 
         data.put("deviceId", deviceId.toString());
@@ -55,7 +56,7 @@ public class UserViewModel extends ViewModel {
                 .getHttpsCallable("createUser")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, UUID>() {
-                    // Access return value of the function
+                    // Access return value of the function createUser
                     @Override
                     public UUID then(@NonNull Task<HttpsCallableResult> task) {
                         Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
@@ -65,6 +66,11 @@ public class UserViewModel extends ViewModel {
                 });
     }
 
+    /**
+     * Calls the getAllUsers cloud function and returns a list of users in the database.
+     *
+     * @return List of User Objects which have all information related to the user.
+     */
     public Task<ArrayList<User>> getAllUsers() {
        return functions
                .getHttpsCallable("getAllUsers")
@@ -104,10 +110,10 @@ public class UserViewModel extends ViewModel {
     }
 
     /**
-     * Calls the getUser cloud function, getting a user's details from the database.
+     * Calls the getUser cloud function gets information about the user from the database
      *
-     * @param userId   UUID identifying the user.
-     * @param deviceId UUID identifying the user's device.
+     * @param userId   UUID to identify the record stored in Users collection.
+     * @param deviceId UUID to identify if the deviceId matches what we have on database for the user.
      * @return User object with the user's information.
      */
     public Task<User> getUser(UUID userId, UUID deviceId) {
@@ -134,7 +140,7 @@ public class UserViewModel extends ViewModel {
      * Calls the deleteUser cloud function, deleting a user.
      * @param userId UUID identifying the user.
      * @param deviceId UUID identifying the user's device.
-     * @return True when delete completes.
+     * @return True when delete completes successfully without errors else returns the error.
      */
     public Task<Boolean> deleteUser(UUID userId, UUID deviceId, UUID targetUserId) {
         Map<String, Object> data = new HashMap<>();
@@ -157,11 +163,11 @@ public class UserViewModel extends ViewModel {
     }
 
     /**
-     * Calls the updateUser cloud function, updating a user's details.
-     * @param userId UUID identifying the user.
-     * @param deviceId UUID identifying the user's device.
-     * @param name Updated user name.
-     * @param email Updated user email.
+     * Calls the updateUser cloud function updates existing users details.
+     * @param userId UUID to identify the user in database.
+     * @param deviceId UUID to verify users device.
+     * @param name new user name (optional)/
+     * @param email new user email (optional).
      * @param phone Updated phone (optional).
      * @param receiveNotifications Updated notification preference (optional).
      * @return UUID identifying the user's ID.
@@ -171,10 +177,14 @@ public class UserViewModel extends ViewModel {
                                    @Nullable String email,
                                    @Nullable String phone,
                                    @Nullable Boolean receiveNotifications) {
+
+        // Builds the data map to be sent to the functionnn which contains
+        // userId, deviceId and new details to update with.
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
+        // payload... the details to update with.
         Map<String, Object> payload = new HashMap<>();
         payload.put("name", name);
         payload.put("email", email);
@@ -182,6 +192,7 @@ public class UserViewModel extends ViewModel {
         payload.put("receiveNotifications", receiveNotifications);
         data.put("data", payload);
 
+        // to debug code cuz a lot of errors while testing... T-T
         System.out.println("updateUser payload type=" + data.getClass().getName());
         System.out.println("updateUser payload=" + data);
 
@@ -198,11 +209,11 @@ public class UserViewModel extends ViewModel {
     }
 
     /**
-     * Calls the getUser cloud function, returning the raw user map.
+     * Calls the getUser cloud function returns the raw user map
      *
-     * @param userId   UUID identifying the user.
-     * @param deviceId UUID identifying the user's device.
-     * @return Map containing the user's data.
+     * @param userId UUID to identify the user in database.
+     * @param deviceId UUID to verify users device.
+     * @return A Map containing the users data returned from the function.
      */
     public Task<Map<String, Object>> getUserRaw(UUID userId, UUID deviceId) {
         Map<String, Object> data = new HashMap<>();

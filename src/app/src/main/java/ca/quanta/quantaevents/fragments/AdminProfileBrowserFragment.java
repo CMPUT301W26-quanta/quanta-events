@@ -30,6 +30,7 @@ public class AdminProfileBrowserFragment extends Fragment {
 
     private UserViewModel model;
 
+    // lists all profiles to show to admin and adds them to the array
     private void listProfiles() {
         model.getAllUsers()
                 .addOnSuccessListener(users -> {
@@ -66,23 +67,26 @@ public class AdminProfileBrowserFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // **** set up the header
+        //set up the header
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
-
+        // set title of the page to Event and the subtitle.
+        // also sets the icon for the page
         infoStore.setTitle("Admin Profile Browser");
         infoStore.setSubtitle("Browse and remove profiles.");
         infoStore.setIconRes(R.drawable.material_symbols_person_shield_outline);
 
-        // **** set up the view model
+        // set up the view model
 
         this.model = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
-        // **** set up the profiles recycler view
+        /**
+         * set up the profiles recycler view
+         */
 
         this.listProfiles();
 
-        // **** set up the buttons
+        // *set up the backbuttons on click listener
 
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()

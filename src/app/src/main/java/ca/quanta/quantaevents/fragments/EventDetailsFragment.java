@@ -53,38 +53,43 @@ public class EventDetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // **** set up the header
+        // set up the header
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
 
+        // set title of the page to Event and the subtitle.
+        // also sets the icon for the page
         infoStore.setTitle("Event");
         infoStore.setSubtitle("View event details");
         infoStore.setIconRes(R.drawable.material_symbols_event_outline);
 
-        // **** set up the view model
+        // set up the view model
 
         this.model = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
-        // **** set up the session store and get this user
+        //set up the session store and get this user
 
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
         eventModel = new ViewModelProvider(this).get(EventViewModel.class);
         imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
 
+        // reads event id passed in form of arguments using bundles
         readEventId();
 
+        // check session
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
             loadEvent();
         });
 
+        // gets role to determine which button to display
         sessionStore.getRoleMask().observe(getViewLifecycleOwner(), mask -> {
             isAdmin = mask != null && (mask & SmartBurger.ADMIN_GROUP) != 0;
             updateManageButton(null);
         });
 
-        // **** set up buttons
+        // set up back button on click listener
 
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
@@ -98,15 +103,18 @@ public class EventDetailsFragment extends Fragment {
         return binding.getRoot();
     }
 
+    // read event id passed in form of arguments
+    // also read if the user was redirect to his fragment from the admin event browser
     private void readEventId() {
-        ca.quanta.quantaevents.fragments.EventDetailsFragmentArgs args = ca.quanta.quantaevents.fragments.EventDetailsFragmentArgs.fromBundle(getArguments());
+        EventDetailsFragmentArgs args = EventDetailsFragmentArgs.fromBundle(getArguments());
         eventId = args.getEventId();
         fromAdmin = args.getFromAdmin();
     }
 
+    // load the event details
     private void loadEvent() {
         if (userId == null || deviceId == null) {
-            NavDirections action = ca.quanta.quantaevents.fragments.EventDetailsFragmentDirections.actionGlobalRegisterFragment();
+            NavDirections action = EventDetailsFragmentDirections.actionGlobalRegisterFragment();
             Navigation.findNavController(requireView()).navigate(action);
             return;
         }
@@ -121,6 +129,8 @@ public class EventDetailsFragment extends Fragment {
                 );
     }
 
+    // bind the event details to the
+    // ui elemtents in the view
     private void bindEvent(Event event) {
         if (event == null) {
             return;
@@ -157,6 +167,7 @@ public class EventDetailsFragment extends Fragment {
         }
     }
 
+    // change text on the button to display according to role
     private void updateManageButton(String organizerId) {
         if (isAdmin && fromAdmin) {
             binding.enrollButton.setText("Delete");
@@ -167,7 +178,7 @@ public class EventDetailsFragment extends Fragment {
             binding.enrollButton.setText("Manage");
             binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
             binding.enrollButton.setOnClickListener(v -> {
-                NavDirections action = ca.quanta.quantaevents.fragments.EventDetailsFragmentDirections.actionEventdetailsfragmentToEventmanagerfragment(eventId);
+                NavDirections action = EventDetailsFragmentDirections.actionEventdetailsfragmentToEventmanagerfragment(eventId);
                 Navigation.findNavController(v).navigate(action);
             });
             return;
@@ -175,6 +186,7 @@ public class EventDetailsFragment extends Fragment {
         binding.enrollButton.setOnClickListener(v -> toggleWaitlist());
     }
 
+    // get the organizer name to display in the ui
     private void fetchOrganizerName(Event event) {
         if (userId == null || deviceId == null || eventId == null) {
             binding.textOrganizer.setText(" [unable to fetch organizer name]");

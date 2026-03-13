@@ -40,18 +40,22 @@ public class AccountFragment extends Fragment implements Tagged {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        // sets title as account
+        // sets subtitle and the icon
         infoStore.setTitle("Account");
         infoStore.setSubtitle("Change account details");
         infoStore.setIconRes(R.drawable.material_symbols_person_outline);
 
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
         userModel = new ViewModelProvider(this).get(UserViewModel.class);
+        // verify and check session
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
             maybeLoadUser();
         });
 
+        // set on click listener for back button
         binding.deleteButton.setOnClickListener(
                 v -> {
                     deleteUser();
@@ -85,6 +89,7 @@ public class AccountFragment extends Fragment implements Tagged {
                 }).addOnCanceledListener(this::handleMissingUser);
     }
 
+    // set input fields to the data fetched from server.
     private void populateFields(@NonNull User user) {
         System.out.println(user);
 
@@ -111,6 +116,8 @@ public class AccountFragment extends Fragment implements Tagged {
         }
     }
 
+    // deelte user from database and clear the shared preferences
+    // and redirect to welcome fragment
     private void deleteUser() {
         if (userId == null || deviceId == null) {
             return;
@@ -132,6 +139,8 @@ public class AccountFragment extends Fragment implements Tagged {
                 });
     }
 
+    // update user details in database and
+    // redirect to home fragment if successful
     private void updateUser() {
         if (userId == null || deviceId == null) {
             return;

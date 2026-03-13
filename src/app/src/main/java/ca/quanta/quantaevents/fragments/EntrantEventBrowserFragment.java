@@ -55,28 +55,32 @@ public class EntrantEventBrowserFragment extends Fragment {
         Log.d("EntrantEventBrowser", "onViewCreated");
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        // set title of the page to Event Browser and the subtitle.
+        // also sets the icon for the page
         infoStore.setTitle("Event Browser");
         infoStore.setSubtitle("Browse Events to enroll");
         infoStore.setIconRes(R.drawable.material_symbols_search_outline);
 
+        // back button click listener
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
         );
+        // filter button click listener to navigate to filter fragment
         binding.filterButton.setOnClickListener(
                 v -> {
-                    NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventBrowserFragmentDirections.actionEntranteventbrowserfragmentToEventfilterfragment();
+                    NavDirections action = EntrantEventBrowserFragmentDirections.actionEntranteventbrowserfragmentToEventfilterfragment();
                     Navigation.findNavController(v).navigate(action);
                 }
         );
         binding.qrButton.setOnClickListener(
                 v -> {
-                    NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventBrowserFragmentDirections.actionEntranteventbrowserfragmentToEventqrcodefragment();
+                    NavDirections action = EntrantEventBrowserFragmentDirections.actionEntranteventbrowserfragmentToEventqrcodefragment();
                     Navigation.findNavController(v).navigate(action);
                 }
         );
 
         adapter = new EventCardAdapter(item -> {
-            NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventBrowserFragmentDirections.actionEventBrowserFragmentToEventDetailsFragment(item.getEventId());
+            NavDirections action = EntrantEventBrowserFragmentDirections.actionEventBrowserFragmentToEventDetailsFragment(item.getEventId());
             Navigation.findNavController(requireView()).navigate(action);
         });
         binding.eventsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -109,7 +113,8 @@ public class EntrantEventBrowserFragment extends Fragment {
             loadAvailableEvents();
         }
     }
-
+    // decides if events should be loaded based on if they
+    // have been loaded before or if session is valid
     private void maybeLoadAllEvents() {
         if (loadedInitialEvents) {
             return;
@@ -121,6 +126,8 @@ public class EntrantEventBrowserFragment extends Fragment {
         loadAvailableEvents();
     }
 
+    // loads all the available events based on the user session and
+    // by default sorts them by registration end time.
     private void loadAvailableEvents() {
         if (userId == null || deviceId == null) {
             Log.d("EntrantEventBrowser", "Session missing: userId/deviceId null");
@@ -152,6 +159,7 @@ public class EntrantEventBrowserFragment extends Fragment {
                     Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
                 });
     }
+    //bind the events to the array adapter and the card item
     private void bindEventList(List<Event> events) {
         if (events == null) {
             Log.d("EntrantEventBrowser", "Event list is null");
@@ -192,7 +200,7 @@ public class EntrantEventBrowserFragment extends Fragment {
                     }
                     Bitmap bitmap = decodeBase64ToBitmap(imageData.toString());
                     if (bitmap != null) {
-                        adapter.upsert(item.withImage(bitmap));
+                        adapter.updateInsert(item.withImage(bitmap));
                     }
                 });
     }
@@ -233,7 +241,7 @@ public class EntrantEventBrowserFragment extends Fragment {
     private void handleMissingUser() {
         sessionStore.clearSession();
         if (isAdded()) {
-            NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventBrowserFragmentDirections.actionGlobalRegisterFragment();
+            NavDirections action = EntrantEventBrowserFragmentDirections.actionGlobalRegisterFragment();
             Navigation.findNavController(requireView()).navigate(action);
         }
     }

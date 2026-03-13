@@ -169,7 +169,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
                     }
                     Bitmap bitmap = decodeBase64ToBitmap(imageData.toString());
                     if (bitmap != null) {
-                        adapter.upsert(item.withImage(bitmap));
+                        adapter.updateInsert(item.withImage(bitmap));
                     }
                 });
     }

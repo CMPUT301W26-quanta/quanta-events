@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Class which represents an ImageViewModel object.
+ * Class which represents an ImageViewModel object for the project.
  */
 public class ImageViewModel extends ViewModel {
 

@@ -53,6 +53,8 @@ public class AdminEventBrowserFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        // set the title as admin event browser
+        // sets the subtitle and icon
         infoStore.setTitle("Admin Event Browser");
         infoStore.setSubtitle("Browse and Moderate Events");
         infoStore.setIconRes(R.drawable.material_symbols_calendar_lock_outline);
@@ -61,6 +63,8 @@ public class AdminEventBrowserFragment extends Fragment {
                 v -> Navigation.findNavController(v).popBackStack()
         );
 
+        // new instance of event card adapter and sends event id and true for fromAdmin
+        // because admin is viewing from admin event browser
         adapter = new EventCardAdapter(item -> {
             Bundle args = new Bundle();
             args.putSerializable("eventId", item.getEventId());
@@ -74,6 +78,7 @@ public class AdminEventBrowserFragment extends Fragment {
         eventModel = new ViewModelProvider(this).get(EventViewModel.class);
         imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
+        // checks and verifies session
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
@@ -87,6 +92,8 @@ public class AdminEventBrowserFragment extends Fragment {
         binding = FragmentAdminEventBrowserBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
+
+    // loads all events past and ongoing for admin to view and moderate them.
 
     private void loadAllEvents() {
         if (userId == null || deviceId == null) {
@@ -119,6 +126,7 @@ public class AdminEventBrowserFragment extends Fragment {
                 });
     }
 
+    // binds the event list to the view
     private void bindEventList(List<Event> events) {
         if (events == null) {
             Log.d("AdminEventBrowser", "Event list is null");
@@ -159,7 +167,7 @@ public class AdminEventBrowserFragment extends Fragment {
                     }
                     Bitmap bitmap = decodeBase64ToBitmap(imageData.toString());
                     if (bitmap != null) {
-                        adapter.upsert(item.withImage(bitmap));
+                        adapter.updateInsert(item.withImage(bitmap));
                     }
                 });
     }
