@@ -138,7 +138,7 @@ public class EventDetailsFragment extends Fragment {
         binding.textDescription.setText(stringValue(event.getEventDescription(), ""));
 
         updateManageButton(organizer);
-        fetchOrganizerName();
+        fetchOrganizerName(event);
         updateWaitlistState();
         refreshWaitlistCount();
 
@@ -180,9 +180,6 @@ public class EventDetailsFragment extends Fragment {
             binding.textOrganizer.setText(" [unable to fetch organizer name]");
             return;
         }
-
-        UUID organizerId = event.getOrganizerId();
-        UUID organizerDeviceId = event.getOrganizerDeviceId();
 
         binding.textOrganizer.setText(" Loading organizer name...");
 
