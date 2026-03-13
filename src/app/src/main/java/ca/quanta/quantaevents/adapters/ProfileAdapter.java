@@ -1,27 +1,43 @@
 package ca.quanta.quantaevents.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
+import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.models.User;
+import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileViewHolder> {
     private final List<User> profiles;
 
-    public ProfileAdapter(List<User> profiles) {
+    private UserViewModel model;
+
+    private Fragment parentFragment;
+
+    public ProfileAdapter(List<User> profiles, Fragment parentFragment) {
+        this.parentFragment = parentFragment;
+
+        this.model = new ViewModelProvider(this.parentFragment.getActivity()).get(UserViewModel.class);
         this.profiles = profiles;
     }
 
@@ -44,7 +60,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         User user = profiles.get(position);
 
         String name = user.getName();
-        holder.name.setText(name != null ? name : "[NO USER.NAME]");
+        holder.name.setText(name != null ? name : "[null username]");
 
         holder.buttonIconClose.setOnClickListener(view -> {
             int profilePosition = holder.getBindingAdapterPosition();
@@ -53,8 +69,53 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
                 return;
             }
 
-            profiles.remove(profilePosition);
-            notifyItemRemoved(profilePosition);
+            UUID profileUserId = profiles.get(profilePosition).getUserId();
+
+            SessionStore sessionStore = new ViewModelProvider(this.parentFragment.getActivity()).get(SessionStore.class);
+
+            sessionStore.observeSession(this.parentFragment.getViewLifecycleOwner(), (userUUID, deviceUUID) -> {
+                if (userUUID == null) {
+                    Log.e("ProfileAdapter", "Failed to deleteUser because userUUID is NULL.");
+                    return;
+                }
+
+                if (deviceUUID == null) {
+                    Log.e("ProfileAdapter", "Failed to deleteUser because userUUID is NULL.");
+                    return;
+                }
+
+                model.deleteUser(userUUID, deviceUUID, user.getUserId())
+                        .addOnSuccessListener(v -> {
+                            int pos = -1;
+
+                            // I do this, instead of doing profiles.get(profilePosition), in case
+                            // something has changed recently (bc this is async). eg another
+                            // profile being removed in the meantime
+                            for (int i = 0; i < profiles.size(); i++) {
+                                User profile = profiles.get(i);
+                                if (profile.getUserId() == profileUserId) {
+                                    pos = i;
+                                    break;
+                                }
+                            }
+
+                            // sometimes this is called twice for some reason, so the profile
+                            // has already been deleted successfully
+                            // bc of that, we get some erroneous calls of this, and this gets
+                            // output even tho everything went well
+                            if (pos == -1) {
+                                Log.e("ProfileAdapter", "Cannot find profile to delete.");
+                                return;
+                            }
+
+                            this.profiles.remove(pos);
+                            this.notifyItemRemoved(pos);
+                        })
+                        .addOnFailureListener(exception -> {
+                            Toast.makeText(this.parentFragment.requireContext(), "Failed to deleteUser: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+                           Log.e("ProfileAdapter", "Failed to deleteUser.");
+                        });
+            });
         });
 
         if (!user.isOrganizer()) {

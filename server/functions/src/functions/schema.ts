@@ -14,7 +14,7 @@ export interface Entrant {
 }
 
 export interface User {
-	deviceID: string;
+	deviceId: string;
 	email: string;
 	organizer: Organizer;
 	admin: Admin;

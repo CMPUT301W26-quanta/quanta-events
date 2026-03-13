@@ -30,8 +30,6 @@ export async function deleteUser(request: CallableRequest) {
     await util.requireRole(userData, "admin");
   }
 
-
-
   const eventsSnapshot = await db.collection("events").get();
 
   const eventUpdates = eventsSnapshot.docs.map(async (eventDoc) => {
@@ -42,7 +40,7 @@ export async function deleteUser(request: CallableRequest) {
     }
 
     const isInAnyList =
-      event.waitList?.includes(target) ||               
+      event.waitList?.includes(target) ||
       event.finalList?.includes(target) ||
       event.cancelledList?.includes(target);
 

@@ -79,12 +79,28 @@ public class UserViewModel extends ViewModel {
                        for (Map<String, Object> userObject : userObjects) {
                            // we only get a limited amount of info back about each user
 
+                           String userId = (String) userObject.get("userId");
+                           String deviceId = (String) userObject.get("deviceId");
                            String name = (String) userObject.get("name");
                            Boolean isEntrant = (Boolean) userObject.get("isEntrant");
                            Boolean isOrganizer = (Boolean) userObject.get("isOrganizer");
                            Boolean isAdmin = (Boolean) userObject.get("isAdmin");
 
-                           users.add(new User(name, null, null, null, isEntrant, isOrganizer, isAdmin));
+                           // verify that they have a userId and deviceId
+                           // otherwise just skip them
+
+                           if (userId == null) {
+                               continue;
+                           }
+
+                           if (deviceId == null) {
+                               continue;
+                           }
+
+                           UUID userUUID = UUID.fromString(userId);
+                           UUID deviceUUID = UUID.fromString(deviceId);
+
+                           users.add(new User(name, null, null, null, isEntrant, isOrganizer, isAdmin, userUUID, deviceUUID));
                        }
 
                        return users;
