@@ -27,7 +27,7 @@ public class ShowQRFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        eventId = ShowQRFragmentArgs.fromBundle(getArguments()).getEventId();
+        eventId = ca.quanta.quantaevents.fragments.ShowQRFragmentArgs.fromBundle(getArguments()).getEventId();
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
         infoStore.setTitle("QR Code");

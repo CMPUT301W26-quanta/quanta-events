@@ -1,5 +1,7 @@
 package ca.quanta.quantaevents.viewmodels;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
@@ -163,6 +165,13 @@ public class EventViewModel extends ViewModel {
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
+        if (fetch == null) {
+            fetch = Fetch.AVAILABLE;
+        }
+        if (sortBy == null) {
+            sortBy = SortBy.REGISTRATION_END;
+        }
+
         Map<String, Object> filter = new HashMap<>();
         filter.put("fetch", fetch.getValue());
         filter.put("startDate", startDate);
@@ -176,6 +185,8 @@ public class EventViewModel extends ViewModel {
         payload.put("sortBy", sortBy.getValue());
         data.put("data", payload);
 
+        Log.d("EventViewModel", "getEvents payload=" + data);
+
         return functions
                 .getHttpsCallable("getEvents")
                 .call(data)
@@ -183,6 +194,7 @@ public class EventViewModel extends ViewModel {
                     @Override
                     public List<Event> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
                         List<Map<String, Object>> result = (List<Map<String, Object>>) task.getResult().getData();
+                        Log.d("EventViewModel", "getEvents result=" + result);
                         ArrayList<Event> events = new ArrayList<>();
                         if (result == null) {
                             return events;
@@ -194,6 +206,179 @@ public class EventViewModel extends ViewModel {
                             }
                         }
                         return events;
+                    }
+                });
+    }
+
+    /**
+     * Calls the getOrganizerName cloud function for an event.
+     */
+    public Task<String> getOrganizerName(UUID userId, UUID deviceId, UUID eventId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("getOrganizerName")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, String>() {
+                    @Override
+                    public String then(@NonNull Task<HttpsCallableResult> task) {
+                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
+                        Object name = result == null ? null : result.get("name");
+                        return name == null ? null : name.toString();
+                    }
+                });
+    }
+
+    /**
+     * Calls the getWaitlistCount cloud function for an event.
+     */
+    public Task<Integer> getWaitlistCount(UUID userId, UUID deviceId, UUID eventId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("getWaitlistCount")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, Integer>() {
+                    @Override
+                    public Integer then(@NonNull Task<HttpsCallableResult> task) {
+                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
+                        Object count = result == null ? null : result.get("count");
+                        return count instanceof Number ? ((Number) count).intValue() : 0;
+                    }
+                });
+    }
+
+    /**
+     * Calls the inWaitlist cloud function for an event.
+     */
+    public Task<Boolean> checkWaitlist(UUID userId, UUID deviceId, UUID eventId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        data.put("data", payload);
+
+        Log.d("EventViewModel", "checkWaitlist payload type=" + data.getClass().getName());
+        Log.d("EventViewModel", "checkWaitlist payload=" + data);
+
+        return functions
+                .getHttpsCallable("checkWaitlist")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, Boolean>() {
+                    @Override
+                    public Boolean then(@NonNull Task<HttpsCallableResult> task) {
+                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
+                        Log.d("EventViewModel", "checkWaitlist result=" + result);
+                        Object inWaitlist = result == null ? null : result.get("inWaitlist");
+                        return inWaitlist instanceof Boolean ? (Boolean) inWaitlist : false;
+                    }
+                });
+    }
+
+    /**
+     * Calls the joinWaitlist cloud function for an event.
+     */
+    public Task<Void> joinWaitlist(UUID userId, UUID deviceId, UUID eventId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        data.put("data", payload);
+
+        Log.d("EventViewModel", "joinWaitlist payload type=" + data.getClass().getName());
+        Log.d("EventViewModel", "joinWaitlist payload=" + data);
+
+        return FirebaseFunctions.getInstance()
+                .getHttpsCallable("joinWaitlist")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, Void>() {
+                    @Override
+                    public Void then(@NonNull Task<HttpsCallableResult> task) {
+                        Log.d("EventViewModel", "joinWaitlist success");
+                        return null;
+                    }
+                });
+    }
+
+    /**
+     * Calls the leaveWaitlist cloud function for an event.
+     */
+    public Task<Void> leaveWaitlist(UUID userId, UUID deviceId, UUID eventId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        data.put("data", payload);
+
+        Log.d("EventViewModel", "leaveWaitlist payload type=" + data.getClass().getName());
+        Log.d("EventViewModel", "leaveWaitlist payload=" + data);
+
+        return functions
+                .getHttpsCallable("leaveWaitlist")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, Void>() {
+                    @Override
+                    public Void then(@NonNull Task<HttpsCallableResult> task) {
+                        Log.d("EventViewModel", "leaveWaitlist success");
+                        return null;
+                    }
+                });
+    }
+
+    /**
+     * Calls the updateEvent cloud function.
+     */
+    public Task<Void> updateEvent(UUID userId, UUID deviceId, UUID eventId,
+                                  String registrationStartTime, String registrationEndTime, String eventTime,
+                                  String eventName, String eventDescription,
+                                  String eventCategory, String eventGuidelines,
+                                  boolean geolocation, int eventCapacity,
+                                  String location, Integer registrationLimit, UUID imageId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        payload.put("registrationStartTime", registrationStartTime);
+        payload.put("registrationEndTime", registrationEndTime);
+        payload.put("eventTime", eventTime);
+        payload.put("eventName", eventName);
+        payload.put("eventDescription", eventDescription);
+        payload.put("eventCategory", eventCategory);
+        payload.put("eventGuidelines", eventGuidelines);
+        payload.put("geolocation", geolocation);
+        payload.put("eventCapacity", eventCapacity);
+        payload.put("location", location);
+        payload.put("registrationLimit", registrationLimit);
+        payload.put("imageId", imageId == null ? null : imageId.toString());
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("updateEvent")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, Void>() {
+                    @Override
+                    public Void then(@NonNull Task<HttpsCallableResult> task) {
+                        return null;
                     }
                 });
     }
@@ -276,10 +461,10 @@ public class EventViewModel extends ViewModel {
     @SuppressWarnings("unchecked")
     private static ArrayList<UUID> parseUuidList(Object value) {
         ArrayList<UUID> result = new ArrayList<>();
-        if (!(value instanceof java.util.List)) {
+        if (!(value instanceof List)) {
             return result;
         }
-        for (Object item : (java.util.List<Object>) value) {
+        for (Object item : (List<Object>) value) {
             UUID id = parseUUID(valueToString(item));
             if (id != null) {
                 result.add(id);

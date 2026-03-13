@@ -30,7 +30,6 @@ import java.util.UUID;
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.EventCardAdapter;
 import ca.quanta.quantaevents.adapters.EventCardItem;
-import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentAdminEventBrowserBinding;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
@@ -201,7 +200,7 @@ public class AdminEventBrowserFragment extends Fragment {
     private void handleMissingUser() {
         sessionStore.clearSession();
         if (isAdded()) {
-            NavDirections action = AdminEventBrowserFragmentDirections.actionGlobalRegisterFragment();
+            NavDirections action = ca.quanta.quantaevents.fragments.AdminEventBrowserFragmentDirections.actionGlobalRegisterFragment();
             Navigation.findNavController(requireView()).navigate(action);
         }
     }

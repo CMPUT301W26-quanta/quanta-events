@@ -64,19 +64,19 @@ public class EntrantEventBrowserFragment extends Fragment {
         );
         binding.filterButton.setOnClickListener(
                 v -> {
-                    NavDirections action = EntrantEventBrowserFragmentDirections.actionEntranteventbrowserfragmentToEventfilterfragment();
+                    NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventBrowserFragmentDirections.actionEntranteventbrowserfragmentToEventfilterfragment();
                     Navigation.findNavController(v).navigate(action);
                 }
         );
         binding.qrButton.setOnClickListener(
                 v -> {
-                    NavDirections action = EntrantEventBrowserFragmentDirections.actionEntranteventbrowserfragmentToEventqrcodefragment();
+                    NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventBrowserFragmentDirections.actionEntranteventbrowserfragmentToEventqrcodefragment();
                     Navigation.findNavController(v).navigate(action);
                 }
         );
 
         adapter = new EventCardAdapter(item -> {
-            NavDirections action = EntrantEventBrowserFragmentDirections.actionEventBrowserFragmentToEventDetailsFragment(item.getEventId());
+            NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventBrowserFragmentDirections.actionEventBrowserFragmentToEventDetailsFragment(item.getEventId());
             Navigation.findNavController(requireView()).navigate(action);
         });
         binding.eventsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -233,7 +233,7 @@ public class EntrantEventBrowserFragment extends Fragment {
     private void handleMissingUser() {
         sessionStore.clearSession();
         if (isAdded()) {
-            NavDirections action = EntrantEventBrowserFragmentDirections.actionGlobalRegisterFragment();
+            NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventBrowserFragmentDirections.actionGlobalRegisterFragment();
             Navigation.findNavController(requireView()).navigate(action);
         }
     }

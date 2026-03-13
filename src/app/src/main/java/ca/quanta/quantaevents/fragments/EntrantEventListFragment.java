@@ -53,6 +53,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d("EntrantEventList", "onViewCreated");
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
         infoStore.setTitle("Event List");
@@ -61,23 +62,24 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
 
         binding.historyButton.setOnClickListener(
                 v -> {
-                    NavDirections action = EntrantEventListFragmentDirections.actionEntranteventlistToEntranteventhistoryfragment();
+                    NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventListFragmentDirections.actionEntranteventlistToEntranteventhistoryfragment();
                     Navigation.findNavController(v).navigate(action);
                 }
         );
         binding.searchButton.setOnClickListener(
                 v -> {
-                    NavDirections action = EntrantEventListFragmentDirections.actionEntranteventlistToEntranteventbrowserfragment();
+                    NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventListFragmentDirections.actionEntranteventlistToEntranteventbrowserfragment();
                     Navigation.findNavController(v).navigate(action);
                 }
         );
 
         adapter = new EventCardAdapter(item -> {
-            NavDirections action = EntrantEventListFragmentDirections.actionEntranteventlistToEventdetailsfragment(item.getEventId());
+            NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventListFragmentDirections.actionEntranteventlistToEventdetailsfragment(item.getEventId());
             Navigation.findNavController(requireView()).navigate(action);
         });
         binding.eventsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.eventsRecyclerView.setAdapter(adapter);
+        Log.d("EntrantEventList", "RecyclerView adapter attached");
 
         eventModel = new ViewModelProvider(this).get(EventViewModel.class);
         imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
@@ -85,6 +87,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
+            Log.d("EntrantEventList", "Session updated userId=" + userId + " deviceId=" + deviceId);
             loadEnrolledEvents();
         });
 
@@ -113,7 +116,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
                         null,
                         null,
                         null,
-                        EventViewModel.SortBy.REGISTRATION_END)
+                        null)
                 .addOnSuccessListener(this::bindEventList)
                 .addOnFailureListener(ex -> {
                     Log.e("EntrantEventList", "Failed to load events", ex);
@@ -210,7 +213,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
     private void handleMissingUser() {
         sessionStore.clearSession();
         if (isAdded()) {
-            NavDirections action = EntrantEventListFragmentDirections.actionGlobalRegisterFragment();
+            NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventListFragmentDirections.actionGlobalRegisterFragment();
             Navigation.findNavController(requireView()).navigate(action);
         }
     }
