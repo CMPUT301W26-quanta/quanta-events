@@ -54,14 +54,12 @@ public class AccountFragment extends Fragment implements Tagged {
 
         binding.deleteButton.setOnClickListener(
                 v -> {
-                    NavDirections action = AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
-                    Navigation.findNavController(v).navigate(action);
+                    deleteUser();
                 }
         );
         binding.saveButton.setOnClickListener(
                 v -> {
-                    NavDirections action = AccountFragmentDirections.actionAccountfragmentToHomefragment();
-                    Navigation.findNavController(v).navigate(action);
+                    updateUser();
                 }
         );
 
@@ -104,14 +102,6 @@ public class AccountFragment extends Fragment implements Tagged {
         }
     }
 
-    private static String stringValue(Object value) {
-        if (value == null) {
-            return "";
-        }
-        String result = value.toString().trim();
-        return result;
-    }
-
     private boolean isUserNotFound(Exception ex) {
         if (ex instanceof FirebaseFunctionsException) {
             FirebaseFunctionsException.Code code = ((FirebaseFunctionsException) ex).getCode();
@@ -119,6 +109,55 @@ public class AccountFragment extends Fragment implements Tagged {
         } else {
             throw new RuntimeException(ex);
         }
+    }
+
+    private void deleteUser() {
+        if (userId == null || deviceId == null) {
+            return;
+        }
+        binding.deleteButton.setEnabled(false);
+        userModel.deleteUser(userId, deviceId, userId)
+                .addOnSuccessListener(_done -> {
+                    sessionStore.clearSession();
+                    binding.deleteButton.setEnabled(true);
+                    android.widget.Toast.makeText(requireContext(), "Account deleted", android.widget.Toast.LENGTH_LONG).show();
+                    if (isAdded()) {
+                        NavDirections action = AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
+                        Navigation.findNavController(requireView()).navigate(action);
+                    }
+                })
+                .addOnFailureListener(ex -> {
+                    binding.deleteButton.setEnabled(true);
+                    android.widget.Toast.makeText(requireContext(), "Failed to delete account", android.widget.Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private void updateUser() {
+        if (userId == null || deviceId == null) {
+            return;
+        }
+        String name = binding.inputName.getText().toString().trim();
+        String email = binding.inputEmail.getText().toString().trim();
+        String phone = binding.inputPhone.getText().toString().trim();
+
+        name = name.isEmpty() ? null : name;
+        email = email.isEmpty() ? null : email;
+        phone = phone.isEmpty() ? null : phone;
+
+        Boolean receiveNotifications = binding.checkNotifications.isChecked();
+
+        binding.saveButton.setEnabled(false);
+        userModel.updateUser(userId, deviceId, name, email, phone, receiveNotifications)
+                .addOnSuccessListener(_userId -> {
+                    binding.saveButton.setEnabled(true);
+                    android.widget.Toast.makeText(requireContext(), "Account updated", android.widget.Toast.LENGTH_LONG).show();
+                    NavDirections action = AccountFragmentDirections.actionAccountfragmentToHomefragment();
+                    Navigation.findNavController(requireView()).navigate(action);
+                })
+                .addOnFailureListener(ex -> {
+                    binding.saveButton.setEnabled(true);
+                    android.widget.Toast.makeText(requireContext(), "Failed to update account", android.widget.Toast.LENGTH_LONG).show();
+                });
     }
 
     private void handleMissingUser() {
