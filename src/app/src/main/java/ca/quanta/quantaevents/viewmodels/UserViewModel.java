@@ -1,6 +1,7 @@
 package ca.quanta.quantaevents.viewmodels;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.Continuation;
@@ -8,7 +9,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,6 +23,7 @@ import ca.quanta.quantaevents.models.User;
 public class UserViewModel extends ViewModel {
     // Initialize an instance of cloud functions
 
+    private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
     /**
      * Calls the createUser cloud function, adding a user to the database.
@@ -37,6 +41,7 @@ public class UserViewModel extends ViewModel {
     public Task<UUID> createUser(String name, String email, String phone, Boolean isEntrant, Boolean isOrganizer, Boolean isAdmin, Boolean getNotifications, UUID deviceId) {
         // Arguments for createUser
         Map<String, Object> data = new HashMap<>();
+
         data.put("deviceId", deviceId.toString());
         data.put("name", name);
         data.put("email", email);
@@ -46,7 +51,7 @@ public class UserViewModel extends ViewModel {
         data.put("isOrganizer", isOrganizer);
         data.put("isAdmin", isAdmin);
 
-        return FirebaseFunctions.getInstance()
+        return functions
                 .getHttpsCallable("createUser")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, UUID>() {
@@ -60,6 +65,44 @@ public class UserViewModel extends ViewModel {
                 });
     }
 
+    public Task<ArrayList<User>> getAllUsers() {
+       return functions
+               .getHttpsCallable("getAllUsers")
+               .call(new HashMap<>())
+               .continueWith(new Continuation<HttpsCallableResult, ArrayList<User>>() {
+                   @Override
+                   public ArrayList<User> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                       List<Map<String, Object>> userObjects = (List<Map<String, Object>>) task.getResult().getData();
+                       ArrayList<User> users = new ArrayList<User>();
+
+                       for (Map<String, Object> userObject : userObjects) {
+                           // we only get a limited amount of info back about each user
+
+                           String userId = (String) userObject.get("userId");
+                           String deviceId = (String) userObject.get("deviceId");
+                           String name = (String) userObject.get("name");
+                           Boolean isEntrant = (Boolean) userObject.get("isEntrant");
+                           Boolean isOrganizer = (Boolean) userObject.get("isOrganizer");
+                           Boolean isAdmin = (Boolean) userObject.get("isAdmin");
+
+                           // verify that they have a userId and deviceId
+                           // otherwise just skip them
+
+                           if (userId == null) {
+                               continue;
+                           }
+
+                           UUID userUUID = UUID.fromString(userId);
+                           UUID deviceUUID = UUID.fromString(deviceId);
+
+                           users.add(new User(name, null, null, null, isEntrant, isOrganizer, isAdmin, userUUID, deviceUUID));
+                       }
+
+                       return users;
+                   }
+               });
+    }
+
     /**
      * Calls the getUser cloud function, getting a user's details from the database.
      *
@@ -69,12 +112,13 @@ public class UserViewModel extends ViewModel {
      */
     public Task<User> getUser(UUID userId, UUID deviceId) {
         Map<String, Object> data = new HashMap<>();
+
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
         System.out.println("GET USER");
 
-        return FirebaseFunctions.getInstance()
+        return functions
                 .getHttpsCallable("getUser")
                 .call(data)
                 .continueWith(task -> {
@@ -101,7 +145,7 @@ public class UserViewModel extends ViewModel {
         payload.put("target", targetUserId.toString());
         data.put("data", payload);
 
-        return FirebaseFunctions.getInstance()
+        return functions
                 .getHttpsCallable("deleteUser")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, Boolean>() {
@@ -122,8 +166,11 @@ public class UserViewModel extends ViewModel {
      * @param receiveNotifications Updated notification preference (optional).
      * @return UUID identifying the user's ID.
      */
-    public Task<String> updateUser(UUID userId, UUID deviceId, String name, String email,
-                                   String phone, Boolean receiveNotifications) {
+    public Task<String> updateUser(UUID userId, UUID deviceId,
+                                   @Nullable String name,
+                                   @Nullable String email,
+                                   @Nullable String phone,
+                                   @Nullable Boolean receiveNotifications) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -135,7 +182,10 @@ public class UserViewModel extends ViewModel {
         payload.put("receiveNotifications", receiveNotifications);
         data.put("data", payload);
 
-        return FirebaseFunctions.getInstance()
+        System.out.println("updateUser payload type=" + data.getClass().getName());
+        System.out.println("updateUser payload=" + data);
+
+        return functions
                 .getHttpsCallable("updateUser")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, String>() {
@@ -159,7 +209,7 @@ public class UserViewModel extends ViewModel {
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
-        return FirebaseFunctions.getInstance()
+        return functions
                 .getHttpsCallable("getUser")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, Map<String, Object>>() {

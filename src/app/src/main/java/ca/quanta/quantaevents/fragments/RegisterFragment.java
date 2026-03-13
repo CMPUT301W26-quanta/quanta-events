@@ -126,7 +126,7 @@ public class RegisterFragment extends Fragment {
                 return;
             }
             redirectedToHome = true;
-            NavDirections action = RegisterFragmentDirections.actionRegisterfragmentToHomefragment();
+            NavDirections action = ca.quanta.quantaevents.fragments.RegisterFragmentDirections.actionRegisterfragmentToHomefragment();
             navController.navigate(action);
         }
     }

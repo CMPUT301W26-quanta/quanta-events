@@ -21,11 +21,11 @@ public class ImageViewModel extends ViewModel {
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
     /**
-     * Calls the createImage cloud function, adding an image to the database.
-     * @param userId UUID identifying the user.
-     * @param deviceId UUID identifying the user's device.
+     * Calls the createImage cloud function, and adds the image to the database.
+     * @param userId UUID to identify user.
+     * @param deviceId UUID to identify the users device.
      * @param imageData Base64-encoded image data.
-     * @return UUID identifying the image's ID.
+     * @return UUID to identify the images ID.
      */
     public Task<String> createImage(UUID userId, UUID deviceId, String imageData) {
         Map<String, Object> data = new HashMap<>();
@@ -49,11 +49,11 @@ public class ImageViewModel extends ViewModel {
     }
 
     /**
-     * Calls the getImage cloud function, fetching an image from the database.
-     * @param imageId UUID identifying the image.
-     * @param userId UUID identifying the user.
-     * @param deviceId UUID identifying the user's device.
-     * @return Map containing the image's data.
+     * Calls the getImage cloud function, and fetches the image from the database.
+     * @param imageId UUID to identify the image
+     * @param userId UUID to identify user.
+     * @param deviceId UUID to identify the users device.
+     * @return Map containing the images data.
      */
     public Task<Map<String, Object>> getImage(UUID imageId, UUID userId, UUID deviceId) {
         Map<String, Object> data = new HashMap<>();

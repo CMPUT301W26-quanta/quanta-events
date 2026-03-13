@@ -62,7 +62,8 @@
                 android:paddingEnd="16dp"
                 android:paddingTop="10dp"
                 android:paddingBottom="4dp"
-                android:text="👤 Organized by .."
+                android:drawableStart="@drawable/material_symbols_person_outline"
+                app:drawableTint="@color/color_dark_gray"
                 android:textSize="18dp"
                 android:textColor="@color/text_color" />
 
@@ -74,7 +75,9 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="4dp"
-                android:text="🕐 Time of event"
+                android:drawableStart="@drawable/ic_round_schedule"
+                app:drawableTint="@color/color_light_red"
+                android:text=" Time of event"
                 android:textSize="18dp"
                 android:textColor="@color/text_color" />
 
@@ -86,7 +89,9 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="4dp"
-                android:text="️📍 Location"
+                android:drawableStart="@drawable/material_symbols_location_rounded"
+                app:drawableTint="@color/color_dark_purple"
+                android:text=" Location"
                 android:textSize="18dp"
                 android:textColor="@color/text_color" />
 
@@ -99,7 +104,9 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="12dp"
                 android:textSize="18dp"
-                android:text="🤝 Number of people on wait list"
+                android:drawableStart="@drawable/material_symbols_group_outline"
+                app:drawableTint="@color/color_dark"
+                android:text=" Number of people on wait list"
                 android:textColor="@color/text_color" />
 
             <!-- Divider -->

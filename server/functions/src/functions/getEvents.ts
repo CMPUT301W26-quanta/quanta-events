@@ -57,7 +57,7 @@ export async function getEvents(
     query = ref.where(
       "eventId",
       "in",
-      organizer.organizer.createdEvents || ["NOTHING"]
+      (organizer.organizer.createdEvents || []).concat(["NOTHING"])
     );
   } else {
     const entrant = util.requireRole(user, "entrant");
@@ -65,21 +65,20 @@ export async function getEvents(
       query = ref.where(
         "eventId",
         "in",
-        entrant.entrant.enteredEvents || ["NOTHING"]
+        (entrant.entrant.enteredEvents || []).concat(["NOTHING"])
       );
     } else if (filter.fetch === "history") {
       query = ref.where(
         "eventId",
         "in",
-        entrant.entrant.history || ["NOTHING"]
+        (entrant.entrant.history || []).concat(["NOTHING"])
       );
     } else {
       query = ref
         .where(
           "eventId",
           "not-in",
-          entrant.entrant.enteredEvents || ["NOTHING"]
-        )
+          (entrant.entrant.enteredEvents || []).concat(["NOTHING"]))
         .where("registrationEndTime", ">=", Timestamp.now());
     }
   }
