@@ -35,7 +35,8 @@ public class InformationFragment extends Fragment implements Tagged {
         infoStore.setIconRes(R.drawable.material_symbols_info_outline);
 
         binding.backButton.setOnClickListener(v -> {
-            Navigation.findNavController(requireView()).popBackStack();
+            // popBackStack was not working; fix it this way until someone can fix it properly
+            Navigation.findNavController(requireView()).navigate(R.id.action_informationFragment_to_homeFragment);
         });
     }
 
