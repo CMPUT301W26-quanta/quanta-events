@@ -1,9 +1,9 @@
-import { CallableRequest, HttpsError } from "firebase-functions/https";
-import * as util from "../util";
-import * as z from "zod";
-import { v4 as uuidv4 } from "uuid";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
+import { CallableRequest, HttpsError } from "firebase-functions/https";
+import { v4 as uuidv4 } from "uuid";
+import * as z from "zod";
+import * as util from "../util";
 
 const createEventInterface = util.standardForm(
   z.object({
@@ -58,6 +58,7 @@ export async function createEvent(request: CallableRequest) {
       .create({
         eventId,
         organizer: userId,
+        organizerDeviceId: deviceId,
         waitList: [],
         cancelledList: [],
         finalList: [],

@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
+import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 public class EventDetailsFragment extends Fragment {
     private FragmentEventDetailsBinding binding;
@@ -43,28 +45,44 @@ public class EventDetailsFragment extends Fragment {
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
+    private UserViewModel model;
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // **** set up the header
+
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+
         infoStore.setTitle("Event");
         infoStore.setSubtitle("View event details");
         infoStore.setIconRes(R.drawable.material_symbols_event_outline);
 
+        // **** set up the view model
+
+        this.model = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+
+        // **** set up the session store and get this user
+
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
         eventModel = new ViewModelProvider(this).get(EventViewModel.class);
         imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
+
         readEventId();
+
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
             loadEvent();
         });
+
         sessionStore.getRoleMask().observe(getViewLifecycleOwner(), mask -> {
             isAdmin = mask != null && (mask & SmartBurger.ADMIN_GROUP) != 0;
             updateManageButton(null);
         });
+
+        // **** set up buttons
 
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
@@ -107,7 +125,33 @@ public class EventDetailsFragment extends Fragment {
         }
         binding.textEventTitle.setText(stringValue(event.getEventName(), "Event"));
         String organizer = event.getOrganizerId() == null ? "Unknown" : event.getOrganizerId().toString();
-        binding.textOrganizer.setText(" Organized by " + organizer);
+
+        UUID organizerId = event.getOrganizerId();
+        UUID organizerDeviceId = event.getOrganizerDeviceId();
+
+        // note: the text on the fragment for the organizer name is
+        // "Loading organizer name..." already, so we don't need to set it to that here.
+        // only to update it once we have our result
+
+        if (organizerId != null && organizerDeviceId != null) {
+            model.getUser(event.getOrganizerId(), event.getOrganizerDeviceId())
+                    .addOnSuccessListener(user -> {
+                        String name = user.getName();
+                        binding.textOrganizer.setText(" Organized by " + (name == null ? "[organizer's username is null]" : name));
+                    })
+                    .addOnFailureListener(exception -> {
+                        Toast.makeText(requireContext(), "Failed to fetch organizer name: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+                        Log.e("EventDetailsFragment", "Failed to fetch organizer name.", exception);
+
+                        // set the organizer id as the name instead,
+                        // to have something there at least, and to possibly help w/ debugging
+                        binding.textOrganizer.setText(" Organized by " + event.getOrganizerId());
+                    });
+        }
+        else {
+            binding.textOrganizer.setText(" [no associated organizer]");
+        }
+
         binding.textDateTime.setText(" " + formatLocalTime(event.getRegistrationStartTime()));
         binding.textLocation.setText(" " + stringValue(event.getLocation(), "TBD"));
 
