@@ -92,10 +92,6 @@ public class UserViewModel extends ViewModel {
                                continue;
                            }
 
-                           if (deviceId == null) {
-                               continue;
-                           }
-
                            UUID userUUID = UUID.fromString(userId);
                            UUID deviceUUID = UUID.fromString(deviceId);
 

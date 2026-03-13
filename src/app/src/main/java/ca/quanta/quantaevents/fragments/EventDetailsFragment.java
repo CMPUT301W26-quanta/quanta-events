@@ -125,34 +125,9 @@ public class EventDetailsFragment extends Fragment {
         if (event == null) {
             return;
         }
+
         binding.textEventTitle.setText(stringValue(event.getEventName(), "Event"));
         String organizer = event.getOrganizerId() == null ? "Unknown" : event.getOrganizerId().toString();
-
-        UUID organizerId = event.getOrganizerId();
-        UUID organizerDeviceId = event.getOrganizerDeviceId();
-
-        // note: the text on the fragment for the organizer name is
-        // "Loading organizer name..." already, so we don't need to set it to that here.
-        // only to update it once we have our result
-
-        if (organizerId != null && organizerDeviceId != null) {
-            model.getUser(event.getOrganizerId(), event.getOrganizerDeviceId())
-                    .addOnSuccessListener(user -> {
-                        String name = user.getName();
-                        binding.textOrganizer.setText(" Organized by " + (name == null ? "[organizer's username is null]" : name));
-                    })
-                    .addOnFailureListener(exception -> {
-                        Toast.makeText(requireContext(), "Failed to fetch organizer name: " + exception.getMessage(), Toast.LENGTH_LONG).show();
-                        Log.e("EventDetailsFragment", "Failed to fetch organizer name.", exception);
-
-                        // set the organizer id as the name instead,
-                        // to have something there at least, and to possibly help w/ debugging
-                        binding.textOrganizer.setText(" Organized by " + event.getOrganizerId());
-                    });
-        }
-        else {
-            binding.textOrganizer.setText(" [no associated organizer]");
-        }
 
         binding.textDateTime.setText(" " + formatLocalTime(event.getRegistrationStartTime()));
         binding.textLocation.setText(" " + stringValue(event.getLocation(), "TBD"));
@@ -163,7 +138,7 @@ public class EventDetailsFragment extends Fragment {
         binding.textDescription.setText(stringValue(event.getEventDescription(), ""));
 
         updateManageButton(organizer);
-        fetchOrganizerName();
+        fetchOrganizerName(event);
         updateWaitlistState();
         refreshWaitlistCount();
 
@@ -200,19 +175,39 @@ public class EventDetailsFragment extends Fragment {
         binding.enrollButton.setOnClickListener(v -> toggleWaitlist());
     }
 
-    private void fetchOrganizerName() {
+    private void fetchOrganizerName(Event event) {
         if (userId == null || deviceId == null || eventId == null) {
+            binding.textOrganizer.setText(" [unable to fetch organizer name]");
             return;
         }
+
+        UUID organizerId = event.getOrganizerId();
+        UUID organizerDeviceId = event.getOrganizerDeviceId();
+
+        binding.textOrganizer.setText(" Loading organizer name...");
+
         eventModel.getOrganizerName(userId, deviceId, eventId)
                 .addOnSuccessListener(name -> {
                     if (!isAdded()) {
+                        binding.textOrganizer.setText(" [no associated organizer]");
                         return;
                     }
-                    if (name == null || name.trim().isEmpty()) {
-                        return;
+
+                    if (name == null) {
+                        name = "[organizer's username is null]";
+                    } else if (name.trim().isEmpty()) {
+                        name = "[organizer has empty name]";
                     }
+
                     binding.textOrganizer.setText(" Organized by " + name.trim());
+                })
+                .addOnFailureListener(exception -> {
+                    Toast.makeText(requireContext(), "Failed to fetch organizer name: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+                    Log.e("EventDetailsFragment", "Failed to fetch organizer name.", exception);
+
+                    // set the organizer id as the name instead,
+                    // to have something there at least, and to possibly help w/ debugging
+                    binding.textOrganizer.setText(" Organized by " + event.getOrganizerId());
                 });
     }
 
