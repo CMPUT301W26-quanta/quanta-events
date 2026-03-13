@@ -23,6 +23,8 @@ import ca.quanta.quantaevents.models.User;
 public class UserViewModel extends ViewModel {
     // Initialize an instance of cloud functions
 
+    private FirebaseFunctions functions = FirebaseFunctions.getInstance();
+
     /**
      * Calls the createUser cloud function, adding a user to the database.
      *
@@ -49,7 +51,7 @@ public class UserViewModel extends ViewModel {
         data.put("isOrganizer", isOrganizer);
         data.put("isAdmin", isAdmin);
 
-        return FirebaseFunctions.getInstance()
+        return functions
                 .getHttpsCallable("createUser")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, UUID>() {
@@ -64,8 +66,6 @@ public class UserViewModel extends ViewModel {
     }
 
     public Task<ArrayList<User>> getAllUsers() {
-        FirebaseFunctions functions = FirebaseFunctions.getInstance();
-
        return functions
                .getHttpsCallable("getAllUsers")
                .call(new HashMap<>())
@@ -89,10 +89,6 @@ public class UserViewModel extends ViewModel {
                            // otherwise just skip them
 
                            if (userId == null) {
-                               continue;
-                           }
-
-                           if (deviceId == null) {
                                continue;
                            }
 
@@ -122,7 +118,7 @@ public class UserViewModel extends ViewModel {
 
         System.out.println("GET USER");
 
-        return FirebaseFunctions.getInstance()
+        return functions
                 .getHttpsCallable("getUser")
                 .call(data)
                 .continueWith(task -> {
@@ -149,7 +145,7 @@ public class UserViewModel extends ViewModel {
         payload.put("target", targetUserId.toString());
         data.put("data", payload);
 
-        return FirebaseFunctions.getInstance()
+        return functions
                 .getHttpsCallable("deleteUser")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, Boolean>() {
@@ -189,7 +185,7 @@ public class UserViewModel extends ViewModel {
         System.out.println("updateUser payload type=" + data.getClass().getName());
         System.out.println("updateUser payload=" + data);
 
-        return FirebaseFunctions.getInstance()
+        return functions
                 .getHttpsCallable("updateUser")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, String>() {
@@ -213,7 +209,7 @@ public class UserViewModel extends ViewModel {
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
-        return FirebaseFunctions.getInstance()
+        return functions
                 .getHttpsCallable("getUser")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, Map<String, Object>>() {
