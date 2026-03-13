@@ -169,7 +169,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
                     }
                     Bitmap bitmap = decodeBase64ToBitmap(imageData.toString());
                     if (bitmap != null) {
-                        adapter.upsert(item.withImage(bitmap));
+                        adapter.updateInsert(item.withImage(bitmap));
                     }
                 });
     }
@@ -189,7 +189,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
         ZonedDateTime local = value.withZoneSameInstant(ZoneId.systemDefault());
         return local.format(displayFormatter);
     }
-
+    // The following function is from/based off OpenAI, ChatGPT, "decodeBase64ToBitmap which decodes base64 to a bitmap", 2026-03-11
     private static Bitmap decodeBase64ToBitmap(String base64) {
         try {
             byte[] bytes = Base64.decode(base64, Base64.DEFAULT);

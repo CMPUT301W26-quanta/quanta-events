@@ -56,6 +56,8 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
         Log.d("EntrantEventList", "onViewCreated");
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        // set title of the page to Event list and the subtitle.
+        // also sets the icon for the page
         infoStore.setTitle("Event List");
         infoStore.setSubtitle("View events in which you are enrolled");
         infoStore.setIconRes(R.drawable.material_symbols_event_list_outline);
@@ -172,7 +174,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
                     }
                     Bitmap bitmap = decodeBase64ToBitmap(imageData.toString());
                     if (bitmap != null) {
-                        adapter.upsert(item.withImage(bitmap));
+                        adapter.updateInsert(item.withImage(bitmap));
                     }
                 });
     }
@@ -193,6 +195,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
         return local.format(displayFormatter);
     }
 
+    // The following function is from/based off OpenAI, ChatGPT, "decodeBase64ToBitmap which decodes base64 to a bitmap", 2026-03-11
     private static Bitmap decodeBase64ToBitmap(String base64) {
         try {
             byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
@@ -213,7 +216,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
     private void handleMissingUser() {
         sessionStore.clearSession();
         if (isAdded()) {
-            NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventListFragmentDirections.actionGlobalRegisterFragment();
+            NavDirections action = EntrantEventListFragmentDirections.actionGlobalRegisterFragment();
             Navigation.findNavController(requireView()).navigate(action);
         }
     }

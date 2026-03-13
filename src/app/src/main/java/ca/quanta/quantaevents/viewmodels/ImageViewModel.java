@@ -13,18 +13,18 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Class which represents an ImageViewModel object.
+ * View-model for managing image-related data and cloud functions.
  */
 public class ImageViewModel extends ViewModel {
     // Initialize an instance of cloud functions
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
     /**
-     * Calls the createImage cloud function, and adds the image to the database.
+     * Calls the createImage cloud function, creating and adding an image to the database.
      * @param userId UUID to identify user.
-     * @param deviceId UUID to identify the users device.
+     * @param deviceId UUID to identify the user's device.
      * @param imageData Base64-encoded image data.
-     * @return UUID to identify the images ID.
+     * @return UUID assigned to newly created image.
      */
     public Task<String> createImage(UUID userId, UUID deviceId, String imageData) {
         Map<String, Object> data = new HashMap<>();
@@ -48,11 +48,11 @@ public class ImageViewModel extends ViewModel {
     }
 
     /**
-     * Calls the getImage cloud function, and fetches the image from the database.
+     * Calls the getImage cloud function and fetches the image from the database.
      * @param imageId UUID to identify the image
      * @param userId UUID to identify user.
-     * @param deviceId UUID to identify the users device.
-     * @return Map containing the images data.
+     * @param deviceId UUID to identify the user's device.
+     * @return Map containing image data.
      */
     public Task<Map<String, Object>> getImage(UUID imageId, UUID userId, UUID deviceId) {
         Map<String, Object> data = new HashMap<>();

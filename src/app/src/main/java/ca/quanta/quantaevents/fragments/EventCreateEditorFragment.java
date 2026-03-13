@@ -272,7 +272,7 @@ public class EventCreateEditorFragment extends Fragment {
         }
     }
 
-
+    // The following function is from/based off OpenAI, ChatGPT, "encodeImagetoBase64 which encodes the image to a format(Base64) which can be stored on firebase", 2026-03-11
     private String encodeImageToBase64(Uri uri) throws IOException {
         try (InputStream inputStream = requireContext().getContentResolver().openInputStream(uri);
              ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {

@@ -40,18 +40,22 @@ public class AccountFragment extends Fragment implements Tagged {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        // sets title as account
+        // sets subtitle and the icon
         infoStore.setTitle("Account");
         infoStore.setSubtitle("Change account details");
         infoStore.setIconRes(R.drawable.material_symbols_person_outline);
 
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
         userModel = new ViewModelProvider(this).get(UserViewModel.class);
+        // verify and check session
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
             maybeLoadUser();
         });
 
+        // set on click listener for back button
         binding.deleteButton.setOnClickListener(
                 v -> {
                     deleteUser();
@@ -85,15 +89,18 @@ public class AccountFragment extends Fragment implements Tagged {
                 }).addOnCanceledListener(this::handleMissingUser);
     }
 
+    // set input fields to the data fetched from server.
     private void populateFields(@NonNull User user) {
         System.out.println(user);
 
         binding.inputName.setText(user.getName());
         binding.inputEmail.setText(user.getEmail());
+
         binding.inputPhone.setText(user.getPhoneNumber());
 
         binding.checkEntrant.setChecked(user.isEntrant());
         binding.checkOrganizer.setChecked(user.isOrganizer());
+
         binding.checkAdmin.setChecked(user.isAdmin());
 
         User.Entrant entrant = user.getEntrant();
@@ -111,6 +118,8 @@ public class AccountFragment extends Fragment implements Tagged {
         }
     }
 
+    // deelte user from database and clear the shared preferences
+    // and redirect to welcome fragment
     private void deleteUser() {
         if (userId == null || deviceId == null) {
             return;
@@ -122,7 +131,7 @@ public class AccountFragment extends Fragment implements Tagged {
                     binding.deleteButton.setEnabled(true);
                     android.widget.Toast.makeText(requireContext(), "Account deleted", android.widget.Toast.LENGTH_LONG).show();
                     if (isAdded()) {
-                        NavDirections action = ca.quanta.quantaevents.fragments.AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
+                        NavDirections action = AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
                         Navigation.findNavController(requireView()).navigate(action);
                     }
                 })
@@ -132,6 +141,8 @@ public class AccountFragment extends Fragment implements Tagged {
                 });
     }
 
+    // update user details in database and
+    // redirect to home fragment if successful
     private void updateUser() {
         if (userId == null || deviceId == null) {
             return;
@@ -151,7 +162,7 @@ public class AccountFragment extends Fragment implements Tagged {
                 .addOnSuccessListener(_userId -> {
                     binding.saveButton.setEnabled(true);
                     android.widget.Toast.makeText(requireContext(), "Account updated", android.widget.Toast.LENGTH_LONG).show();
-                    NavDirections action = ca.quanta.quantaevents.fragments.AccountFragmentDirections.actionAccountfragmentToHomefragment();
+                    NavDirections action = AccountFragmentDirections.actionAccountfragmentToHomefragment();
                     Navigation.findNavController(requireView()).navigate(action);
                 })
                 .addOnFailureListener(ex -> {
@@ -164,7 +175,7 @@ public class AccountFragment extends Fragment implements Tagged {
         sessionStore.clearSession();
         System.out.println("MISSING USER");
         if (isAdded()) {
-            NavDirections action = ca.quanta.quantaevents.fragments.AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
+            NavDirections action = AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
             Navigation.findNavController(requireView()).navigate(action);
         }
     }

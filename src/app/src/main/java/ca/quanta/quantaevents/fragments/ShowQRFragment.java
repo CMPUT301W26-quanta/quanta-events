@@ -33,10 +33,13 @@ public class ShowQRFragment extends Fragment {
         UUID eventId = ShowQRFragmentArgs.fromBundle(getArguments()).getEventId();
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        // set title of the page to QR code and the subtitle to share an event qr code.
+        // also sets the icon for the page
         infoStore.setTitle("QR Code");
         infoStore.setSubtitle("Share an event QR code");
         infoStore.setIconRes(R.drawable.material_symbols_group_outline);
 
+        // sets up the qrcode image view to generate the QR code bitmap and set it as the image source
         binding.qrCodeImage.post(() -> {
             try {
                 binding.qrCodeImage.setImageBitmap(generateQrCode(eventId, binding.qrCodeImage.getWidth()));
@@ -45,11 +48,12 @@ public class ShowQRFragment extends Fragment {
             }
         });
 
-
+        // sets up the back button listener
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
         );
 
+        // set up the share button listener
         binding.shareButton.setOnClickListener(v -> {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
@@ -58,6 +62,7 @@ public class ShowQRFragment extends Fragment {
         });
     }
 
+    // generates th bit map QRCode
     private Bitmap generateQrCode(UUID eventId, int edgeSize) throws WriterException {
         BarcodeEncoder writer = new BarcodeEncoder();
 
