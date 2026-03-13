@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import java.util.UUID;
@@ -38,8 +39,8 @@ public class InformationFragment extends Fragment implements Tagged {
 
         //sets up the back buttton listener
         binding.backButton.setOnClickListener(v -> {
-            // popBackStack was not working; fix it this way until someone can fix it properly
-            Navigation.findNavController(requireView()).navigate(R.id.action_informationFragment_to_homeFragment);
+            NavDirections action = ca.quanta.quantaevents.fragments.InformationFragmentDirections.actionGlobalHomeFragment();
+            Navigation.findNavController(requireView()).navigate(action);
         });
     }
 
