@@ -16,7 +16,6 @@ import java.util.UUID;
  * Class which represents an ImageViewModel object.
  */
 public class ImageViewModel extends ViewModel {
-
     // Initialize an instance of cloud functions
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 

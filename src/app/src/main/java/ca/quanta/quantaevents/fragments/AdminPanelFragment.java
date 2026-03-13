@@ -28,21 +28,30 @@ public class AdminPanelFragment extends Fragment implements Tagged {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+
         infoStore.setTitle("Admin Panel");
-        infoStore.setSubtitle("Access moderation tools");
+        infoStore.setSubtitle("Access moderation tools.");
         infoStore.setIconRes(R.drawable.material_symbols_security);
+
         binding.adminBrowseEventsButton.setOnClickListener(
                 v -> {
                     NavDirections action = ca.quanta.quantaevents.fragments.AdminPanelFragmentDirections.actionAdminpanelFragmentToAdmineventbrowserFragment();
                     Navigation.findNavController(v).navigate(action);
                 }
         );
+
         binding.adminBrowseProfilesButton.setOnClickListener(
                 v -> {
                     NavDirections action = ca.quanta.quantaevents.fragments.AdminPanelFragmentDirections.actionAdminpanelFragmentToAdminprofilebrowserFragment();
                     Navigation.findNavController(v).navigate(action);
-                }
-        );
+                });
+
+        binding.adminBrowseImagesButton.setOnClickListener(
+                v -> {
+                    NavDirections action = ca.quanta.quantaevents.fragments.AdminPanelFragmentDirections.actionAdminpanelFragmentToAdminImageBrowserFragment();
+                    Navigation.findNavController(v).navigate(action);
+                });
+
         new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
     }
 
