@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,8 @@ public class EventDetailsFragment extends Fragment {
     private UUID eventId;
     private boolean isAdmin = false;
     private boolean fromAdmin = false;
+    private boolean inWaitlist = false;
+    private int waitlistCount = 0;
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
@@ -79,14 +82,14 @@ public class EventDetailsFragment extends Fragment {
     }
 
     private void readEventId() {
-        EventDetailsFragmentArgs args = EventDetailsFragmentArgs.fromBundle(getArguments());
+        ca.quanta.quantaevents.fragments.EventDetailsFragmentArgs args = ca.quanta.quantaevents.fragments.EventDetailsFragmentArgs.fromBundle(getArguments());
         eventId = args.getEventId();
         fromAdmin = args.getFromAdmin();
     }
 
     private void loadEvent() {
         if (userId == null || deviceId == null) {
-            NavDirections action = EventDetailsFragmentDirections.actionGlobalRegisterFragment();
+            NavDirections action = ca.quanta.quantaevents.fragments.EventDetailsFragmentDirections.actionGlobalRegisterFragment();
             Navigation.findNavController(requireView()).navigate(action);
             return;
         }
@@ -111,12 +114,15 @@ public class EventDetailsFragment extends Fragment {
         binding.textDateTime.setText(" " + formatLocalTime(event.getRegistrationStartTime()));
         binding.textLocation.setText(" " + stringValue(event.getLocation(), "TBD"));
 
-        int waitCount = event.getWaitList() == null ? 0 : event.getWaitList().size();
-        binding.textWaitingList.setText(" Wait list: " + waitCount);
+        waitlistCount = event.getWaitList() == null ? 0 : event.getWaitList().size();
+        updateWaitlistText();
 
         binding.textDescription.setText(stringValue(event.getEventDescription(), ""));
 
         updateManageButton(organizer);
+        fetchOrganizerName();
+        updateWaitlistState();
+        refreshWaitlistCount();
 
         UUID imageUuid = event.getImageId();
         if (imageUuid != null) {
@@ -143,9 +149,116 @@ public class EventDetailsFragment extends Fragment {
             binding.enrollButton.setText("Manage");
             binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
             binding.enrollButton.setOnClickListener(v -> {
-                NavDirections action = EventDetailsFragmentDirections.actionEventdetailsfragmentToEventmanagerfragment(eventId);
+                NavDirections action = ca.quanta.quantaevents.fragments.EventDetailsFragmentDirections.actionEventdetailsfragmentToEventmanagerfragment(eventId);
                 Navigation.findNavController(v).navigate(action);
             });
+            return;
+        }
+        binding.enrollButton.setOnClickListener(v -> toggleWaitlist());
+    }
+
+    private void fetchOrganizerName() {
+        if (userId == null || deviceId == null || eventId == null) {
+            return;
+        }
+        eventModel.getOrganizerName(userId, deviceId, eventId)
+                .addOnSuccessListener(name -> {
+                    if (!isAdded()) {
+                        return;
+                    }
+                    if (name == null || name.trim().isEmpty()) {
+                        return;
+                    }
+                    binding.textOrganizer.setText(" Organized by " + name.trim());
+                });
+    }
+
+    private void updateWaitlistState() {
+        if (userId == null || deviceId == null || eventId == null) {
+            Log.d("EventDetails", "updateWaitlistState: missing session or eventId");
+            return;
+        }
+        Log.d("EventDetails", "updateWaitlistState: checking waitlist for eventId=" + eventId);
+        eventModel.checkWaitlist(userId, deviceId, eventId)
+                .addOnSuccessListener(result -> {
+                    inWaitlist = Boolean.TRUE.equals(result);
+                    Log.d("EventDetails", "inWaitlist result=" + inWaitlist);
+                    updateEnrollButtonLabel();
+                });
+    }
+
+    private void refreshWaitlistCount() {
+        if (userId == null || deviceId == null || eventId == null) {
+            Log.d("EventDetails", "refreshWaitlistCount: missing session or eventId");
+            return;
+        }
+        eventModel.getWaitlistCount(userId, deviceId, eventId)
+                .addOnSuccessListener(count -> {
+                    waitlistCount = count == null ? 0 : count;
+                    updateWaitlistText();
+                })
+                .addOnFailureListener(ex ->
+                        Log.e("EventDetails", "refreshWaitlistCount: failed", ex)
+                );
+    }
+
+    private void updateWaitlistText() {
+        if (!isAdded()) {
+            return;
+        }
+        binding.textWaitingList.setText(" Wait list: " + waitlistCount);
+    }
+
+    private void updateEnrollButtonLabel() {
+        if (!isAdded()) {
+            return;
+        }
+        if (inWaitlist) {
+            binding.enrollButton.setText("Leave Waitlist");
+            binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
+        } else {
+            binding.enrollButton.setText("Join Waitlist");
+            binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_green));
+        }
+    }
+
+    private void toggleWaitlist() {
+        if (userId == null || deviceId == null || eventId == null) {
+            Log.d("EventDetails", "toggleWaitlist: missing session or eventId");
+            return;
+        }
+        if (inWaitlist) {
+            Log.d("EventDetails", "leaveWaitlist: eventId=" + eventId);
+            eventModel.leaveWaitlist(userId, deviceId, eventId)
+                    .addOnSuccessListener(_done -> {
+                        inWaitlist = false;
+                        Log.d("EventDetails", "leaveWaitlist: success");
+                        updateEnrollButtonLabel();
+                        refreshWaitlistCount();
+                        Toast.makeText(requireContext(), "Left waitlist", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(ex ->
+                            {
+                                Log.e("EventDetails", "leaveWaitlist: failed", ex);
+                                Toast.makeText(requireContext(), "Failed to leave waitlist", Toast.LENGTH_LONG).show();
+                            }
+                    );
+        } else {
+            Log.d("EventDetails", "joinWaitlist: eventId=" + eventId);
+            eventModel.joinWaitlist(userId, deviceId, eventId)
+                    .addOnSuccessListener(_done -> {
+                        inWaitlist = true;
+                        Log.d("EventDetails", "joinWaitlist: success");
+                        updateEnrollButtonLabel();
+                        refreshWaitlistCount();
+                        Toast.makeText(requireContext(), "Joined waitlist", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(ex ->
+                            {
+                                Log.e("EventDetails", "joinWaitlist: failed", ex);
+                                Toast.makeText(requireContext(), "Failed to join waitlist", Toast.LENGTH_LONG).show();
+                            }
+                    );
         }
     }
 

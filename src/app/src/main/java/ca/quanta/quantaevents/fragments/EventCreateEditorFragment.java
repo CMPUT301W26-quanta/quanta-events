@@ -57,6 +57,9 @@ public class EventCreateEditorFragment extends Fragment {
     private UUID userId;
     private UUID deviceId;
     private UUID eventId;
+    private UUID existingImageId;
+    private boolean imageDirty = false;
+    private boolean imageRemoved = false;
 
     public EventCreateEditorFragment() {
         // Required empty public constructor
@@ -87,7 +90,7 @@ public class EventCreateEditorFragment extends Fragment {
                 v -> Navigation.findNavController(v).popBackStack()
         );
 
-        binding.saveButton.setOnClickListener(_view -> createEvent());
+        binding.saveButton.setOnClickListener(_view -> saveEvent());
         binding.inputRegistrationEnd.setOnClickListener(v -> showDateTimePicker(binding.inputRegistrationEnd));
         binding.inputStartTime.setOnClickListener(v -> showDateTimePicker(binding.inputStartTime));
         binding.inputRegistrationStart.setOnClickListener(v -> showDateTimePicker(binding.inputRegistrationStart));
@@ -113,6 +116,8 @@ public class EventCreateEditorFragment extends Fragment {
                         return;
                     }
                     selectedImageUri = uri;
+                    imageDirty = true;
+                    imageRemoved = false;
                     try {
                         selectedImageBase64 = encodeImageToBase64(uri);
                         showPreviewFromBase64(selectedImageBase64);
@@ -123,7 +128,7 @@ public class EventCreateEditorFragment extends Fragment {
                 });
     }
 
-    private void createEvent() {
+    private void saveEvent() {
         String name = safeText(binding.inputName.getText());
         String description = safeText(binding.inputDescription.getText());
         String registrationStart = getUtcValue(binding.inputRegistrationStart);
@@ -149,6 +154,12 @@ public class EventCreateEditorFragment extends Fragment {
 
         binding.saveButton.setEnabled(false);
 
+        if (eventId != null) {
+            updateEventFlow(registrationStart, registrationEnd, eventTime, name, description,
+                    eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit);
+            return;
+        }
+
         if (selectedImageBase64 != null) {
             imageModel.createImage(userId, deviceId, selectedImageBase64)
                     .addOnSuccessListener(imageId -> createEventWithImageId(imageId, registrationStart, registrationEnd,
@@ -170,6 +181,8 @@ public class EventCreateEditorFragment extends Fragment {
         binding.imagePreview.setImageDrawable(null);
         binding.imagePreview.setVisibility(View.GONE);
         selectedImageBase64 = null;
+        imageDirty = true;
+        imageRemoved = true;
     }
 
     private void showDateTimePicker(TextInputEditText target) {
@@ -219,6 +232,9 @@ public class EventCreateEditorFragment extends Fragment {
         if (event == null) {
             return;
         }
+        existingImageId = event.getImageId();
+        imageDirty = false;
+        imageRemoved = false;
         binding.inputName.setText(stringValue(event.getEventName(), ""));
         binding.inputDescription.setText(stringValue(event.getEventDescription(), ""));
         binding.inputLocation.setText(stringValue(event.getLocation(), ""));
@@ -313,6 +329,70 @@ public class EventCreateEditorFragment extends Fragment {
                     binding.saveButton.setEnabled(true);
                     Log.e(TAG, "Failed to create event", ex);
                     Toast.makeText(requireContext(), "Failed to create event", Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private void updateEventFlow(String registrationStart, String registrationEnd, String eventTime,
+                                 String name, String description,
+                                 String eventCategory, String eventGuidelines,
+                                 boolean geolocation, int eventCapacity,
+                                 String location, Integer registrationLimit) {
+        if (imageDirty) {
+            if (imageRemoved) {
+                updateEventWithImageId(null, registrationStart, registrationEnd, eventTime,
+                        name, description, eventCategory, eventGuidelines, geolocation,
+                        eventCapacity, location, registrationLimit);
+            } else if (selectedImageBase64 != null) {
+                imageModel.createImage(userId, deviceId, selectedImageBase64)
+                        .addOnSuccessListener(imageId -> updateEventWithImageId(imageId, registrationStart, registrationEnd,
+                                eventTime, name, description, eventCategory, eventGuidelines, geolocation,
+                                eventCapacity, location, registrationLimit))
+                        .addOnFailureListener(ex -> {
+                            binding.saveButton.setEnabled(true);
+                            Log.e(TAG, "Failed to upload image", ex);
+                            Toast.makeText(requireContext(), "Failed to upload image", Toast.LENGTH_LONG).show();
+                        });
+            } else {
+                updateEventWithImageId(null, registrationStart, registrationEnd, eventTime,
+                        name, description, eventCategory, eventGuidelines, geolocation,
+                        eventCapacity, location, registrationLimit);
+            }
+            return;
+        }
+        updateEventWithImageId(existingImageId == null ? null : existingImageId.toString(),
+                registrationStart, registrationEnd, eventTime, name, description,
+                eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit);
+    }
+
+    private void updateEventWithImageId(@Nullable String imageId, String registrationStart,
+                                        String registrationEnd, String eventTime,
+                                        String name, String description,
+                                        String eventCategory, String eventGuidelines,
+                                        boolean geolocation, int eventCapacity,
+                                        String location, Integer registrationLimit) {
+        UUID imageUuid = null;
+        if (imageId != null) {
+            try {
+                imageUuid = UUID.fromString(imageId);
+            } catch (IllegalArgumentException ignored) {
+                imageUuid = null;
+            }
+        }
+        eventModel.updateEvent(userId, deviceId, eventId,
+                        registrationStart, registrationEnd, eventTime,
+                        name, description, eventCategory, eventGuidelines,
+                        geolocation, eventCapacity, location, registrationLimit, imageUuid)
+                .addOnSuccessListener(_done -> {
+                    binding.saveButton.setEnabled(true);
+                    Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_LONG).show();
+                    if (isAdded()) {
+                        Navigation.findNavController(requireView()).popBackStack();
+                    }
+                })
+                .addOnFailureListener(ex -> {
+                    binding.saveButton.setEnabled(true);
+                    Log.e(TAG, "Failed to update event", ex);
+                    Toast.makeText(requireContext(), "Failed to update event", Toast.LENGTH_LONG).show();
                 });
     }
 

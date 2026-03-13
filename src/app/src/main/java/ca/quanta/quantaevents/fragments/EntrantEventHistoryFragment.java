@@ -62,7 +62,7 @@ public class EntrantEventHistoryFragment extends Fragment {
         );
 
         adapter = new EventCardAdapter(item -> {
-            NavDirections action = EntrantEventHistoryFragmentDirections.actionEntrantEventHistoryFragmentToEventDetailsFragment(item.getEventId());
+            NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventHistoryFragmentDirections.actionEntrantEventHistoryFragmentToEventDetailsFragment(item.getEventId());
             Navigation.findNavController(requireView()).navigate(action);
         });
         binding.eventsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -100,7 +100,7 @@ public class EntrantEventHistoryFragment extends Fragment {
                         null,
                         null,
                         null,
-                        EventViewModel.SortBy.REGISTRATION_END)
+                        EventViewModel.SortBy.NAME)
                 .addOnSuccessListener(this::bindEventList)
                 .addOnFailureListener(ex -> {
                     Log.e("EntrantEventHistory", "Failed to load events", ex);
@@ -197,7 +197,7 @@ public class EntrantEventHistoryFragment extends Fragment {
     private void handleMissingUser() {
         sessionStore.clearSession();
         if (isAdded()) {
-            NavDirections action = EntrantEventHistoryFragmentDirections.actionGlobalRegisterFragment();
+            NavDirections action = ca.quanta.quantaevents.fragments.EntrantEventHistoryFragmentDirections.actionGlobalRegisterFragment();
             Navigation.findNavController(requireView()).navigate(action);
         }
     }

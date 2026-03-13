@@ -33,13 +33,13 @@ public class AdminPanelFragment extends Fragment implements Tagged {
         infoStore.setIconRes(R.drawable.material_symbols_security);
         binding.adminBrowseEventsButton.setOnClickListener(
                 v -> {
-                    NavDirections action = AdminPanelFragmentDirections.actionAdminpanelFragmentToAdmineventbrowserFragment();
+                    NavDirections action = ca.quanta.quantaevents.fragments.AdminPanelFragmentDirections.actionAdminpanelFragmentToAdmineventbrowserFragment();
                     Navigation.findNavController(v).navigate(action);
                 }
         );
         binding.adminBrowseProfilesButton.setOnClickListener(
                 v -> {
-                    NavDirections action = AdminPanelFragmentDirections.actionAdminpanelFragmentToAdminprofilebrowserFragment();
+                    NavDirections action = ca.quanta.quantaevents.fragments.AdminPanelFragmentDirections.actionAdminpanelFragmentToAdminprofilebrowserFragment();
                     Navigation.findNavController(v).navigate(action);
                 }
         );
