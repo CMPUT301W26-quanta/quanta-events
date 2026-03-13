@@ -27,7 +27,6 @@ import ca.quanta.quantaevents.fragments.AdminPanelFragment;
 import ca.quanta.quantaevents.fragments.EntrantEventListFragment;
 import ca.quanta.quantaevents.fragments.EventDashboardFragment;
 import ca.quanta.quantaevents.fragments.HomeFragment;
-import ca.quanta.quantaevents.fragments.InformationFragment;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
@@ -89,11 +88,10 @@ public class MainActivity extends AppCompatActivity {
                 );
 
         new SmartBurger(this, ((NavHostFragment) binding.navHost.getFragment()).getNavController(), binding.coordinator)
-                .with(new InformationFragment(), R.drawable.material_symbols_info_outline,"Information", NavGraphDirections::actionGlobalInformationFragment)
-                .with(new EventDashboardFragment(), R.drawable.material_symbols_dashboard_outline, "Dashboard", NavGraphDirections::actionGlobalEventdashboardFragment)
-                .with(new EntrantEventListFragment(), R.drawable.material_symbols_event_list_outline, "Event List", NavGraphDirections::actionGlobalEntranteventlistFragment)
+                .with(new EventDashboardFragment(), R.drawable.material_symbols_dashboard_outline, SmartBurger.ORGANIZER_GROUP, "Dashboard", NavGraphDirections::actionGlobalEventdashboardFragment)
+                .with(new EntrantEventListFragment(), R.drawable.material_symbols_event_list_outline, SmartBurger.ENTRANT_GROUP, "Event List", NavGraphDirections::actionGlobalEntranteventlistFragment)
                 .with(new AccountFragment(), R.drawable.material_symbols_person_outline, "Account", NavGraphDirections::actionGlobalAccountFragment)
-                .with(new AdminPanelFragment(), R.drawable.material_symbols_security, "Admin Panel", NavGraphDirections::actionGlobalAdminpanelFragment)
+                .with(new AdminPanelFragment(), R.drawable.material_symbols_security, SmartBurger.ADMIN_GROUP, "Admin Panel", NavGraphDirections::actionGlobalAdminpanelFragment)
                 .with(new HomeFragment(), R.drawable.material_symbols_home_outline, "Home", NavGraphDirections::actionGlobalHomeFragment)
                 .inject();
 

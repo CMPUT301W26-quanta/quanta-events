@@ -256,10 +256,6 @@
         app:destination="@id/eventdashboardFragment"
         app:popUpTo="@id/nav_graph" />
     <action
-        android:id="@+id/action_global_informationFragment"
-        app:destination="@id/informationFragment"
-        app:popUpTo="@id/nav_graph" />
-    <action
         android:id="@+id/action_global_adminpanelFragment"
         app:destination="@id/adminpanelFragment"
         app:popUpTo="@id/nav_graph" />
@@ -273,11 +269,7 @@
     <fragment
         android:id="@+id/adminNotificationHistoryFragment"
         android:name="ca.quanta.quantaevents.fragments.AdminNotificationHistoryFragment"
-        android:label="fragment_android_notifcation_history_panel">
-        <action
-            android:id="@+id/action_adminNotificationHistoryFragment_to_adminprofilebrowserFragment"
-            app:destination="@id/adminprofilebrowserFragment" />
-    </fragment>
+        android:label="fragment_android_notifcation_history_panel" />
     <action
         android:id="@+id/action_global_registerFragment"
         app:destination="@id/registerFragment"
@@ -286,11 +278,6 @@
     <fragment
         android:id="@+id/adminImageBrowserFragment"
         android:name="ca.quanta.quantaevents.fragments.AdminImageBrowserFragment"
-        android:label="AdminImageBrowserFragment" >
-        <action
-            android:id="@+id/action_adminImageBrowserFragment_to_adminpanelFragment"
-            app:destination="@id/adminpanelFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
+        android:label="AdminImageBrowserFragment" />
 
 </navigation>
