@@ -1,0 +1,27 @@
+name: Run Tests And Instrumented Tests
+
+on:
+  pull_request:
+    paths:
+      - src/**
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Setup 
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+        
+      - name: Give gradlew permission
+        run: chmod +x gradlew
+        working-directory: src
+
+      - name: Run test
+        run: ./gradlew test
+        working-directory: src
