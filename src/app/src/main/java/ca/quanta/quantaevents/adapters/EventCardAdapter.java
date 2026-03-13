@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.imageview.ShapeableImageView;
@@ -44,11 +46,17 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
         holder.time.setText(item.getTime());
         holder.location.setText(item.getLocation());
 
+        // set the event card's background colour
+        holder.card.setCardBackgroundColor(
+                ContextCompat.getColor(holder.itemView.getContext(), R.color.card_background_default)
+        );
+
         if (item.getImage() != null) {
             holder.image.setImageBitmap(item.getImage());
         } else {
             holder.image.setImageResource(R.drawable.material_symbols_image_rounded);
         }
+
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onItemClick(item);
@@ -82,6 +90,8 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
     }
 
     static class EventViewHolder extends RecyclerView.ViewHolder {
+        final CardView card;
+
         final ShapeableImageView image;
         final TextView title;
         final TextView time;
@@ -89,10 +99,12 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
 
         EventViewHolder(@NonNull View itemView) {
             super(itemView);
-            image = itemView.findViewById(R.id.event_image);
-            title = itemView.findViewById(R.id.event_title);
-            time = itemView.findViewById(R.id.event_time);
-            location = itemView.findViewById(R.id.event_location);
+
+            this.card = itemView.findViewById(R.id.event_card);
+            this.image = itemView.findViewById(R.id.event_image);
+            this.title = itemView.findViewById(R.id.event_title);
+            this.time = itemView.findViewById(R.id.event_time);
+            this.location = itemView.findViewById(R.id.event_location);
         }
     }
 }

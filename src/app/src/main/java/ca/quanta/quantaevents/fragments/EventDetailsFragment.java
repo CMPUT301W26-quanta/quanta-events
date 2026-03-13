@@ -30,6 +30,7 @@ import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
+import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 public class EventDetailsFragment extends Fragment {
     private FragmentEventDetailsBinding binding;
@@ -46,28 +47,44 @@ public class EventDetailsFragment extends Fragment {
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
+    private UserViewModel model;
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // **** set up the header
+
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+
         infoStore.setTitle("Event");
         infoStore.setSubtitle("View event details");
         infoStore.setIconRes(R.drawable.material_symbols_event_outline);
 
+        // **** set up the view model
+
+        this.model = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+
+        // **** set up the session store and get this user
+
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
         eventModel = new ViewModelProvider(this).get(EventViewModel.class);
         imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
+
         readEventId();
+
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
             loadEvent();
         });
+
         sessionStore.getRoleMask().observe(getViewLifecycleOwner(), mask -> {
             isAdmin = mask != null && (mask & SmartBurger.ADMIN_GROUP) != 0;
             updateManageButton(null);
         });
+
+        // **** set up buttons
 
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
@@ -108,9 +125,10 @@ public class EventDetailsFragment extends Fragment {
         if (event == null) {
             return;
         }
+
         binding.textEventTitle.setText(stringValue(event.getEventName(), "Event"));
         String organizer = event.getOrganizerId() == null ? "Unknown" : event.getOrganizerId().toString();
-        binding.textOrganizer.setText(" Organized by " + organizer);
+
         binding.textDateTime.setText(" " + formatLocalTime(event.getRegistrationStartTime()));
         binding.textLocation.setText(" " + stringValue(event.getLocation(), "TBD"));
 
@@ -120,7 +138,7 @@ public class EventDetailsFragment extends Fragment {
         binding.textDescription.setText(stringValue(event.getEventDescription(), ""));
 
         updateManageButton(organizer);
-        fetchOrganizerName();
+        fetchOrganizerName(event);
         updateWaitlistState();
         refreshWaitlistCount();
 
@@ -157,19 +175,36 @@ public class EventDetailsFragment extends Fragment {
         binding.enrollButton.setOnClickListener(v -> toggleWaitlist());
     }
 
-    private void fetchOrganizerName() {
+    private void fetchOrganizerName(Event event) {
         if (userId == null || deviceId == null || eventId == null) {
+            binding.textOrganizer.setText(" [unable to fetch organizer name]");
             return;
         }
+
+        binding.textOrganizer.setText(" Loading organizer name...");
+
         eventModel.getOrganizerName(userId, deviceId, eventId)
                 .addOnSuccessListener(name -> {
                     if (!isAdded()) {
+                        binding.textOrganizer.setText(" [no associated organizer]");
                         return;
                     }
-                    if (name == null || name.trim().isEmpty()) {
-                        return;
+
+                    if (name == null) {
+                        name = "[organizer's username is null]";
+                    } else if (name.trim().isEmpty()) {
+                        name = "[organizer has empty name]";
                     }
+
                     binding.textOrganizer.setText(" Organized by " + name.trim());
+                })
+                .addOnFailureListener(exception -> {
+                    Toast.makeText(requireContext(), "Failed to fetch organizer name: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+                    Log.e("EventDetailsFragment", "Failed to fetch organizer name.", exception);
+
+                    // set the organizer id as the name instead,
+                    // to have something there at least, and to possibly help w/ debugging
+                    binding.textOrganizer.setText(" Organized by " + event.getOrganizerId());
                 });
     }
 

@@ -64,7 +64,6 @@
                 android:paddingBottom="4dp"
                 android:drawableStart="@drawable/material_symbols_person_outline"
                 app:drawableTint="@color/color_dark_gray"
-                android:text=" Organized by .."
                 android:textSize="18dp"
                 android:textColor="@color/text_color" />
 
