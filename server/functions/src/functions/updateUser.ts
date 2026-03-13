@@ -25,16 +25,16 @@ export async function updateUser(request: CallableRequest) {
   const db = getFirestore();
 
   const updates: Record<string, any> = {
-    ...(name !== undefined && { name }),
-    ...(email !== undefined && { email }),
-    ...(phone !== undefined && { phone }),
-    ...(receiveNotifications !== undefined && {
-      "entrant.receiveNotifications": receiveNotifications,
+    ...(name !== null && { name }),
+    ...(email !== null && { email }),
+    ...(phone !== null && { phone }),
+    ...(receiveNotifications !== null && {
+    "entrant.receiveNotifications": receiveNotifications,
     }),
   };
 
   await db.collection("users").doc(userId).update(updates);
 
   logger.info("Updated user", { userId });
-  return { userId };
+  return { };
 }
