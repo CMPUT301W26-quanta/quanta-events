@@ -1,9 +1,9 @@
-import * as z from "zod";
-import * as util from "../util";
-import { CallableRequest, HttpsError } from "firebase-functions/https";
 import { DocumentSnapshot, getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
+import { CallableRequest, HttpsError } from "firebase-functions/https";
+import * as z from "zod";
 import { EventDocument } from "../schema";
+import * as util from "../util";
 
 const getEventInterface = util.standardForm(
   z.object({
