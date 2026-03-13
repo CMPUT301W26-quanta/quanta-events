@@ -25,8 +25,8 @@ export async function updateUser(request: CallableRequest) {
   const db = getFirestore();
 
   const updates: Record<string, any> = {
-    name,
-    email,
+    ...(name !== undefined && { name }),
+    ...(email !== undefined && { email }),
     ...(phone !== undefined && { phone }),
     ...(receiveNotifications !== undefined && {
       "entrant.receiveNotifications": receiveNotifications,
