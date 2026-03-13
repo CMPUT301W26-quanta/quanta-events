@@ -87,14 +87,17 @@ export async function createNotification(request: CallableRequest) {
     const tokens: string[] = [];
     const userDocuments = db.collection("users") as CollectionReference<UserDocument, UserDocument>;
     for (const entrantId of recipients) {
+
       const userDocument = (await userDocuments.doc(entrantId).get()).data();
       const token = userDocument?.notifToken;
-      if (token != null) {
+      const receiveNotifications = userDocument?.entrant?.receiveNotifications;
+      
+      if (token != null && receiveNotifications) {
         tokens.push(token);
       }
     }
 
-    // TODO Send notification to the recipients, but only if they wish to receive notifications
+    // Send notification to the recipients
     if (tokens.length > 0) {
       const ms = getMessaging();
       await ms.sendEachForMulticast({tokens: tokens, notification: {title: title, body: message}});
