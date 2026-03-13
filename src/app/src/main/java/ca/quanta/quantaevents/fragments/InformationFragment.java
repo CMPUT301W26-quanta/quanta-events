@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import java.util.UUID;
@@ -39,8 +38,7 @@ public class InformationFragment extends Fragment implements Tagged {
 
         //sets up the back buttton listener
         binding.backButton.setOnClickListener(v -> {
-            NavDirections action = ca.quanta.quantaevents.fragments.InformationFragmentDirections.actionGlobalHomeFragment();
-            Navigation.findNavController(requireView()).navigate(action);
+            Navigation.findNavController(requireView()).popBackStack();
         });
     }
 
