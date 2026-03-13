@@ -5,6 +5,8 @@ import * as util from "../util";
 import { v4 as uuidv4 } from "uuid";
 import { CollectionReference, getFirestore } from "firebase-admin/firestore";
 import { EventDocument } from "../schema";
+import { UserDocument } from "../schema";
+import { getMessaging } from "firebase-admin/messaging";
 
 const createNotificationInterface = util.standardForm(
   z.object({
@@ -20,7 +22,6 @@ const createNotificationInterface = util.standardForm(
 
 export async function createNotification(request: CallableRequest) {
 
-  // TODO Find a way to send the notification
   const { userId, deviceId, data } = util.parseInterface(
       createNotificationInterface,
       request
@@ -53,12 +54,12 @@ export async function createNotification(request: CallableRequest) {
     }
 
     const eventDocuments = db.collection("events") as CollectionReference<EventDocument, EventDocument>;
-    const events = (await eventDocuments.doc(eventId).get()).data();
+    const eventDocument = (await eventDocuments.doc(eventId).get()).data();
 
     // Store all the recipients in some collection
     const recipients: string[] = [];
     if (waited) {
-      const waitedList = events?.waitList as string[];
+      const waitedList = eventDocument?.waitList as string[];
       for (const entrantId of waitedList) {
         if (!recipients.includes(entrantId)) {
           recipients.push(entrantId);
@@ -66,7 +67,7 @@ export async function createNotification(request: CallableRequest) {
       }
     }
     if (cancelled) {
-      const cancelledList = events?.cancelledList as string[];
+      const cancelledList = eventDocument?.cancelledList as string[];
       for (const entrantId of cancelledList) {
         if (!recipients.includes(entrantId)) {
           recipients.push(entrantId);
@@ -74,7 +75,7 @@ export async function createNotification(request: CallableRequest) {
       }
     }
     if (selected) {
-      const finalList = events?.finalList as string[];
+      const finalList = eventDocument?.finalList as string[];
       for (const entrantId of finalList) {
         if (!recipients.includes(entrantId)) {
           recipients.push(entrantId);
@@ -82,8 +83,23 @@ export async function createNotification(request: CallableRequest) {
       }
     }
 
-    // TODO get the FCM codes by querying the user objects in the recipient list
+    // TODO get the FCM tokens by querying the user objects in the recipient list
+    // NOTE: requires a token field in the UserDocument, so currently this would be wrong
+    const tokens: string[] = [];
+    const userDocuments = db.collection("users") as CollectionReference<UserDocument, UserDocument>;
+    for (const entrantId of recipients) {
+      const userDocument = (await userDocuments.doc(entrantId).get()).data();
+      const token = userDocument?.token;
+      if (token != null) {
+        tokens.push(token);
+      }
+    }
+
     // TODO Send notification to the recipients
+    if (tokens.length > 0) {
+      const ms = getMessaging();
+    await ms.sendEachForMulticast({tokens: tokens, notification: {title: title, body: message}});
+    }
 
     logger.info("Notification Created and sent succesfully", { notificationId });
     return { notificationId };
