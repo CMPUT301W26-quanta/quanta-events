@@ -69,8 +69,6 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
                 return;
             }
 
-            UUID profileUserId = profiles.get(profilePosition).getUserId();
-
             SessionStore sessionStore = new ViewModelProvider(this.parentFragment.getActivity()).get(SessionStore.class);
 
             sessionStore.observeSession(this.parentFragment.getViewLifecycleOwner(), (userUUID, deviceUUID) -> {
@@ -86,30 +84,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
 
                 model.deleteUser(userUUID, deviceUUID, user.getUserId())
                         .addOnSuccessListener(v -> {
-                            int pos = -1;
-
-                            // I do this, instead of doing profiles.get(profilePosition), in case
-                            // something has changed recently (bc this is async). eg another
-                            // profile being removed in the meantime
-                            for (int i = 0; i < profiles.size(); i++) {
-                                User profile = profiles.get(i);
-                                if (profile.getUserId() == profileUserId) {
-                                    pos = i;
-                                    break;
-                                }
-                            }
-
-                            // sometimes this is called twice for some reason, so the profile
-                            // has already been deleted successfully
-                            // bc of that, we get some erroneous calls of this, and this gets
-                            // output even tho everything went well
-                            if (pos == -1) {
-                                Log.e("ProfileAdapter", "Cannot find profile to delete.");
-                                return;
-                            }
-
-                            this.profiles.remove(pos);
-                            this.notifyItemRemoved(pos);
+                            this.profiles.remove(profilePosition);
+                            this.notifyItemRemoved(profilePosition);
                         })
                         .addOnFailureListener(exception -> {
                             Toast.makeText(this.parentFragment.requireContext(), "Failed to deleteUser: " + exception.getMessage(), Toast.LENGTH_LONG).show();
