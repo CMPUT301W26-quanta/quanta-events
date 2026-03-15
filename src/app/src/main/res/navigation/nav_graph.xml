@@ -23,7 +23,7 @@
         android:label="fragment_home"
         tools:layout="@layout/fragment_home">
         <action
-            android:id="@+id/action_testFragmentOne_to_informationFragment"
+            android:id="@+id/action_homeFragment_to_informationFragment"
             app:destination="@id/informationFragment" />
     </fragment>
 
