@@ -8,7 +8,8 @@
     android:layout_marginHorizontal="16dp"
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="0dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="@color/color_light"
     app:strokeColor="@color/border"
     app:strokeWidth="2dp">
 
@@ -74,12 +75,34 @@
 
             <!-- Time -->
             <TextView
-                android:id="@+id/event_time"
+                android:id="@+id/registration_start_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:drawableStart="@drawable/material_symbols_event_available"
+                app:drawableTint="@color/color_light_green"
+                android:text="Some Time"
+                android:textSize="16sp"
+                android:textColor="@color/text_color" />
+
+            <TextView
+                android:id="@+id/registration_end_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:drawableStart="@drawable/material_symbols_event_busy"
+                app:drawableTint="@color/color_light_red"
+                android:text="Some Time"
+                android:textSize="16sp"
+                android:textColor="@color/text_color" />
+
+            <TextView
+                android:id="@+id/event_start_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:drawableStart="@drawable/ic_round_schedule"
-                app:drawableTint="@color/color_dark_gray"
+                app:drawableTint="@color/color_dark"
                 android:text="Some Time"
                 android:textSize="16sp"
                 android:textColor="@color/text_color" />
@@ -91,7 +114,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:drawableStart="@drawable/material_symbols_location_rounded"
-                android:drawableTint="@color/color_light_red"
+                android:drawableTint="@color/color_dark_purple"
                 android:text="Some location"
                 android:textSize="16sp"
                 android:textColor="@color/text_color" />

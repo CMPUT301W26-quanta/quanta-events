@@ -143,7 +143,7 @@ public class EntrantEventBrowserFragment extends Fragment {
                         null,
                         null,
                         null,
-                        EventViewModel.SortBy.REGISTRATION_END)
+                        EventViewModel.SortBy.REGISTRATION_START)
                 .addOnSuccessListener(this::bindEventList)
                 .addOnFailureListener(ex -> {
                     Log.e("EntrantEventBrowser", "Failed to load events", ex);
@@ -196,7 +196,7 @@ public class EntrantEventBrowserFragment extends Fragment {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
-                    Object imageData = data.get("imageData");
+                    Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;
                     }

@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Name"
+                android:hint="Event Name*"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
@@ -54,7 +54,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Location"
+                android:hint="Location*"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
@@ -78,7 +78,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="Event Starts at"
+                android:hint="Event Starts at*"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
@@ -106,7 +106,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="Registration Starts"
+                android:hint="Registration Starts*"
                 android:focusable="false"
                 android:clickable="true"
                 app:boxCornerRadiusTopStart="12dp"
@@ -134,7 +134,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="Registration Ends"
+                android:hint="Registration Ends*"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
@@ -160,7 +160,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="Description"
+                android:hint="Description*"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
@@ -257,7 +257,7 @@
                     android:minHeight="64dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
-                    android:hint="Entrant Capacity"
+                    android:hint="Entrant Capacity*"
                     app:boxCornerRadiusTopStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
@@ -352,7 +352,6 @@
                         app:strokeColor="@color/border"
                         app:strokeWidth="2dp"
                         app:cornerRadius="12dp" />
-
                 </LinearLayout>
 
                 <TextView
@@ -360,7 +359,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Recommended Ratio 16:9 • Max Size: 5 MB"
+                    android:text="Recommended Ratio 16:9 • Max Size: 600 KB"
                     android:textColor="@color/color_dark_gray"
                     android:textSize="12sp" />
 

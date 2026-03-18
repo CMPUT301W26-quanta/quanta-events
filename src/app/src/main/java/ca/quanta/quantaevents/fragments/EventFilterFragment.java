@@ -1,5 +1,8 @@
 package ca.quanta.quantaevents.fragments;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,12 +14,23 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.google.android.material.textfield.TextInputEditText;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentEventFilterBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
 public class EventFilterFragment extends Fragment {
     private FragmentEventFilterBinding binding;
+    private final DateTimeFormatter displayFormatter =
+            DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
+    private final DateTimeFormatter utcFormatter =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -32,6 +46,8 @@ public class EventFilterFragment extends Fragment {
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
         );
+        binding.inputTo.setOnClickListener(v -> showDateTimePicker(binding.inputTo));
+        binding.inputFrom.setOnClickListener(v -> showDateTimePicker(binding.inputFrom));
     }
 
     @Override
@@ -40,4 +56,23 @@ public class EventFilterFragment extends Fragment {
         binding = FragmentEventFilterBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
+
+    private void showDateTimePicker(TextInputEditText target) {
+        Calendar cal = Calendar.getInstance();
+        new DatePickerDialog(requireContext(), R.style.ThemeOverlay_QuantaEvents_DatePicker,
+                (dateView, year, month, dayOfMonth) -> {
+                    new TimePickerDialog(requireContext(), R.style.ThemeOverlay_QuantaEvents_TimePicker,
+                            (timeView, hourOfDay, minute) -> {
+                                LocalDateTime local = LocalDateTime.of(year, month + 1, dayOfMonth,
+                                        hourOfDay, minute);
+                                ZonedDateTime zonedLocal = local.atZone(ZoneId.systemDefault());
+                                ZonedDateTime utc = zonedLocal.withZoneSameInstant(ZoneId.of("UTC"));
+                                String display = zonedLocal.format(displayFormatter);
+                                String utcValue = utc.format(utcFormatter);
+                                target.setText(display);
+                                target.setTag(utcValue);
+                            }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false).show();
+                }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
 }

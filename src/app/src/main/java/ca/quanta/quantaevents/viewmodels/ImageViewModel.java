@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import ca.quanta.quantaevents.models.Image;
+import ca.quanta.quantaevents.models.User;
+
 /**
  * View-model for managing image-related data and cloud functions.
  */
@@ -54,7 +57,7 @@ public class ImageViewModel extends ViewModel {
      * @param deviceId UUID to identify the user's device.
      * @return Map containing image data.
      */
-    public Task<Map<String, Object>> getImage(UUID imageId, UUID userId, UUID deviceId) {
+    public Task<Image> getImage(UUID imageId, UUID userId, UUID deviceId) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -66,11 +69,12 @@ public class ImageViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getImage")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Map<String, Object>>() {
-                    @Override
-                    public Map<String, Object> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        return (Map<String, Object>) task.getResult().getData();
-                    }
+                .continueWith(task -> {
+                    Map<String, Object> imageData = (Map<String, Object>) task.getResult().getData();
+                    Image result = new Image(imageId, imageData);
+                    System.out.println("Got Image" + result);
+                    return result;
                 });
+
     }
 }

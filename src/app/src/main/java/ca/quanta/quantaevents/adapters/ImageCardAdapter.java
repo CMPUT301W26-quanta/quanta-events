@@ -100,7 +100,7 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
 
         this.imageModel.getImage(event.getImageId(), this.userId, this.deviceId)
                 .addOnSuccessListener(image -> {
-                    Object imageData = image.get("imageData");
+                    Object imageData = image.getImageData();
 
                     // put in a placeholder if the event has an image, but its image data is
                     // set to null

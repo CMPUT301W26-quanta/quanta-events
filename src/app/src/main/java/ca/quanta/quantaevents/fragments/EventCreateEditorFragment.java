@@ -263,7 +263,7 @@ public class EventCreateEditorFragment extends Fragment {
         if (imageUuid != null) {
             imageModel.getImage(imageUuid, userId, deviceId)
                     .addOnSuccessListener(imageData -> {
-                        Object imageBase64 = imageData.get("imageData");
+                        Object imageBase64 = imageData.getImageData();
                         if (imageBase64 != null) {
                             selectedImageBase64 = imageBase64.toString();
                             showPreviewFromBase64(selectedImageBase64);

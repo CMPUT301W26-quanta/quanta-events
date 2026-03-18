@@ -139,7 +139,7 @@ public class EventDetailsFragment extends Fragment {
         binding.textEventTitle.setText(stringValue(event.getEventName(), "Event"));
         String organizer = event.getOrganizerId() == null ? "Unknown" : event.getOrganizerId().toString();
 
-        binding.textDateTime.setText(" " + formatLocalTime(event.getRegistrationStartTime()));
+        binding.eventStartTime.setText(" " + formatLocalTime(event.getRegistrationStartTime()));
         binding.textLocation.setText(" " + stringValue(event.getLocation(), "TBD"));
 
         waitlistCount = event.getWaitList() == null ? 0 : event.getWaitList().size();
@@ -156,7 +156,7 @@ public class EventDetailsFragment extends Fragment {
         if (imageUuid != null) {
             imageModel.getImage(imageUuid, userId, deviceId)
                     .addOnSuccessListener(imageData -> {
-                        Object imageBase64 = imageData.get("imageData");
+                        Object imageBase64 = imageData.getImageData();
                         if (imageBase64 != null) {
                             Bitmap bitmap = decodeBase64ToBitmap(imageBase64.toString());
                             if (bitmap != null) {

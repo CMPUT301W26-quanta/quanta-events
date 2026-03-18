@@ -11,6 +11,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="2dp"
         android:fillViewport="true"
+        android:backgroundTint="@color/color_dark_gray"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/layout_bottom_buttons"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,50 +65,88 @@
                 android:paddingBottom="4dp"
                 android:drawableStart="@drawable/material_symbols_person_outline"
                 app:drawableTint="@color/color_dark_gray"
-                android:textSize="18dp"
+                android:textSize="16dp"
                 android:textColor="@color/text_color" />
 
             <!-- Date/Time -->
             <TextView
-                android:id="@+id/textDateTime"
+                android:id="@+id/registration_start_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="4dp"
+                android:drawableStart="@drawable/material_symbols_event_available"
+                app:drawableTint="@color/color_light_green"
+                android:text=" Time of event"
+                android:textSize="16dp"
+                android:textColor="@color/text_color" />
+
+            <!-- Date/Time -->
+            <TextView
+                android:id="@+id/registration_end_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="4dp"
+                android:drawableStart="@drawable/material_symbols_event_busy"
+                app:drawableTint="@color/color_light_red"
+                android:text=" Time of event"
+                android:textSize="16dp"
+                android:textColor="@color/text_color" />
+
+            <!-- Date/Time -->
+            <TextView
+                android:id="@+id/event_start_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="4dp"
                 android:drawableStart="@drawable/ic_round_schedule"
-                app:drawableTint="@color/color_light_red"
-                android:text=" Time of event"
-                android:textSize="18dp"
-                android:textColor="@color/text_color" />
-
-            <!-- Location -->
-            <TextView
-                android:id="@+id/textLocation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="4dp"
-                android:drawableStart="@drawable/material_symbols_location_rounded"
-                app:drawableTint="@color/color_dark_purple"
-                android:text=" Location"
-                android:textSize="18dp"
-                android:textColor="@color/text_color" />
-
-            <!-- Waiting List -->
-            <TextView
-                android:id="@+id/textWaitingList"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="12dp"
-                android:textSize="18dp"
-                android:drawableStart="@drawable/material_symbols_group_outline"
                 app:drawableTint="@color/color_dark"
-                android:text=" Number of people on wait list"
+                android:text=" Time of event"
+                android:textSize="16dp"
                 android:textColor="@color/text_color" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- Location -->
+                <TextView
+                    android:id="@+id/textLocation"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="4dp"
+                    android:drawableStart="@drawable/material_symbols_location_rounded"
+                    app:drawableTint="@color/color_dark_purple"
+                    android:text=" Location"
+                    android:textSize="16dp"
+                    android:textColor="@color/text_color" />
+
+                <!-- Waiting List -->
+                <TextView
+                    android:id="@+id/textWaitingList"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="4dp"
+                    android:textSize="16dp"
+                    android:drawableStart="@drawable/material_symbols_group_outline"
+                    app:drawableTint="@color/design_default_color_primary_variant"
+                    android:text=" Waitlist count"
+                    android:textColor="@color/text_color" />
+
+            </LinearLayout>
 
             <!-- Divider -->
             <View

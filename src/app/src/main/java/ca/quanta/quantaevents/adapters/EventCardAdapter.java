@@ -43,7 +43,7 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         EventCardItem item = items.get(position);
         holder.title.setText(item.getTitle());
-        holder.time.setText(item.getTime());
+        holder.eventStartTime.setText(item.getEventStartTime());
         holder.location.setText(item.getLocation());
 
         // set the event card's background colour
@@ -108,7 +108,7 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
 
         final ShapeableImageView image;
         final TextView title;
-        final TextView time;
+        final TextView eventStartTime;
         final TextView location;
 
         EventViewHolder(@NonNull View itemView) {
@@ -117,7 +117,7 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
             this.card = itemView.findViewById(R.id.event_card);
             this.image = itemView.findViewById(R.id.event_image);
             this.title = itemView.findViewById(R.id.event_title);
-            this.time = itemView.findViewById(R.id.event_time);
+            this.eventStartTime = itemView.findViewById(R.id.event_start_time);
             this.location = itemView.findViewById(R.id.event_location);
         }
     }

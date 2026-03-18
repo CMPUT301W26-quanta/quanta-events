@@ -168,7 +168,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
-                    Object imageData = data.get("imageData");
+                    Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;
                     }
