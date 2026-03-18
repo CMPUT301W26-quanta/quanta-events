@@ -207,27 +207,4 @@ public class UserViewModel extends ViewModel {
                 });
     }
 
-    /**
-     * Calls the getUser cloud function returns the raw user map
-     *
-     * @param userId UUID to identify the user in database.
-     * @param deviceId UUID to verify users device.
-     * @return A Map containing the users data returned from the function.
-     */
-    public Task<Map<String, Object>> getUserRaw(UUID userId, UUID deviceId) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("userId", userId.toString());
-        data.put("deviceId", deviceId.toString());
-
-        return functions
-                .getHttpsCallable("getUser")
-                .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Map<String, Object>>() {
-                    @Override
-                    public Map<String, Object> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        return (Map<String, Object>) task.getResult().getData();
-                    }
-                });
-    }
-
 }
