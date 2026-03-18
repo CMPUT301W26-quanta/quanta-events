@@ -28,15 +28,15 @@ public class AdminNotificationHistoryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // **** set up the header
+        // set up the header
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
 
         infoStore.setTitle("Notification History");
-        infoStore.setSubtitle("View event notification history.");
+        infoStore.setSubtitle("View user notification history.");
         infoStore.setIconRes(R.drawable.material_symbols_history);
 
-        // **** set up the notification recycler view
+        // set up the notification recycler view
 
         // TODO: fetch all notifications from the database instead
 
@@ -52,7 +52,7 @@ public class AdminNotificationHistoryFragment extends Fragment {
         binding.notificationsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.notificationsRecyclerView.setAdapter(notificationAdapter);
 
-        // **** set up the buttons
+        // set up the back buttons on click listener
 
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()

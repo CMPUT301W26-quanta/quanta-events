@@ -1,4 +1,4 @@
-name: Build Firebase Functions
+name: Typecheck Firebase Functions
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
       - server/**
     
 jobs:
-  deploy:
+  tsc-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -20,6 +20,6 @@ jobs:
         run: npm install
         working-directory: ./server/functions
 
-      - name: Build TypeScript
+      - name: Typecheck TypeScript by Building
         run: npm run build
         working-directory: ./server/functions

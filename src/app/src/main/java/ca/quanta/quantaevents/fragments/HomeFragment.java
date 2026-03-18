@@ -41,10 +41,13 @@ public class HomeFragment extends Fragment implements Tagged {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        // set title of the page to Home and subtitle to what the page does
+        // also sets the icon for the page
         infoStore.setTitle("Home");
         infoStore.setSubtitle("Receive lottery selection updates here.");
         infoStore.setIconRes(R.drawable.material_symbols_home_outline);
 
+        // manages user session which checks if user is registered
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
         userModel = new ViewModelProvider(this).get(UserViewModel.class);
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
@@ -53,8 +56,10 @@ public class HomeFragment extends Fragment implements Tagged {
             maybeValidateUser();
         });
 
+        // listener for info button
+
         binding.infoButton.setOnClickListener(_view -> {
-            NavDirections action = ca.quanta.quantaevents.fragments.HomeFragmentDirections.actionTestFragmentOneToInformationFragment();
+            NavDirections action = HomeFragmentDirections.actionHomeFragmentToInformationFragment();
             Navigation.findNavController(requireView()).navigate(action);
         });
 
@@ -68,6 +73,8 @@ public class HomeFragment extends Fragment implements Tagged {
         return binding.getRoot();
     }
 
+    //validates user by checking if they
+    // exist in database if not handle it properly.
     private void maybeValidateUser() {
         if (userId == null || deviceId == null) {
             return;
@@ -89,6 +96,7 @@ public class HomeFragment extends Fragment implements Tagged {
         throw new RuntimeException(ex);
     }
 
+    // clears shared_pereferencs file if the userid does not exist on database
     private void handleMissingUser() {
         sessionStore.clearSession();
         if (isAdded()) {

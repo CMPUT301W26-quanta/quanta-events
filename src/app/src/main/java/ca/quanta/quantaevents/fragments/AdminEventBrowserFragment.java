@@ -53,6 +53,8 @@ public class AdminEventBrowserFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        // set the title as admin event browser
+        // sets the subtitle and icon
         infoStore.setTitle("Admin Event Browser");
         infoStore.setSubtitle("Browse and Moderate Events");
         infoStore.setIconRes(R.drawable.material_symbols_calendar_lock_outline);
@@ -61,6 +63,8 @@ public class AdminEventBrowserFragment extends Fragment {
                 v -> Navigation.findNavController(v).popBackStack()
         );
 
+        // new instance of event card adapter and sends event id and true for fromAdmin
+        // because admin is viewing from admin event browser
         adapter = new EventCardAdapter(item -> {
             Bundle args = new Bundle();
             args.putSerializable("eventId", item.getEventId());
@@ -68,12 +72,14 @@ public class AdminEventBrowserFragment extends Fragment {
             Navigation.findNavController(requireView())
                     .navigate(R.id.action_admineventbrowserfragment_to_eventdetailsfragment, args);
         });
+
         binding.eventsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.eventsRecyclerView.setAdapter(adapter);
 
         eventModel = new ViewModelProvider(this).get(EventViewModel.class);
         imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
+        // checks and verifies session
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
@@ -88,16 +94,20 @@ public class AdminEventBrowserFragment extends Fragment {
         return binding.getRoot();
     }
 
+    // loads all events past and ongoing for admin to view and moderate them.
+
     private void loadAllEvents() {
         if (userId == null || deviceId == null) {
             Log.d("AdminEventBrowser", "Session missing: userId/deviceId null");
             return;
         }
+
         Log.d("AdminEventBrowser", "Loading all events for admin " + userId);
+
         eventModel.getEvents(
                         userId,
                         deviceId,
-                        200,
+                        -1,
                         null,
                         EventViewModel.Fetch.ALL,
                         null,
@@ -119,29 +129,38 @@ public class AdminEventBrowserFragment extends Fragment {
                 });
     }
 
+    // binds the event list to the view
+    // The following function is from OpenAI, ChatGPT, "bindEventList implementation under AdminEventBrowser", 2026-03-12
     private void bindEventList(List<Event> events) {
         if (events == null) {
             Log.d("AdminEventBrowser", "Event list is null");
             return;
         }
+
         Log.d("AdminEventBrowser", "Loaded events count=" + events.size());
+
         if (events.isEmpty()) {
             Toast.makeText(requireContext(), "No events found", Toast.LENGTH_LONG).show();
             adapter.setItems(new ArrayList<>());
             return;
         }
+
         ArrayList<EventCardItem> items = new ArrayList<>();
+
         for (Event event : events) {
             if (event == null) {
                 continue;
             }
+
             UUID eventId = event.getEventId();
             String title = stringValue(event.getEventName(), "Event");
             String time = formatLocalTime(event.getRegistrationStartTime());
             String location = stringValue(event.getLocation(), "TBD");
             items.add(new EventCardItem(eventId, title, time, location, null));
         }
+
         adapter.setItems(items);
+
         for (int i = 0; i < events.size(); i++) {
             Event event = events.get(i);
             if (event != null && event.getImageId() != null && i < items.size()) {
@@ -159,7 +178,7 @@ public class AdminEventBrowserFragment extends Fragment {
                     }
                     Bitmap bitmap = decodeBase64ToBitmap(imageData.toString());
                     if (bitmap != null) {
-                        adapter.upsert(item.withImage(bitmap));
+                        adapter.updateInsert(item.withImage(bitmap));
                     }
                 });
     }
@@ -200,7 +219,7 @@ public class AdminEventBrowserFragment extends Fragment {
     private void handleMissingUser() {
         sessionStore.clearSession();
         if (isAdded()) {
-            NavDirections action = ca.quanta.quantaevents.fragments.AdminEventBrowserFragmentDirections.actionGlobalRegisterFragment();
+            NavDirections action = AdminEventBrowserFragmentDirections.actionGlobalRegisterFragment();
             Navigation.findNavController(requireView()).navigate(action);
         }
     }

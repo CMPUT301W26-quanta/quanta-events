@@ -34,11 +34,28 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
 
     private Fragment parentFragment;
 
+    private SessionStore sessionStore;
+
+    private UUID userId;
+    private UUID deviceId;
+
     public ProfileAdapter(List<User> profiles, Fragment parentFragment) {
         this.parentFragment = parentFragment;
 
         this.model = new ViewModelProvider(this.parentFragment.getActivity()).get(UserViewModel.class);
         this.profiles = profiles;
+
+        // **** set up the session store
+
+        this.sessionStore = new ViewModelProvider(this.parentFragment.getActivity()).get(SessionStore.class);
+
+        this.userId = null;
+        this.deviceId = null;
+
+        this.sessionStore.observeSession(this.parentFragment.getViewLifecycleOwner(), (userId, deviceId) -> {
+            this.userId = userId;
+            this.deviceId = deviceId;
+        });
     }
 
     @Override
@@ -69,53 +86,21 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
                 return;
             }
 
-            UUID profileUserId = profiles.get(profilePosition).getUserId();
+            if (this.userId == null || this.deviceId == null) {
+                Log.e("ProfileAdapter", "Failed to deleteUser because userId or deviceId is NULL.");
+                Toast.makeText(this.parentFragment.requireContext(), "Still loading user. Please try again.", Toast.LENGTH_LONG).show();
+                return;
+            }
 
-            SessionStore sessionStore = new ViewModelProvider(this.parentFragment.getActivity()).get(SessionStore.class);
-
-            sessionStore.observeSession(this.parentFragment.getViewLifecycleOwner(), (userUUID, deviceUUID) -> {
-                if (userUUID == null) {
-                    Log.e("ProfileAdapter", "Failed to deleteUser because userUUID is NULL.");
-                    return;
-                }
-
-                if (deviceUUID == null) {
-                    Log.e("ProfileAdapter", "Failed to deleteUser because userUUID is NULL.");
-                    return;
-                }
-
-                model.deleteUser(userUUID, deviceUUID, user.getUserId())
-                        .addOnSuccessListener(v -> {
-                            int pos = -1;
-
-                            // I do this, instead of doing profiles.get(profilePosition), in case
-                            // something has changed recently (bc this is async). eg another
-                            // profile being removed in the meantime
-                            for (int i = 0; i < profiles.size(); i++) {
-                                User profile = profiles.get(i);
-                                if (profile.getUserId() == profileUserId) {
-                                    pos = i;
-                                    break;
-                                }
-                            }
-
-                            // sometimes this is called twice for some reason, so the profile
-                            // has already been deleted successfully
-                            // bc of that, we get some erroneous calls of this, and this gets
-                            // output even tho everything went well
-                            if (pos == -1) {
-                                Log.e("ProfileAdapter", "Cannot find profile to delete.");
-                                return;
-                            }
-
-                            this.profiles.remove(pos);
-                            this.notifyItemRemoved(pos);
-                        })
-                        .addOnFailureListener(exception -> {
-                            Toast.makeText(this.parentFragment.requireContext(), "Failed to deleteUser: " + exception.getMessage(), Toast.LENGTH_LONG).show();
-                           Log.e("ProfileAdapter", "Failed to deleteUser.");
-                        });
-            });
+            model.deleteUser(this.userId, this.deviceId, user.getUserId())
+                    .addOnSuccessListener(v -> {
+                        this.profiles.remove(profilePosition);
+                        this.notifyItemRemoved(profilePosition);
+                    })
+                    .addOnFailureListener(exception -> {
+                        Toast.makeText(this.parentFragment.requireContext(), "Failed to deleteUser: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+                        Log.e("ProfileAdapter", "Failed to deleteUser.");
+                    });
         });
 
         if (!user.isOrganizer()) {

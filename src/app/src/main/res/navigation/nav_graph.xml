@@ -23,7 +23,7 @@
         android:label="fragment_home"
         tools:layout="@layout/fragment_home">
         <action
-            android:id="@+id/action_testFragmentOne_to_informationFragment"
+            android:id="@+id/action_homeFragment_to_informationFragment"
             app:destination="@id/informationFragment" />
     </fragment>
 
@@ -66,6 +66,10 @@
         <action
             android:id="@+id/action_admineventbrowserfragment_to_eventedetailsfragment"
             app:destination="@id/eventDetailsFragment" />
+        <action
+            android:id="@+id/action_adminpanelFragment_to_adminImageBrowserFragment"
+            app:destination="@id/adminImageBrowserFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -252,10 +256,6 @@
         app:destination="@id/eventdashboardFragment"
         app:popUpTo="@id/nav_graph" />
     <action
-        android:id="@+id/action_global_informationFragment"
-        app:destination="@id/informationFragment"
-        app:popUpTo="@id/nav_graph" />
-    <action
         android:id="@+id/action_global_adminpanelFragment"
         app:destination="@id/adminpanelFragment"
         app:popUpTo="@id/nav_graph" />
@@ -269,15 +269,15 @@
     <fragment
         android:id="@+id/adminNotificationHistoryFragment"
         android:name="ca.quanta.quantaevents.fragments.AdminNotificationHistoryFragment"
-        android:label="fragment_android_notifcation_history_panel">
-        <action
-            android:id="@+id/action_adminNotificationHistoryFragment_to_adminprofilebrowserFragment"
-            app:destination="@id/adminprofilebrowserFragment" />
-    </fragment>
+        android:label="fragment_android_notifcation_history_panel" />
     <action
         android:id="@+id/action_global_registerFragment"
         app:destination="@id/registerFragment"
         app:popUpTo="@id/nav_graph"
         app:popUpToInclusive="true" />
+    <fragment
+        android:id="@+id/adminImageBrowserFragment"
+        android:name="ca.quanta.quantaevents.fragments.AdminImageBrowserFragment"
+        android:label="AdminImageBrowserFragment" />
 
 </navigation>

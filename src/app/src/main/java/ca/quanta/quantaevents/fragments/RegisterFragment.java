@@ -56,6 +56,8 @@ public class RegisterFragment extends Fragment {
         observeSessionAndRedirect();
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        // set title of the page to Welcome! and also the subtitle
+        // also sets the icon for the page
         infoStore.setTitle("Welcome!");
         infoStore.setSubtitle("Get started by creating an account.");
         infoStore.setIconRes(R.drawable.material_symbols_waving_hand_outline);
@@ -69,9 +71,8 @@ public class RegisterFragment extends Fragment {
     }
 
     /**
-     * Listener for the save button that extracts text input and check box values.
-     *
-     * @param v The fragment which the button is associated with.
+     * Listener for the save button that extracts text input and check box values..
+     * and decides what to do on success or on failure
      */
     public void onSaveClick(View v) {
         if (redirectedToHome) {
@@ -102,6 +103,7 @@ public class RegisterFragment extends Fragment {
 
     }
 
+    // Regidrect the user to appropriate fragment
     private void observeSessionAndRedirect() {
         sessionStore.getUserId().observe(getViewLifecycleOwner(), userId -> tryRedirect());
         sessionStore.getDeviceId().observe(getViewLifecycleOwner(), deviceId -> tryRedirect());
@@ -115,6 +117,7 @@ public class RegisterFragment extends Fragment {
         return value;
     }
 
+    // triess redirecting user to appropriate fragment.
     private void tryRedirect() {
         if (redirectedToHome) {
             return;
@@ -126,7 +129,7 @@ public class RegisterFragment extends Fragment {
                 return;
             }
             redirectedToHome = true;
-            NavDirections action = ca.quanta.quantaevents.fragments.RegisterFragmentDirections.actionRegisterfragmentToHomefragment();
+            NavDirections action = RegisterFragmentDirections.actionRegisterfragmentToHomefragment();
             navController.navigate(action);
         }
     }
