@@ -48,6 +48,14 @@ public class EventFilterFragment extends Fragment {
         );
         binding.inputTo.setOnClickListener(v -> showDateTimePicker(binding.inputTo));
         binding.inputFrom.setOnClickListener(v -> showDateTimePicker(binding.inputFrom));
+        binding.resetButton.setOnClickListener(v -> {
+            binding.inputFrom.setText(null);
+            binding.inputFrom.setTag(null);
+            binding.inputTo.setText(null);
+            binding.inputTo.setTag(null);
+            binding.inputCategory.setText(null);
+            binding.inputCategory.setTag(null);
+        });
     }
 
     @Override
