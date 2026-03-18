@@ -64,6 +64,9 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
 
         this.sessionStore = new ViewModelProvider(this.parentFragment.requireActivity()).get(SessionStore.class);
 
+        this.userId = null;
+        this.deviceId = null;
+
         sessionStore.observeSession(this.parentFragment.getViewLifecycleOwner(), (userId, deviceId) -> {
             this.userId = userId;
             this.deviceId = deviceId;
@@ -97,6 +100,12 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
     @Override
     public void onBindViewHolder(@NonNull ImageCardViewHolder holder, int position) {
         Event event = this.events.get(position);
+
+        if (this.userId == null || this.deviceId == null) {
+            Log.e("ImageCardAdapter", "Failed to bind image; userId or deviceId is NULL.");
+            Toast.makeText(this.parentFragment.requireContext(), "Still loading user. Please try again.", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         this.imageModel.getImage(event.getImageId(), this.userId, this.deviceId)
                 .addOnSuccessListener(image -> {

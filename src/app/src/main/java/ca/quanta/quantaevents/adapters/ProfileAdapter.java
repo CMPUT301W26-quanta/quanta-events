@@ -34,11 +34,28 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
 
     private Fragment parentFragment;
 
+    private SessionStore sessionStore;
+
+    private UUID userId;
+    private UUID deviceId;
+
     public ProfileAdapter(List<User> profiles, Fragment parentFragment) {
         this.parentFragment = parentFragment;
 
         this.model = new ViewModelProvider(this.parentFragment.getActivity()).get(UserViewModel.class);
         this.profiles = profiles;
+
+        // **** set up the session store
+
+        this.sessionStore = new ViewModelProvider(this.parentFragment.getActivity()).get(SessionStore.class);
+
+        this.userId = null;
+        this.deviceId = null;
+
+        this.sessionStore.observeSession(this.parentFragment.getViewLifecycleOwner(), (userId, deviceId) -> {
+            this.userId = userId;
+            this.deviceId = deviceId;
+        });
     }
 
     @Override
@@ -69,29 +86,21 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
                 return;
             }
 
-            SessionStore sessionStore = new ViewModelProvider(this.parentFragment.getActivity()).get(SessionStore.class);
+            if (this.userId == null || this.deviceId == null) {
+                Log.e("ProfileAdapter", "Failed to deleteUser because userId or deviceId is NULL.");
+                Toast.makeText(this.parentFragment.requireContext(), "Still loading user. Please try again.", Toast.LENGTH_LONG).show();
+                return;
+            }
 
-            sessionStore.observeSession(this.parentFragment.getViewLifecycleOwner(), (userUUID, deviceUUID) -> {
-                if (userUUID == null) {
-                    Log.e("ProfileAdapter", "Failed to deleteUser because userUUID is NULL.");
-                    return;
-                }
-
-                if (deviceUUID == null) {
-                    Log.e("ProfileAdapter", "Failed to deleteUser because userUUID is NULL.");
-                    return;
-                }
-
-                model.deleteUser(userUUID, deviceUUID, user.getUserId())
-                        .addOnSuccessListener(v -> {
-                            this.profiles.remove(profilePosition);
-                            this.notifyItemRemoved(profilePosition);
-                        })
-                        .addOnFailureListener(exception -> {
-                            Toast.makeText(this.parentFragment.requireContext(), "Failed to deleteUser: " + exception.getMessage(), Toast.LENGTH_LONG).show();
-                           Log.e("ProfileAdapter", "Failed to deleteUser.");
-                        });
-            });
+            model.deleteUser(this.userId, this.deviceId, user.getUserId())
+                    .addOnSuccessListener(v -> {
+                        this.profiles.remove(profilePosition);
+                        this.notifyItemRemoved(profilePosition);
+                    })
+                    .addOnFailureListener(exception -> {
+                        Toast.makeText(this.parentFragment.requireContext(), "Failed to deleteUser: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+                        Log.e("ProfileAdapter", "Failed to deleteUser.");
+                    });
         });
 
         if (!user.isOrganizer()) {
