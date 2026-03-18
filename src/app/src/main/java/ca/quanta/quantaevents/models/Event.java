@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -193,6 +194,48 @@ public class Event {
         this.eventCapacity = eventCapacity == null ? 0 : eventCapacity;
         this.registrationLimit = registrationLimit;
         this.imageId = imageId;
+    }
+
+    public Event(UUID eventId, Map<String, Object> data){
+        this.eventId = eventId;
+        this.organizerId = data.get("organizerId") == null ? null : UUID.fromString(data.get("organizerId").toString());
+        this.organizerDeviceId = data.get("organizerDeviceId") == null ? null : UUID.fromString(data.get("organizerDeviceId").toString());
+        this.waitList = data.get("waitList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("waitList");
+        this.cancelledList = data.get("cancelledList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("cancelledList");
+        this.finalList = data.get("finalList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("finalList");
+        this.registrationStartTime = ZonedDateTime.parse(data.get("registrationStartTime").toString());
+        this.registrationEndTime = ZonedDateTime.parse(data.get("registrationEndTime").toString());
+        this.eventTime = data.get("eventTime") == null ? null : ZonedDateTime.parse(data.get("eventTime").toString());
+        this.eventName = data.get("eventName").toString();
+        this.eventDescription = data.get("eventDescription").toString();
+        this.location = data.get("location").toString();
+        this.eventCategory = data.get("eventCategory") == null ? null : data.get("eventCategory").toString();
+        this.eventGuidelines = data.get("eventGuidelines") == null ? null : data.get("eventGuidelines").toString();
+        this.geolocation = Boolean.parseBoolean(data.getOrDefault("geolocation", "false").toString());
+        this.eventCapacity = Integer.parseInt(data.getOrDefault("eventCapacity", "0").toString());
+        this.registrationLimit = data.get("registrationLimit") == null ? null : Integer.parseInt(data.get("registrationLimit").toString());
+        this.imageId = data.get("imageId") == null ? null : UUID.fromString(data.get("imageId").toString());
+    }
+
+    public Event(Map<String, Object> data) {
+        this.eventId = UUID.fromString((String) data.get("eventId"));
+        this.organizerId = data.get("organizerId") == null ? null : UUID.fromString(data.get("organizerId").toString());
+        this.organizerDeviceId = data.get("organizerDeviceId") == null ? null : UUID.fromString(data.get("organizerDeviceId").toString());
+        this.waitList = data.get("waitList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("waitList");
+        this.cancelledList = data.get("cancelledList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("cancelledList");
+        this.finalList = data.get("finalList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("finalList");
+        this.registrationStartTime = ZonedDateTime.parse(data.get("registrationStartTime").toString());
+        this.registrationEndTime = ZonedDateTime.parse(data.get("registrationEndTime").toString());
+        this.eventTime = data.get("eventTime") == null ? null : ZonedDateTime.parse(data.get("eventTime").toString());
+        this.eventName = data.get("eventName").toString();
+        this.eventDescription = data.get("eventDescription").toString();
+        this.location = data.get("location").toString();
+        this.eventCategory = data.get("eventCategory") == null ? null : data.get("eventCategory").toString();
+        this.eventGuidelines = data.get("eventGuidelines") == null ? null : data.get("eventGuidelines").toString();
+        this.geolocation = Boolean.parseBoolean(data.getOrDefault("geolocation", "false").toString());
+        this.eventCapacity = Integer.parseInt(data.getOrDefault("eventCapacity", "0").toString());
+        this.registrationLimit = data.get("registrationLimit") == null ? null : Integer.parseInt(data.get("registrationLimit").toString());
+        this.imageId = data.get("imageId") == null ? null : UUID.fromString(data.get("imageId").toString());
     }
 
     public UUID getEventId() {
