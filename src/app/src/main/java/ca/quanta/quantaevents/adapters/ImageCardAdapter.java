@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -164,7 +165,7 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
     public static class ImageCardViewHolder extends RecyclerView.ViewHolder {
         MaterialCardView card;
         ImageView image;
-        Button buttonRemove;
+        ImageButton buttonRemove;
 
         public ImageCardViewHolder(@NonNull View itemView) {
             super(itemView);
