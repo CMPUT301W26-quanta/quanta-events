@@ -144,7 +144,12 @@ public class EntrantEventBrowserFragment extends Fragment {
                         null,
                         null,
                         EventViewModel.SortBy.REGISTRATION_START)
-                .addOnSuccessListener(this::bindEventList)
+                .addOnSuccessListener(events -> {
+                    if (!isAdded()) {
+                        return;
+                    }
+                    bindEventList(events);
+                })
                 .addOnFailureListener(ex -> {
                     Log.e("EntrantEventBrowser", "Failed to load events", ex);
                     if (ex instanceof FirebaseFunctionsException) {
@@ -156,20 +161,25 @@ public class EntrantEventBrowserFragment extends Fragment {
                         handleMissingUser();
                         return;
                     }
-                    Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
+                    if (isAdded()) {
+                        Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
+                    }
                 });
     }
     //bind the events to the array adapter and the card item
     // The following function is from OpenAI, ChatGPT, "bindEventList implementation for EntrantEventBrowser", 2026-03-11
 
     private void bindEventList(List<Event> events) {
+        if (!isAdded()) {
+            return;
+        }
         if (events == null) {
             Log.d("EntrantEventBrowser", "Event list is null");
             return;
         }
         Log.d("EntrantEventBrowser", "Loaded events count=" + events.size());
         if (events.isEmpty()) {
-            Toast.makeText(requireContext(), "No events found", Toast.LENGTH_LONG).show();
+            Toast.makeText(requireContext(), "No events created!", Toast.LENGTH_LONG).show();
             adapter.setItems(new ArrayList<>());
             return;
         }
@@ -196,6 +206,9 @@ public class EntrantEventBrowserFragment extends Fragment {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
+                    if (!isAdded()) {
+                        return;
+                    }
                     Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;

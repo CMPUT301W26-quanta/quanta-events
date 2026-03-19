@@ -171,7 +171,7 @@ public class UserViewModel extends ViewModel {
      * @param receiveNotifications Updated notification preference (optional).
      * @return UUID identifying the user's ID.
      */
-    public Task<String> updateUser(UUID userId, UUID deviceId,
+    public Task<UUID> updateUser(UUID userId, UUID deviceId,
                                    @Nullable String name,
                                    @Nullable String email,
                                    @Nullable String phone,
@@ -198,11 +198,11 @@ public class UserViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("updateUser")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, String>() {
+                .continueWith(new Continuation<HttpsCallableResult, UUID>() {
                     @Override
-                    public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                    public UUID then(@NonNull Task<HttpsCallableResult> task) throws Exception {
                         Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
-                        return (String) result.get("userId");
+                        return UUID.fromString((String) result.get("userId"));
                     }
                 });
     }

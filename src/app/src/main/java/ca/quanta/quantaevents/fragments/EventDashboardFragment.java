@@ -120,18 +120,28 @@ public class EventDashboardFragment extends Fragment implements Tagged {
                         null,
                         null,
                         EventViewModel.SortBy.REGISTRATION_END)
-                .addOnSuccessListener(this::bindEventList)
+                .addOnSuccessListener(events -> {
+                    if (!isAdded()) {
+                        return;
+                    }
+                    bindEventList(events);
+                })
                 .addOnFailureListener(ex -> {
                     Log.e("EventDashboard", "Failed to load events", ex);
                     if (isUserNotFound(ex)) {
                         handleMissingUser();
                         return;
                     }
-                    Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
+                    if (isAdded()) {
+                        Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
+                    }
                 });
     }
 
     private void bindEventList(java.util.List<Event> events) {
+        if (!isAdded()) {
+            return;
+        }
         if (events == null) {
             return;
         }
@@ -163,6 +173,9 @@ public class EventDashboardFragment extends Fragment implements Tagged {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
+                    if (!isAdded()) {
+                        return;
+                    }
                     Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;

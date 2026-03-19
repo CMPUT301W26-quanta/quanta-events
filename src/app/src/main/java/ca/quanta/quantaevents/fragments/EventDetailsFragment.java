@@ -48,6 +48,7 @@ public class EventDetailsFragment extends Fragment {
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
     private UserViewModel model;
+    private boolean isOrganizer = false;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -137,8 +138,9 @@ public class EventDetailsFragment extends Fragment {
         }
 
         binding.textEventTitle.setText(stringValue(event.getEventName(), "Event"));
-        String organizer = event.getOrganizerId() == null ? "Unknown" : event.getOrganizerId().toString();
 
+        String organizer = event.getOrganizerId() == null ? "Unknown" : event.getOrganizerId().toString();
+        System.out.println(organizer);
         binding.eventStartTime.setText(" " + formatLocalTime(event.getRegistrationStartTime()));
         binding.textLocation.setText(" " + stringValue(event.getLocation(), "TBD"));
 
@@ -172,9 +174,11 @@ public class EventDetailsFragment extends Fragment {
         if (isAdmin && fromAdmin) {
             binding.enrollButton.setText("Delete");
             binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
+            isOrganizer = false;
             return;
         }
         if (userId != null && organizerId != null && organizerId.equals(userId.toString())) {
+            isOrganizer = true;
             binding.enrollButton.setText("Manage");
             binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
             binding.enrollButton.setOnClickListener(v -> {
@@ -183,6 +187,7 @@ public class EventDetailsFragment extends Fragment {
             });
             return;
         }
+        isOrganizer = false;
         binding.enrollButton.setOnClickListener(v -> toggleWaitlist());
     }
 
@@ -221,6 +226,9 @@ public class EventDetailsFragment extends Fragment {
     }
 
     private void updateWaitlistState() {
+        if (isOrganizer || (isAdmin && fromAdmin)) {
+            return;
+        }
         if (userId == null || deviceId == null || eventId == null) {
             Log.d("EventDetails", "updateWaitlistState: missing session or eventId");
             return;
@@ -258,6 +266,9 @@ public class EventDetailsFragment extends Fragment {
 
     private void updateEnrollButtonLabel() {
         if (!isAdded()) {
+            return;
+        }
+        if (isOrganizer || (isAdmin && fromAdmin)) {
             return;
         }
         if (inWaitlist) {

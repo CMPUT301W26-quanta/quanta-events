@@ -300,7 +300,7 @@ public class EventCreateEditorFragment extends Fragment {
         binding.imagePreview.setVisibility(View.VISIBLE);
     }
 
-    private void createEventWithImageId(@Nullable String imageId, String registrationStart,
+    private void createEventWithImageId(@Nullable UUID imageId, String registrationStart,
                                         String registrationEnd, String eventTime,
                                         String name, String description,
                                         String eventCategory, String eventGuidelines,
@@ -309,7 +309,7 @@ public class EventCreateEditorFragment extends Fragment {
         UUID imageUuid = null;
         if (imageId != null) {
             try {
-                imageUuid = UUID.fromString(imageId);
+                imageUuid = imageId;
             } catch (IllegalArgumentException ignored) {
                 imageUuid = null;
             }
@@ -359,12 +359,12 @@ public class EventCreateEditorFragment extends Fragment {
             }
             return;
         }
-        updateEventWithImageId(existingImageId == null ? null : existingImageId.toString(),
+        updateEventWithImageId(existingImageId == null ? null : existingImageId,
                 registrationStart, registrationEnd, eventTime, name, description,
                 eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit);
     }
 
-    private void updateEventWithImageId(@Nullable String imageId, String registrationStart,
+    private void updateEventWithImageId(@Nullable UUID imageId, String registrationStart,
                                         String registrationEnd, String eventTime,
                                         String name, String description,
                                         String eventCategory, String eventGuidelines,
@@ -373,7 +373,7 @@ public class EventCreateEditorFragment extends Fragment {
         UUID imageUuid = null;
         if (imageId != null) {
             try {
-                imageUuid = UUID.fromString(imageId);
+                imageUuid = imageId;
             } catch (IllegalArgumentException ignored) {
                 imageUuid = null;
             }

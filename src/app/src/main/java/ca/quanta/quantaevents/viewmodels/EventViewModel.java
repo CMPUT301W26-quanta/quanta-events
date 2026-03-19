@@ -79,7 +79,7 @@ public class EventViewModel extends ViewModel {
      * @param imageId UUID identifying the image for the event (optional).
      * @return UUID assigned to the newly created event.
      */
-    public Task<String> createEvent(UUID userId, UUID deviceId, String registrationStartTime,
+    public Task<UUID> createEvent(UUID userId, UUID deviceId, String registrationStartTime,
                                     String registrationEndTime, String eventTime,
                                     String eventName, String eventDescription,
                                     String eventCategory, String eventGuidelines,
@@ -107,11 +107,11 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("createEvent")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, String>() {
+                .continueWith(new Continuation<HttpsCallableResult, UUID>() {
                     @Override
-                    public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                    public UUID then(@NonNull Task<HttpsCallableResult> task) throws Exception {
                         Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
-                        return (String) result.get("eventId");
+                        return UUID.fromString((String) result.get("eventId"));
                     }
                 });
     }

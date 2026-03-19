@@ -198,7 +198,7 @@ public class Event {
 
     public Event(UUID eventId, Map<String, Object> data){
         this.eventId = eventId;
-        this.organizerId = data.get("organizerId") == null ? null : UUID.fromString(data.get("organizerId").toString());
+        this.organizerId = data.get("organizer") == null ? null : UUID.fromString((String) data.get("organizer"));
         this.organizerDeviceId = data.get("organizerDeviceId") == null ? null : UUID.fromString(data.get("organizerDeviceId").toString());
         this.waitList = data.get("waitList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("waitList");
         this.cancelledList = data.get("cancelledList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("cancelledList");
@@ -219,7 +219,7 @@ public class Event {
 
     public Event(Map<String, Object> data) {
         this.eventId = UUID.fromString((String) data.get("eventId"));
-        this.organizerId = data.get("organizerId") == null ? null : UUID.fromString(data.get("organizerId").toString());
+        this.organizerId = data.get("organizer") == null ? null : UUID.fromString((String) data.get("organizer"));
         this.organizerDeviceId = data.get("organizerDeviceId") == null ? null : UUID.fromString(data.get("organizerDeviceId").toString());
         this.waitList = data.get("waitList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("waitList");
         this.cancelledList = data.get("cancelledList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("cancelledList");

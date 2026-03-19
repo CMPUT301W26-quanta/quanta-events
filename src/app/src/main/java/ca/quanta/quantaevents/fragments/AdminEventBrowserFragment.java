@@ -114,7 +114,12 @@ public class AdminEventBrowserFragment extends Fragment {
                         null,
                         null,
                         EventViewModel.SortBy.REGISTRATION_END)
-                .addOnSuccessListener(this::bindEventList)
+                .addOnSuccessListener(events -> {
+                    if (!isAdded()) {
+                        return;
+                    }
+                    bindEventList(events);
+                })
                 .addOnFailureListener(ex -> {
                     Log.e("AdminEventBrowser", "Failed to load events", ex);
                     if (ex instanceof FirebaseFunctionsException) {
@@ -125,13 +130,18 @@ public class AdminEventBrowserFragment extends Fragment {
                         handleMissingUser();
                         return;
                     }
-                    Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
+                    if (isAdded()) {
+                        Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
+                    }
                 });
     }
 
     // binds the event list to the view
     // The following function is from OpenAI, ChatGPT, "bindEventList implementation under AdminEventBrowser", 2026-03-12
     private void bindEventList(List<Event> events) {
+        if (!isAdded()) {
+            return;
+        }
         if (events == null) {
             Log.d("AdminEventBrowser", "Event list is null");
             return;
@@ -140,7 +150,7 @@ public class AdminEventBrowserFragment extends Fragment {
         Log.d("AdminEventBrowser", "Loaded events count=" + events.size());
 
         if (events.isEmpty()) {
-            Toast.makeText(requireContext(), "No events found", Toast.LENGTH_LONG).show();
+            Toast.makeText(requireContext(), "No events to moderate", Toast.LENGTH_LONG).show();
             adapter.setItems(new ArrayList<>());
             return;
         }
@@ -172,6 +182,9 @@ public class AdminEventBrowserFragment extends Fragment {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
+                    if (!isAdded()) {
+                        return;
+                    }
                     Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;
