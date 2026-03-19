@@ -6,26 +6,33 @@ import java.util.UUID;
 public class Comment{
 
     private final UUID commentId;
-    private final UUID userId;
+    private final UUID commenterId;
     private ZonedDateTime commentTime;
 
-    public Comment(UUID commentId, UUID userId, ZonedDateTime commentTime){
+
+    /**
+     * Constructor for a Notification object.
+     * @param commenterId ID of a User who made the comment.
+     * @param commentId The ID of the comment.
+     * @param commentTime The time at which the comment was made.
+     */
+    public Comment(UUID commentId, UUID commenterId, ZonedDateTime commentTime){
 
         this.commentId = UUID.randomUUID();
-        this.userId = userId;
+        this.commenterId = commenterId;
         this.commentTime = commentTime;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public UUID getCommenterId() {
+        return this.commenterId;
     }
 
     public UUID getCommentId(){
-        return commentId;
+        return this.commentId;
     }
 
     public ZonedDateTime getCommentTime(){
-        return commentTime;
+        return this.commentTime;
     }
 
 
