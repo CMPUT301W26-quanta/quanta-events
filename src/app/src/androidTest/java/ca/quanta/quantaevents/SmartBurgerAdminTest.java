@@ -32,7 +32,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class SmartBurgerNavigationTest {
+public class SmartBurgerAdminTest {
 
     @Before
     public void skipRegistration() {
@@ -51,7 +51,7 @@ public class SmartBurgerNavigationTest {
 
 
 
-@Rule
+    @Rule
     public ActivityScenarioRule<MainActivity> activityRule = new
             ActivityScenarioRule<>(MainActivity.class);
 
@@ -151,3 +151,4 @@ public class SmartBurgerNavigationTest {
 
 
 }
+
