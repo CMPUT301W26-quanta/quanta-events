@@ -137,9 +137,8 @@ public class SmartBurger {
     }
 
 
-
     public void inject() {
-        rootButton = createButton(R.drawable.menu_to_close);
+        rootButton = createButton(R.drawable.material_symbols_menu);
         rootButton.setContentDescription("Open Menu");
         rootButton.setOnClickListener(_view -> this.toggle());
         rootButton.setVisibility(GONE);
@@ -194,7 +193,7 @@ public class SmartBurger {
 
     private void toClosed() {
         this.open = false;
-        rootButton.setImageDrawable(getDrawable(R.drawable.menu_to_close));
+        rootButton.setImageDrawable(getDrawable(R.drawable.material_symbols_menu));
     }
 
     private void rebuild() {

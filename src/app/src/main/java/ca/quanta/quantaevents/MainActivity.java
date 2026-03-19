@@ -28,6 +28,7 @@ import ca.quanta.quantaevents.fragments.EntrantEventListFragment;
 import ca.quanta.quantaevents.fragments.EventDashboardFragment;
 import ca.quanta.quantaevents.fragments.HomeFragment;
 import ca.quanta.quantaevents.models.User;
+import ca.quanta.quantaevents.loading.Loader;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
@@ -107,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         sessionStore.getRoleMask().observe(this, mask -> burgerState.setGroupFilter(mask == null ? 0 : mask));
+
+        new Loader(this, binding.loadingFrame).inject();
     }
 
     @SuppressWarnings("unchecked")
