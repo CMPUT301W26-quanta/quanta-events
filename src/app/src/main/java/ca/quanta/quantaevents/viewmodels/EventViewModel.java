@@ -442,6 +442,7 @@ public class EventViewModel extends ViewModel {
         ArrayList<UUID> waitList = parseUuidList(data.get("waitList"));
         ArrayList<UUID> cancelledList = parseUuidList(data.get("cancelledList"));
         ArrayList<UUID> finalList = parseUuidList(data.get("finalList"));
+        ArrayList<UUID> commentsList = parseUuidList(data.get("commentsList"));
 
         ZonedDateTime start = parseZonedDateTime(valueToString(data.get("registrationStartTime")));
         ZonedDateTime end = parseZonedDateTime(valueToString(data.get("registrationEndTime")));
@@ -457,7 +458,7 @@ public class EventViewModel extends ViewModel {
         Integer registrationLimit = parseInteger(data.get("registrationLimit"));
         UUID imageId = parseUUID(valueToString(data.get("imageId")));
 
-        return new Event(eventId, organizerId, organizerDeviceId, waitList, cancelledList, finalList,
+        return new Event(eventId, organizerId, organizerDeviceId, waitList, cancelledList, finalList, commentsList,
                 start, end, eventTime, eventName, eventDescription, location,
                 eventCategory, eventGuidelines, geolocation, eventCapacity,
                 registrationLimit, imageId);
