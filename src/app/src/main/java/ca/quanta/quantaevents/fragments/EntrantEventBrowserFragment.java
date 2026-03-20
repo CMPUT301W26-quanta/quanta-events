@@ -31,6 +31,7 @@ import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.EventCardAdapter;
 import ca.quanta.quantaevents.adapters.EventCardItem;
 import ca.quanta.quantaevents.databinding.FragmentEntrantEventBrowserBinding;
+import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
@@ -134,37 +135,40 @@ public class EntrantEventBrowserFragment extends Fragment {
             return;
         }
         Log.d("EntrantEventBrowser", "Loading available events for user " + userId + deviceId);
-        eventModel.getEvents(
-                        userId,
-                        deviceId,
-                        50,
-                        null,
-                        EventViewModel.Fetch.AVAILABLE,
-                        null,
-                        null,
-                        null,
-                        EventViewModel.SortBy.REGISTRATION_START)
-                .addOnSuccessListener(events -> {
-                    if (!isAdded()) {
-                        return;
-                    }
-                    bindEventList(events);
-                })
-                .addOnFailureListener(ex -> {
-                    Log.e("EntrantEventBrowser", "Failed to load events", ex);
-                    if (ex instanceof FirebaseFunctionsException) {
-                        FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
-                        Log.e("EntrantEventBrowser", "Functions code=" + fex.getCode() + " message="
-                                + fex.getMessage());
-                    }
-                    if (isUserNotFound(ex)) {
-                        handleMissingUser();
-                        return;
-                    }
-                    if (isAdded()) {
-                        Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
-                    }
-                });
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(
+            eventModel.getEvents(
+                            userId,
+                            deviceId,
+                            50,
+                            null,
+                            EventViewModel.Fetch.AVAILABLE,
+                            null,
+                            null,
+                            null,
+                            EventViewModel.SortBy.REGISTRATION_START)
+                    .addOnSuccessListener(events -> {
+                        if (!isAdded()) {
+                            return;
+                        }
+                        bindEventList(events);
+                    })
+                    .addOnFailureListener(ex -> {
+                        Log.e("EntrantEventBrowser", "Failed to load events", ex);
+                        if (ex instanceof FirebaseFunctionsException) {
+                            FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
+                            Log.e("EntrantEventBrowser", "Functions code=" + fex.getCode() + " message="
+                                    + fex.getMessage());
+                        }
+                        if (isUserNotFound(ex)) {
+                            handleMissingUser();
+                            return;
+                        }
+                        if (isAdded()) {
+                            Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
+                        }
+                    })
+        );
     }
     //bind the events to the array adapter and the card item
     // The following function is from OpenAI, ChatGPT, "bindEventList implementation for EntrantEventBrowser", 2026-03-11

@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.UUID;
@@ -61,8 +62,31 @@ public class SessionStore extends AndroidViewModel {
     }
 
     public void observeSession(@NonNull LifecycleOwner owner, @NonNull SessionListener listener) {
-        getUserId().observe(owner, value -> listener.onSessionChanged(parseUUID(value), parseUUID(getDeviceId().getValue())));
-        getDeviceId().observe(owner, value -> listener.onSessionChanged(parseUUID(getUserId().getValue()), parseUUID(value)));
+        MediatorLiveData<SessionPair> combined = new MediatorLiveData<>();
+        Runnable emit = () -> {
+            UUID currentUser = parseUUID(getUserId().getValue());
+            UUID currentDevice = parseUUID(getDeviceId().getValue());
+            combined.setValue(new SessionPair(currentUser, currentDevice));
+        };
+        combined.addSource(getUserId(), _value -> emit.run());
+        combined.addSource(getDeviceId(), _value -> emit.run());
+
+        final SessionPair[] lastEmitted = new SessionPair[1];
+        combined.observe(owner, pair -> {
+            if (pair == null) {
+                return;
+            }
+            boolean bothPresent = pair.userId != null && pair.deviceId != null;
+            boolean bothMissing = pair.userId == null && pair.deviceId == null;
+            if (!bothPresent && !bothMissing) {
+                return;
+            }
+            if (pair.equals(lastEmitted[0])) {
+                return;
+            }
+            lastEmitted[0] = pair;
+            listener.onSessionChanged(pair.userId, pair.deviceId);
+        });
     }
 
     public void setSession(UUID userId, UUID deviceId) {
@@ -94,6 +118,36 @@ public class SessionStore extends AndroidViewModel {
             return UUID.fromString(value);
         } catch (IllegalArgumentException ex) {
             return null;
+        }
+    }
+
+    private static final class SessionPair {
+        @Nullable
+        final UUID userId;
+        @Nullable
+        final UUID deviceId;
+
+        private SessionPair(@Nullable UUID userId, @Nullable UUID deviceId) {
+            this.userId = userId;
+            this.deviceId = deviceId;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof SessionPair)) {
+                return false;
+            }
+            SessionPair other = (SessionPair) obj;
+            return java.util.Objects.equals(userId, other.userId)
+                    && java.util.Objects.equals(deviceId, other.deviceId);
+        }
+
+        @Override
+        public int hashCode() {
+            return java.util.Objects.hash(userId, deviceId);
         }
     }
 }

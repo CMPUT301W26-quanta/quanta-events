@@ -23,6 +23,7 @@ import java.util.UUID;
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.ImageCardAdapter;
 import ca.quanta.quantaevents.databinding.FragmentAdminImageBrowserBinding;
+import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
@@ -39,33 +40,36 @@ public class AdminImageBrowserFragment extends Fragment {
     private UUID deviceId;
 
     private void listImageCards() {
-        this.eventModel.getEvents(
-                        this.userId,
-                        this.deviceId,
-                        -1,
-                        null,
-                        EventViewModel.Fetch.ALL,
-                        null,
-                        null,
-                        null,
-                        EventViewModel.SortBy.REGISTRATION_END)
-                .addOnSuccessListener(events -> {
-                    // use the adapter to display them
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(
+            this.eventModel.getEvents(
+                            this.userId,
+                            this.deviceId,
+                            -1,
+                            null,
+                            EventViewModel.Fetch.ALL,
+                            null,
+                            null,
+                            null,
+                            EventViewModel.SortBy.REGISTRATION_END)
+                    .addOnSuccessListener(events -> {
+                        // use the adapter to display them
 
-                    ImageCardAdapter imageCardsAdapter = new ImageCardAdapter(events, this);
+                        ImageCardAdapter imageCardsAdapter = new ImageCardAdapter(events, this);
 
-                    binding.imageCardsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                    binding.imageCardsRecyclerView.setAdapter(imageCardsAdapter);
-                })
-                .addOnFailureListener(exception -> {
-                    Log.e("AdminImageBrowserFragment", "Failed to fetch events.", exception);
+                        binding.imageCardsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        binding.imageCardsRecyclerView.setAdapter(imageCardsAdapter);
+                    })
+                    .addOnFailureListener(exception -> {
+                        Log.e("AdminImageBrowserFragment", "Failed to fetch events.", exception);
 
-                    Toast.makeText(requireContext(), "Failed to fetch events: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(requireContext(), "Failed to fetch events: " + exception.getMessage(), Toast.LENGTH_LONG).show();
 
-                    if (exception instanceof FirebaseFunctionsException) {
-                        Log.e("AdminImageBrowserFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
-                    }
-                });
+                        if (exception instanceof FirebaseFunctionsException) {
+                            Log.e("AdminImageBrowserFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
+                        }
+                    })
+        );
     }
 
     @Override
@@ -110,4 +114,5 @@ public class AdminImageBrowserFragment extends Fragment {
         binding = FragmentAdminImageBrowserBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
+
 }

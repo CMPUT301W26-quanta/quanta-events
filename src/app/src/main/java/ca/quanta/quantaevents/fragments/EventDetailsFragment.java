@@ -25,6 +25,7 @@ import java.util.UUID;
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.burger.SmartBurger;
 import ca.quanta.quantaevents.databinding.FragmentEventDetailsBinding;
+import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
@@ -119,15 +120,18 @@ public class EventDetailsFragment extends Fragment {
             Navigation.findNavController(requireView()).navigate(action);
             return;
         }
-        eventModel.getEvent(eventId, userId, deviceId)
-                .addOnSuccessListener(this::bindEvent)
-                .addOnFailureListener(ex -> {
-                            if (isAdded()) {
-                                Toast.makeText(requireContext(), "Failed to load event", Toast.LENGTH_LONG).show();
-                                Navigation.findNavController(requireView()).popBackStack();
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(
+            eventModel.getEvent(eventId, userId, deviceId)
+                    .addOnSuccessListener(this::bindEvent)
+                    .addOnFailureListener(ex -> {
+                                if (isAdded()) {
+                                    Toast.makeText(requireContext(), "Failed to load event", Toast.LENGTH_LONG).show();
+                                    Navigation.findNavController(requireView()).popBackStack();
+                                }
                             }
-                        }
-                );
+                    )
+        );
     }
 
     // bind the event details to the

@@ -31,6 +31,7 @@ import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.EventCardAdapter;
 import ca.quanta.quantaevents.adapters.EventCardItem;
 import ca.quanta.quantaevents.databinding.FragmentEntrantEventHistoryBinding;
+import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
@@ -97,29 +98,32 @@ public class EntrantEventHistoryFragment extends Fragment {
             return;
         }
         Log.d("EntrantEventHistory", "Loading history events for user " + userId);
-        eventModel.getEvents(
-                        userId,
-                        deviceId,
-                        50,
-                        null,
-                        EventViewModel.Fetch.HISTORY,
-                        null,
-                        null,
-                        null,
-                        EventViewModel.SortBy.NAME)
-                .addOnSuccessListener(this::bindEventList)
-                .addOnFailureListener(ex -> {
-                    Log.e("EntrantEventHistory", "Failed to load events", ex);
-                    if (ex instanceof FirebaseFunctionsException) {
-                        FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
-                        Log.e("EntrantEventHistory", "Functions code=" + fex.getCode() + " message=" + fex.getMessage());
-                    }
-                    if (isUserNotFound(ex)) {
-                        handleMissingUser();
-                        return;
-                    }
-                    Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
-                });
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(
+            eventModel.getEvents(
+                            userId,
+                            deviceId,
+                            50,
+                            null,
+                            EventViewModel.Fetch.HISTORY,
+                            null,
+                            null,
+                            null,
+                            EventViewModel.SortBy.NAME)
+                    .addOnSuccessListener(this::bindEventList)
+                    .addOnFailureListener(ex -> {
+                        Log.e("EntrantEventHistory", "Failed to load events", ex);
+                        if (ex instanceof FirebaseFunctionsException) {
+                            FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
+                            Log.e("EntrantEventHistory", "Functions code=" + fex.getCode() + " message=" + fex.getMessage());
+                        }
+                        if (isUserNotFound(ex)) {
+                            handleMissingUser();
+                            return;
+                        }
+                        Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
+                    })
+        );
     }
 
     // bind the data to the view

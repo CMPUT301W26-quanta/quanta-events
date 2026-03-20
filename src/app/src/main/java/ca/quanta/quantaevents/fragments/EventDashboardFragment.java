@@ -31,6 +31,7 @@ import ca.quanta.quantaevents.adapters.EventCardItem;
 import ca.quanta.quantaevents.burger.SmartBurgerState;
 import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentEventDashboardBinding;
+import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
@@ -110,32 +111,35 @@ public class EventDashboardFragment extends Fragment implements Tagged {
     }
 
     private void loadCreatedEvents() {
-        eventModel.getEvents(
-                        userId,
-                        deviceId,
-                        50,
-                        null,
-                        EventViewModel.Fetch.CREATED,
-                        null,
-                        null,
-                        null,
-                        EventViewModel.SortBy.REGISTRATION_END)
-                .addOnSuccessListener(events -> {
-                    if (!isAdded()) {
-                        return;
-                    }
-                    bindEventList(events);
-                })
-                .addOnFailureListener(ex -> {
-                    Log.e("EventDashboard", "Failed to load events", ex);
-                    if (isUserNotFound(ex)) {
-                        handleMissingUser();
-                        return;
-                    }
-                    if (isAdded()) {
-                        Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
-                    }
-                });
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(
+            eventModel.getEvents(
+                            userId,
+                            deviceId,
+                            50,
+                            null,
+                            EventViewModel.Fetch.CREATED,
+                            null,
+                            null,
+                            null,
+                            EventViewModel.SortBy.REGISTRATION_END)
+                    .addOnSuccessListener(events -> {
+                        if (!isAdded()) {
+                            return;
+                        }
+                        bindEventList(events);
+                    })
+                    .addOnFailureListener(ex -> {
+                        Log.e("EventDashboard", "Failed to load events", ex);
+                        if (isUserNotFound(ex)) {
+                            handleMissingUser();
+                            return;
+                        }
+                        if (isAdded()) {
+                            Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
+                        }
+                    })
+        );
     }
 
     private void bindEventList(java.util.List<Event> events) {

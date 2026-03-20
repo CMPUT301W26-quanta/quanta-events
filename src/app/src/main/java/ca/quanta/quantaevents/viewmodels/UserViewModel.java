@@ -92,6 +92,7 @@ public class UserViewModel extends ViewModel {
                            Boolean isEntrant = (Boolean) userObject.get("isEntrant");
                            Boolean isOrganizer = (Boolean) userObject.get("isOrganizer");
                            Boolean isAdmin = (Boolean) userObject.get("isAdmin");
+                           System.out.println(userId + name + isEntrant + isOrganizer + isAdmin);
 
                            // verify that they have a userId, otherwise just skip them
 
@@ -171,7 +172,7 @@ public class UserViewModel extends ViewModel {
      * @param receiveNotifications Updated notification preference (optional).
      * @return UUID identifying the user's ID.
      */
-    public Task<UUID> updateUser(UUID userId, UUID deviceId,
+    public Task<Void> updateUser(UUID userId, UUID deviceId,
                                    @Nullable String name,
                                    @Nullable String email,
                                    @Nullable String phone,
@@ -198,11 +199,11 @@ public class UserViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("updateUser")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, UUID>() {
+                .continueWith(new Continuation<HttpsCallableResult, Void>() {
                     @Override
-                    public UUID then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                    public Void then(@NonNull Task<HttpsCallableResult> task) throws Exception {
                         Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
-                        return UUID.fromString((String) result.get("userId"));
+                        return null;
                     }
                 });
     }

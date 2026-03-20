@@ -31,6 +31,7 @@ import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.EventCardAdapter;
 import ca.quanta.quantaevents.adapters.EventCardItem;
 import ca.quanta.quantaevents.databinding.FragmentAdminEventBrowserBinding;
+import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
@@ -103,8 +104,8 @@ public class AdminEventBrowserFragment extends Fragment {
         }
 
         Log.d("AdminEventBrowser", "Loading all events for admin " + userId);
-
-        eventModel.getEvents(
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(eventModel.getEvents(
                         userId,
                         deviceId,
                         -1,
@@ -133,7 +134,9 @@ public class AdminEventBrowserFragment extends Fragment {
                     if (isAdded()) {
                         Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
                     }
-                });
+                })
+        );
+
     }
 
     // binds the event list to the view
