@@ -14,6 +14,14 @@ public class EventCardItem {
     @Nullable
     private final Bitmap image;
 
+    /**
+     * Constructor for an EventCardItem.
+     * @param eventId the event id of event
+     * @param title TItle of the event
+     * @param time Registration start time
+     * @param location Event location
+     * @param image Bitmap of the event image/poster if any uploaded
+     */
     public EventCardItem(UUID eventId, String title, String time, String location, @Nullable Bitmap image) {
         this.eventId = eventId;
         this.title = title;

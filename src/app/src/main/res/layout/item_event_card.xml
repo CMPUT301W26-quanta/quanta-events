@@ -2,6 +2,7 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/event_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
@@ -9,7 +10,7 @@
     app:cardCornerRadius="12dp"
     app:cardElevation="0dp"
     app:strokeColor="@color/border"
-    app:strokeWidth="1dp">
+    app:strokeWidth="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,6 +27,16 @@
             android:scaleType="centerCrop"
             android:src="@drawable/material_symbols_image_rounded"
             app:shapeAppearanceOverlay="@style/RoundedImage" />
+
+        <View
+            android:id="@+id/top_divider"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="12dp"
+            android:background="@color/border"
+            app:layout_constraintTop_toBottomOf="@+id/event_image"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Event Information-->
         <LinearLayout
@@ -48,7 +59,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Event Title"
-                    android:textSize="16sp"
+                    android:textSize="22sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_color"
                     android:maxLines="1"
@@ -67,8 +78,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="🕐 Some Time"
-                android:textSize="12sp"
+                android:drawableStart="@drawable/ic_round_schedule"
+                app:drawableTint="@color/color_dark_gray"
+                android:text="Some Time"
+                android:textSize="16sp"
                 android:textColor="@color/text_color" />
 
             <!-- Location -->
@@ -77,8 +90,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="🗺️ Some location"
-                android:textSize="12sp"
+                android:drawableStart="@drawable/material_symbols_location_rounded"
+                android:drawableTint="@color/color_light_red"
+                android:text="Some location"
+                android:textSize="16sp"
                 android:textColor="@color/text_color" />
 
         </LinearLayout>

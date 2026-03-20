@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -27,10 +28,15 @@ import ca.quanta.quantaevents.fragments.AdminPanelFragment;
 import ca.quanta.quantaevents.fragments.EntrantEventListFragment;
 import ca.quanta.quantaevents.fragments.EventDashboardFragment;
 import ca.quanta.quantaevents.fragments.HomeFragment;
-import ca.quanta.quantaevents.fragments.InformationFragment;
+import ca.quanta.quantaevents.loading.Loader;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
+
+/**
+ * Entry point of app, sets up appropriate buttons for smart burger menu based on user role
+ * this where all the fragments will load up after the end of infoStore view
+ */
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +45,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        // our app is not designed to support dark mode properly.
+        // eg. the background becomes dark, but the text remains dark so you can't read it
+        // So force light mode
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(binding.getRoot());
 
         try {
@@ -81,12 +91,11 @@ public class MainActivity extends AppCompatActivity {
                 );
 
         new SmartBurger(this, ((NavHostFragment) binding.navHost.getFragment()).getNavController(), binding.coordinator)
-                .with(new InformationFragment(), R.drawable.material_symbols_info_outline, NavGraphDirections::actionGlobalInformationFragment)
-                .with(new EventDashboardFragment(), R.drawable.material_symbols_dashboard_outline, SmartBurger.ORGANIZER_GROUP, NavGraphDirections::actionGlobalEventdashboardFragment)
-                .with(new EntrantEventListFragment(), R.drawable.material_symbols_event_list_outline, SmartBurger.ENTRANT_GROUP, NavGraphDirections::actionGlobalEntranteventlistFragment)
-                .with(new AccountFragment(), R.drawable.material_symbols_person_outline, NavGraphDirections::actionGlobalAccountFragment)
-                .with(new AdminPanelFragment(), R.drawable.material_symbols_security, SmartBurger.ADMIN_GROUP, NavGraphDirections::actionGlobalAdminpanelFragment)
-                .with(new HomeFragment(), R.drawable.material_symbols_home_outline, NavGraphDirections::actionGlobalHomeFragment)
+                .with(new EventDashboardFragment(), R.drawable.material_symbols_dashboard_outline, SmartBurger.ORGANIZER_GROUP, "Dashboard", NavGraphDirections::actionGlobalEventdashboardFragment)
+                .with(new EntrantEventListFragment(), R.drawable.material_symbols_event_list_outline, SmartBurger.ENTRANT_GROUP, "Event List", NavGraphDirections::actionGlobalEntranteventlistFragment)
+                .with(new AccountFragment(), R.drawable.material_symbols_person_outline, "Account", NavGraphDirections::actionGlobalAccountFragment)
+                .with(new AdminPanelFragment(), R.drawable.material_symbols_security, SmartBurger.ADMIN_GROUP, "Admin Panel", NavGraphDirections::actionGlobalAdminpanelFragment)
+                .with(new HomeFragment(), R.drawable.material_symbols_home_outline, "Home", NavGraphDirections::actionGlobalHomeFragment)
                 .inject();
 
         sessionStore.observeSession(this, (userId, deviceId) -> {
@@ -103,6 +112,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         sessionStore.getRoleMask().observe(this, mask -> burgerState.setGroupFilter(mask == null ? 0 : mask));
+
+        new Loader(this, binding.loadingFrame).inject();
     }
 
     @SuppressWarnings("unchecked")

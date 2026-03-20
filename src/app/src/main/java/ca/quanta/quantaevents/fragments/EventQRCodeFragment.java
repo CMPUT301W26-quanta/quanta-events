@@ -32,12 +32,16 @@ public class EventQRCodeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+        // set title of the page to Scan QR code and the subtitle.
+        // also sets the icon for the page
         infoStore.setTitle("Scan QR Code");
         infoStore.setSubtitle("Scan a promotional QR code");
         infoStore.setIconRes(R.drawable.material_symbols_qr_code_outline);
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(binding.getRoot()).popBackStack()
         );
+
+        // Request camer permission
 
         if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -49,8 +53,10 @@ public class EventQRCodeFragment extends Fragment {
             );
         }
 
+        // Hide the status view of the QR code scanner
         binding.qrCodeScanner.getStatusView().setVisibility(GONE);
 
+        // keep scanning for qr codes and decode them
         binding.qrCodeScanner.decodeContinuous(result -> {
             String text = result.getText();
             if (text.startsWith("quanta-events:")) {

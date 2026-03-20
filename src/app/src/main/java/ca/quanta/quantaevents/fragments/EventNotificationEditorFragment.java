@@ -30,6 +30,7 @@ public class EventNotificationEditorFragment extends Fragment {
         infoStore.setSubtitle("Send a push notification");
         infoStore.setIconRes(R.drawable.material_symbols_notification_add_outline);
 
+        //set on click listener for the back button
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
         );

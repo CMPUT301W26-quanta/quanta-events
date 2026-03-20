@@ -16,16 +16,27 @@ public class Event {
     @Nullable
     private final UUID organizerId;
 
+    @Nullable
+    private final UUID organizerDeviceId;
+
     private ArrayList<UUID> waitList;
     private ArrayList<UUID> cancelledList;
     private ArrayList<UUID> finalList;
 
     private ZonedDateTime registrationStartTime;
     private ZonedDateTime registrationEndTime;
+    @Nullable
+    private ZonedDateTime eventTime;
 
     private String eventName;
     private String eventDescription;
     private String location;
+    @Nullable
+    private String eventCategory;
+    @Nullable
+    private String eventGuidelines;
+    private boolean geolocation;
+    private Integer eventCapacity;
 
     @Nullable
     private Integer registrationLimit;
@@ -42,18 +53,24 @@ public class Event {
      * @param eventDescription Description of the event.
      */
     public Event(ZonedDateTime registrationStartTime, ZonedDateTime registrationEndTime,
-          String eventName, String eventDescription, Float price, Integer registrationLimit,
-          UUID imageId) {
+                 String eventName, String eventDescription, Float price, Integer registrationLimit,
+                 UUID imageId) {
         this.eventId = UUID.randomUUID();
         this.organizerId = null;
+        this.organizerDeviceId = null;
         this.waitList = new ArrayList<>();
         this.cancelledList = new ArrayList<>();
         this.finalList = new ArrayList<>();
         this.registrationStartTime = registrationStartTime;
         this.registrationEndTime = registrationEndTime;
+        this.eventTime = null;
         this.eventName = eventName;
         this.eventDescription = eventDescription;
         this.location = "";
+        this.eventCategory = null;
+        this.eventGuidelines = null;
+        this.geolocation = false;
+        this.eventCapacity = 0;
         this.registrationLimit = registrationLimit;
         this.imageId = imageId;
     }
@@ -70,14 +87,20 @@ public class Event {
                  String eventName, String eventDescription, Float price, Integer registrationLimit) {
         this.eventId = UUID.randomUUID();
         this.organizerId = null;
+        this.organizerDeviceId = null;
         this.waitList = new ArrayList<>();
         this.cancelledList = new ArrayList<>();
         this.finalList = new ArrayList<>();
         this.registrationStartTime = registrationStartTime;
         this.registrationEndTime = registrationEndTime;
+        this.eventTime = null;
         this.eventName = eventName;
         this.eventDescription = eventDescription;
         this.location = "";
+        this.eventCategory = null;
+        this.eventGuidelines = null;
+        this.geolocation = false;
+        this.eventCapacity = 0;
         this.registrationLimit = registrationLimit;
         this.imageId = null;
     }
@@ -94,14 +117,20 @@ public class Event {
                  String eventName, String eventDescription, Float price, UUID imageId) {
         this.eventId = UUID.randomUUID();
         this.organizerId = null;
+        this.organizerDeviceId = null;
         this.waitList = new ArrayList<>();
         this.cancelledList = new ArrayList<>();
         this.finalList = new ArrayList<>();
         this.registrationStartTime = registrationStartTime;
         this.registrationEndTime = registrationEndTime;
+        this.eventTime = null;
         this.eventName = eventName;
         this.eventDescription = eventDescription;
         this.location = "";
+        this.eventCategory = null;
+        this.eventGuidelines = null;
+        this.geolocation = false;
+        this.eventCapacity = 0;
         this.registrationLimit = null;
         this.imageId = imageId;
     }
@@ -118,14 +147,20 @@ public class Event {
                  String eventName, String eventDescription, Float price) {
         this.eventId = UUID.randomUUID();
         this.organizerId = null;
+        this.organizerDeviceId = null;
         this.waitList = new ArrayList<>();
         this.cancelledList = new ArrayList<>();
         this.finalList = new ArrayList<>();
         this.registrationStartTime = registrationStartTime;
         this.registrationEndTime = registrationEndTime;
+        this.eventTime = null;
         this.eventName = eventName;
         this.eventDescription = eventDescription;
         this.location = "";
+        this.eventCategory = null;
+        this.eventGuidelines = null;
+        this.geolocation = false;
+        this.eventCapacity = 0;
         this.registrationLimit = null;
         this.imageId = null;
     }
@@ -133,21 +168,29 @@ public class Event {
     /**
      * Constructor for an Event object when loading from storage.
      */
-    public Event(UUID eventId, @Nullable UUID organizerId,
+    public Event(UUID eventId, @Nullable UUID organizerId, @Nullable UUID organizerDeviceId,
                  ArrayList<UUID> waitList, ArrayList<UUID> cancelledList, ArrayList<UUID> finalList,
                  ZonedDateTime registrationStartTime, ZonedDateTime registrationEndTime,
-                 String eventName, String eventDescription, String location,
+                 @Nullable ZonedDateTime eventTime, String eventName, String eventDescription,
+                 String location, @Nullable String eventCategory, @Nullable String eventGuidelines,
+                 boolean geolocation, @Nullable Integer eventCapacity,
                  @Nullable Integer registrationLimit, @Nullable UUID imageId) {
         this.eventId = eventId;
         this.organizerId = organizerId;
+        this.organizerDeviceId = organizerDeviceId;
         this.waitList = waitList == null ? new ArrayList<>() : waitList;
         this.cancelledList = cancelledList == null ? new ArrayList<>() : cancelledList;
         this.finalList = finalList == null ? new ArrayList<>() : finalList;
         this.registrationStartTime = registrationStartTime;
         this.registrationEndTime = registrationEndTime;
+        this.eventTime = eventTime;
         this.eventName = eventName;
         this.eventDescription = eventDescription;
         this.location = location;
+        this.eventCategory = eventCategory;
+        this.eventGuidelines = eventGuidelines;
+        this.geolocation = geolocation;
+        this.eventCapacity = eventCapacity == null ? 0 : eventCapacity;
         this.registrationLimit = registrationLimit;
         this.imageId = imageId;
     }
@@ -159,6 +202,11 @@ public class Event {
     @Nullable
     public UUID getOrganizerId() {
         return organizerId;
+    }
+
+    @Nullable
+    public UUID getOrganizerDeviceId() {
+        return organizerDeviceId;
     }
 
     public ArrayList<UUID> getWaitList() {
@@ -181,6 +229,11 @@ public class Event {
         return registrationEndTime;
     }
 
+    @Nullable
+    public ZonedDateTime getEventTime() {
+        return eventTime;
+    }
+
     public String getEventName() {
         return eventName;
     }
@@ -191,6 +244,24 @@ public class Event {
 
     public String getLocation() {
         return location;
+    }
+
+    @Nullable
+    public String getEventCategory() {
+        return eventCategory;
+    }
+
+    @Nullable
+    public String getEventGuidelines() {
+        return eventGuidelines;
+    }
+
+    public boolean isGeolocationEnabled() {
+        return geolocation;
+    }
+
+    public Integer getEventCapacity() {
+        return eventCapacity;
     }
 
     @Nullable

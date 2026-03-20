@@ -3,6 +3,7 @@ package ca.quanta.quantaevents.models;
 import androidx.annotation.Nullable;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -30,6 +31,18 @@ public class User {
             return receiveNotifications;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            Entrant entrant = (Entrant) o;
+            return Objects.equals(receiveNotifications, entrant.receiveNotifications);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(receiveNotifications);
+        }
+
         @Nullable
         static Entrant fromMap(@Nullable Map<String, Object> map) {
             if (map == null) {
@@ -45,6 +58,12 @@ public class User {
      * Class which defines an Organizer.
      */
     public static class Organizer {
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            return o != null && getClass() == o.getClass();
+        }
+
         @Nullable
         static Organizer fromMap(@Nullable Map<String, Object> map) {
             if (map == null) {
@@ -59,6 +78,12 @@ public class User {
      * Class which defines an Admin.
      */
     public static class Admin {
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            return o != null && getClass() == o.getClass();
+        }
+
         @Nullable
         static Admin fromMap(@Nullable Map<String, Object> map) {
             if (map == null) {
@@ -78,7 +103,9 @@ public class User {
 
     private final UUID userId;
     private final UUID deviceId;
+    @Nullable
     private String name;
+    @Nullable
     private String email;
     @Nullable
     private String phoneNumber;
@@ -183,7 +210,6 @@ public class User {
         } else {
             this.admin = null;
         }
-
     }
 
     public boolean isEntrant() {
@@ -211,10 +237,12 @@ public class User {
         return deviceId;
     }
 
+    @Nullable
     public String getName() {
         return name;
     }
 
+    @Nullable
     public String getEmail() {
         return email;
     }
@@ -222,5 +250,17 @@ public class User {
     @Nullable
     public String getPhoneNumber() {
         return phoneNumber;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(entrant, user.entrant) && Objects.equals(organizer, user.organizer) && Objects.equals(admin, user.admin) && Objects.equals(userId, user.userId) && Objects.equals(deviceId, user.deviceId) && Objects.equals(name, user.name) && Objects.equals(email, user.email) && Objects.equals(phoneNumber, user.phoneNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entrant, organizer, admin, userId, deviceId, name, email, phoneNumber);
     }
 }

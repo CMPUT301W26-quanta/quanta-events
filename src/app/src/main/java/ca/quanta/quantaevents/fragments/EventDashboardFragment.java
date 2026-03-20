@@ -31,22 +31,20 @@ import ca.quanta.quantaevents.adapters.EventCardItem;
 import ca.quanta.quantaevents.burger.SmartBurgerState;
 import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentEventDashboardBinding;
+import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
-import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 public class EventDashboardFragment extends Fragment implements Tagged {
     private FragmentEventDashboardBinding binding;
     private EventCardAdapter adapter;
     private EventViewModel eventModel;
     private ImageViewModel imageModel;
-    private UserViewModel userModel;
     private SessionStore sessionStore;
     private UUID userId;
     private UUID deviceId;
-    private UUID pendingEventId;
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
     private boolean loadedInitialEvents = false;
@@ -61,13 +59,13 @@ public class EventDashboardFragment extends Fragment implements Tagged {
         infoStore.setIconRes(R.drawable.material_symbols_dashboard_outline);
         binding.createButton.setOnClickListener(
                 v -> {
-                    NavDirections action = EventDashboardFragmentDirections.actionEventdashboardFragmentToEventEditorFragment(null);
+                    NavDirections action = ca.quanta.quantaevents.fragments.EventDashboardFragmentDirections.actionEventdashboardFragmentToEventEditorFragment(null);
                     Navigation.findNavController(v).navigate(action);
                 }
         );
 
         adapter = new EventCardAdapter(item -> {
-            NavDirections action = EventDashboardFragmentDirections.actionEventdashboardfragmentToEventedetailsfragment(item.getEventId());
+            NavDirections action = ca.quanta.quantaevents.fragments.EventDashboardFragmentDirections.actionEventdashboardfragmentToEventedetailsfragment(item.getEventId());
             Navigation.findNavController(requireView()).navigate(action);
         });
         binding.eventsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -75,16 +73,12 @@ public class EventDashboardFragment extends Fragment implements Tagged {
 
         eventModel = new ViewModelProvider(this).get(EventViewModel.class);
         imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
-        userModel = new ViewModelProvider(this).get(UserViewModel.class);
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
-            // TODO: Switch to use server-side getEvents
-//            maybeFetchPending();
             maybeLoadAllEvents();
         });
-        handleIncomingEventId();
 
         new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
     }
@@ -96,38 +90,12 @@ public class EventDashboardFragment extends Fragment implements Tagged {
         return binding.getRoot();
     }
 
-
-    private void handleIncomingEventId() {
-        // TODO: Switch to use server-side getEvents
-//        Bundle args = getArguments();
-//        if (args == null) {
-//            return;
-//        }
-//        String eventIdValue = args.getString("eventId");
-//        Log.d("EventDashboard", "Incoming eventId arg: " + eventIdValue);
-//        if (eventIdValue == null || eventIdValue.isEmpty()) {
-//            return;
-//        }
-//        UUID eventId = parseUUID(eventIdValue);
-//        if (eventId == null) {
-//            return;
-//        }
-//        pendingEventId = eventId;
-//        maybeFetchPending();
-    }
-
-    private void maybeFetchPending() {
-        if (pendingEventId == null) {
-            return;
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (userId != null && deviceId != null) {
+            loadCreatedEvents();
         }
-        if (userId == null || deviceId == null) {
-            Log.d("EventDashboard", "Waiting for session: userId=" + userId + " deviceId=" + deviceId);
-            return;
-        }
-        UUID eventId = pendingEventId;
-        pendingEventId = null;
-        Log.d("EventDashboard", "Fetching event: " + eventId);
-        fetchAndDisplayEvent(eventId);
     }
 
     private void maybeLoadAllEvents() {
@@ -142,10 +110,19 @@ public class EventDashboardFragment extends Fragment implements Tagged {
     }
 
     private void loadCreatedEvents() {
-        userModel.getUserRaw(userId, deviceId)
-                .addOnSuccessListener(this::loadFromUserData)
+        eventModel.getEvents(
+                        userId,
+                        deviceId,
+                        50,
+                        null,
+                        EventViewModel.Fetch.CREATED,
+                        null,
+                        null,
+                        null,
+                        EventViewModel.SortBy.REGISTRATION_END)
+                .addOnSuccessListener(this::bindEventList)
                 .addOnFailureListener(ex -> {
-                    Log.e("EventDashboard", "Failed to load user", ex);
+                    Log.e("EventDashboard", "Failed to load events", ex);
                     if (isUserNotFound(ex)) {
                         handleMissingUser();
                         return;
@@ -154,57 +131,33 @@ public class EventDashboardFragment extends Fragment implements Tagged {
                 });
     }
 
-    @SuppressWarnings("unchecked")
-    private void loadFromUserData(java.util.Map<String, Object> userData) {
-        if (userData == null) {
+    private void bindEventList(java.util.List<Event> events) {
+        if (events == null) {
             return;
         }
-        Object organizer = userData.get("organizer");
-        if (!(organizer instanceof java.util.Map)) {
-            Log.d("EventDashboard", "No organizer data for user");
+        if (events.isEmpty()) {
+            Toast.makeText(requireContext(), "No events found", Toast.LENGTH_LONG).show();
+            adapter.setItems(new java.util.ArrayList<>());
             return;
         }
-        Object created = ((java.util.Map<String, Object>) organizer).get("createdEvents");
-        if (!(created instanceof java.util.List)) {
-            Log.d("EventDashboard", "No createdEvents list");
-            return;
+        java.util.ArrayList<EventCardItem> items = new java.util.ArrayList<>();
+        for (Event event : events) {
+            if (event == null) {
+                continue;
+            }
+            UUID eventId = event.getEventId();
+            String title = stringValue(event.getEventName(), "Event");
+            String time = formatLocalTime(event.getRegistrationStartTime());
+            String location = stringValue(event.getLocation(), "TBD");
+            items.add(new EventCardItem(eventId, title, time, location, null));
         }
-        for (Object id : (java.util.List<Object>) created) {
-            UUID eventId = parseUUID(id == null ? null : id.toString());
-            if (eventId != null) {
-                fetchAndDisplayEvent(eventId);
+        adapter.setItems(items);
+        for (int i = 0; i < events.size(); i++) {
+            Event event = events.get(i);
+            if (event != null && event.getImageId() != null && i < items.size()) {
+                fetchAndAttachImage(event.getEventId(), items.get(i), event.getImageId());
             }
         }
-    }
-
-    private void fetchAndDisplayEvent(UUID eventId) {
-        if (userId == null || deviceId == null) {
-            Toast.makeText(requireContext(), "Missing user session", Toast.LENGTH_LONG).show();
-            return;
-        }
-        eventModel.getEvent(eventId, userId, deviceId)
-                .addOnSuccessListener(event -> {
-                    if (event == null) {
-                        return;
-                    }
-                    Log.d("EventDashboard", "Event data loaded: " + event.getEventName());
-                    String title = stringValue(event.getEventName(), "Event");
-                    String time = "🕐 " + formatLocalTime(event.getRegistrationStartTime());
-                    String location = "🗺️ " + stringValue(event.getLocation(), "TBD");
-                    EventCardItem item = new EventCardItem(eventId, title, time, location, null);
-                    adapter.upsert(item);
-
-                    UUID imageUuid = event.getImageId();
-                    if (imageUuid != null) {
-                        fetchAndAttachImage(eventId, item, imageUuid);
-                    }
-                })
-                .addOnFailureListener(ex ->
-                        {
-                            Log.e("EventDashboard", "Failed to load event", ex);
-                            Toast.makeText(requireContext(), "Failed to load event", Toast.LENGTH_LONG).show();
-                        }
-                );
     }
 
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
@@ -216,7 +169,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
                     }
                     Bitmap bitmap = decodeBase64ToBitmap(imageData.toString());
                     if (bitmap != null) {
-                        adapter.upsert(item.withImage(bitmap));
+                        adapter.updateInsert(item.withImage(bitmap));
                     }
                 });
     }
@@ -236,22 +189,11 @@ public class EventDashboardFragment extends Fragment implements Tagged {
         ZonedDateTime local = value.withZoneSameInstant(ZoneId.systemDefault());
         return local.format(displayFormatter);
     }
-
+    // The following function is from/based off OpenAI, ChatGPT, "decodeBase64ToBitmap which decodes base64 to a bitmap", 2026-03-11
     private static Bitmap decodeBase64ToBitmap(String base64) {
         try {
             byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
             return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        } catch (IllegalArgumentException ex) {
-            return null;
-        }
-    }
-
-    private static UUID parseUUID(@Nullable String value) {
-        if (value == null || value.isEmpty()) {
-            return null;
-        }
-        try {
-            return UUID.fromString(value);
         } catch (IllegalArgumentException ex) {
             return null;
         }
@@ -268,7 +210,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
     private void handleMissingUser() {
         sessionStore.clearSession();
         if (isAdded()) {
-            NavDirections action = EventDashboardFragmentDirections.actionGlobalRegisterFragment();
+            NavDirections action = ca.quanta.quantaevents.fragments.EventDashboardFragmentDirections.actionGlobalRegisterFragment();
             Navigation.findNavController(requireView()).navigate(action);
         }
     }

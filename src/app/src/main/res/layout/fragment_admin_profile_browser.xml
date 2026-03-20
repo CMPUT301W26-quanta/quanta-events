@@ -5,53 +5,55 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/filter_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="2dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingTop="20dp"
-        android:paddingBottom="8dp">
+    <!-- the checkboxes stuff isn't actually a required feature in the user stories -->
+    <!-- so I removed them for now. We can re-add them later if we have the time to -->
+    <!-- implement extra unrequired/unnecessary features -->
 
-        <CheckBox
-            android:id="@+id/check_entrant"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="Show entrants"
-            android:textColor="@color/text_color"
-            app:buttonTint="@color/color_dark_gray"
-            app:strokeColor="@color/border"
-            app:strokeWidth="2dp" />
+<!--    <LinearLayout-->
+<!--        android:id="@+id/filter_layout"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:layout_marginTop="2dp"-->
+<!--        android:paddingTop="12dp"-->
+<!--        android:paddingBottom="12dp">-->
 
-        <CheckBox
-            android:id="@+id/check_organizer"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="Show organizers"
-            android:textColor="@color/text_color"
-            app:buttonTint="@color/color_dark_purple"
-            app:strokeColor="@color/border"
-            app:strokeWidth="2dp" />
-    </LinearLayout>
+<!--        <CheckBox-->
+<!--            android:id="@+id/check_entrant"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:checked="true"-->
+<!--            android:text="Show entrants"-->
+<!--            android:textColor="@color/text_color"-->
+<!--            app:buttonTint="@color/color_dark_gray"-->
+<!--            app:strokeColor="@color/border"-->
+<!--            app:strokeWidth="2dp" />-->
 
+<!--        <CheckBox-->
+<!--            android:id="@+id/check_organizer"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:checked="true"-->
+<!--            android:text="Show organizers"-->
+<!--            android:textColor="@color/text_color"-->
+<!--            app:buttonTint="@color/color_dark_purple"-->
+<!--            app:strokeColor="@color/border"-->
+<!--            app:strokeWidth="2dp" />-->
+<!--    </LinearLayout>-->
 
+    <!-- add constraintTop_toBottomOf @id/filter_layout if we re add that -->
+    <!-- AND remove constraintTop_toTopOf parent -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/profiles_recycler_view"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="12dp"
         android:clipToPadding="false"
         android:scrollbars="vertical"
         android:overScrollMode="ifContentScrolls"
-        app:layout_constraintTop_toBottomOf="@id/filter_layout"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/back_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -62,7 +64,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="20dp"
-        android:backgroundTint="@color/color_dark_purple"
+        android:backgroundTint="@color/color_light_purple"
         android:text="Back"
         android:textColor="@color/text_color"
         android:textAlignment="center"

@@ -1,6 +1,7 @@
 package ca.quanta.quantaevents.viewmodels;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.Continuation;
@@ -8,35 +9,38 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.models.User;
 
 /**
- * Class which represents a UserViewModel object.
+ * View-model for managing user-related data and cloud functions.
  */
 public class UserViewModel extends ViewModel {
     // Initialize an instance of cloud functions
 
+    private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
     /**
-     * Calls the createUser cloud function, adding a user to the database.
-     *
+     * Calls the createUser cloud function, creating and adding a user to the database.
      * @param name             Name of the user.
      * @param email            Email address of the user.
      * @param phone            Phone number of the user.
-     * @param isEntrant        Boolean that's true when the user selects to be an Entrant.
-     * @param isOrganizer      Boolean that's true when the user selects to be an Organizer.
-     * @param isAdmin          Boolean that's true when the user selects to be an Admin.
-     * @param getNotifications Boolean that's true when the user selects to receive notifications.
+     * @param isEntrant        Boolean that's true when the user selects to be an Entrant. (Will be removed in final checkpoint)
+     * @param isOrganizer      Boolean that's true when the user selects to be an Organizer. (Will be removed in final checkpoint)
+     * @param isAdmin          Boolean that's true when the user selects to be an Admin. (Will be removed in final checkpoint)
+     * @param getNotifications Boolean that's true when the user selects to receive notifications. (Will be removed in final checkpoint)
      * @param deviceId         UUID identifying the user's device.
-     * @return UUID identifying the user's ID.
+     * @return UUID assigned to newly created user.
      */
     public Task<UUID> createUser(String name, String email, String phone, Boolean isEntrant, Boolean isOrganizer, Boolean isAdmin, Boolean getNotifications, UUID deviceId) {
-        // Arguments for createUser
+        // Arguments for createUser passed in data Map
         Map<String, Object> data = new HashMap<>();
+
         data.put("deviceId", deviceId.toString());
         data.put("name", name);
         data.put("email", email);
@@ -46,11 +50,11 @@ public class UserViewModel extends ViewModel {
         data.put("isOrganizer", isOrganizer);
         data.put("isAdmin", isAdmin);
 
-        return FirebaseFunctions.getInstance()
+        return functions
                 .getHttpsCallable("createUser")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, UUID>() {
-                    // Access return value of the function
+                    // Access return value of the function createUser
                     @Override
                     public UUID then(@NonNull Task<HttpsCallableResult> task) {
                         Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
@@ -61,20 +65,65 @@ public class UserViewModel extends ViewModel {
     }
 
     /**
-     * Calls the getUser cloud function, getting a user's details from the database.
-     *
-     * @param userId   UUID identifying the user.
-     * @param deviceId UUID identifying the user's device.
-     * @return User object with the user's information.
+     * Calls the getAllUsers cloud function, getting all users stored in the database.
+     * @return List of User Objects.
+     */
+    public Task<ArrayList<User>> getAllUsers() {
+//        TODO: pass user information and verify the user is an admin when calling this
+//        Map<String, Object> data = new HashMap<>();
+//
+//        data.put("userId", userId.toString());
+//        data.put("deviceId", deviceId.toString());
+
+        return functions
+               .getHttpsCallable("getAllUsers")
+               .call(new HashMap<>())
+               .continueWith(new Continuation<HttpsCallableResult, ArrayList<User>>() {
+                   @Override
+                   public ArrayList<User> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                       List<Map<String, Object>> userObjects = (List<Map<String, Object>>) task.getResult().getData();
+                       ArrayList<User> users = new ArrayList<User>();
+
+                       for (Map<String, Object> userObject : userObjects) {
+                           // we only get a limited amount of info back about each user
+
+                           String userId = (String) userObject.get("userId");
+                           String name = (String) userObject.get("name");
+                           Boolean isEntrant = (Boolean) userObject.get("isEntrant");
+                           Boolean isOrganizer = (Boolean) userObject.get("isOrganizer");
+                           Boolean isAdmin = (Boolean) userObject.get("isAdmin");
+
+                           // verify that they have a userId, otherwise just skip them
+
+                           if (userId == null) {
+                               continue;
+                           }
+
+                           UUID userUUID = UUID.fromString(userId);
+
+                           users.add(new User(name, null, null, null, isEntrant, isOrganizer, isAdmin, userUUID, null));
+                       }
+
+                       return users;
+                   }
+               });
+    }
+
+    /**
+     * Calls the getUser cloud function, getting user data from the database.
+     * @param userId   UUID to identify user.
+     * @param deviceId UUID to identify user's device.
+     * @return User object containing user's data.
      */
     public Task<User> getUser(UUID userId, UUID deviceId) {
         Map<String, Object> data = new HashMap<>();
+
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
         System.out.println("GET USER");
 
-        return FirebaseFunctions.getInstance()
+        return functions
                 .getHttpsCallable("getUser")
                 .call(data)
                 .continueWith(task -> {
@@ -87,10 +136,10 @@ public class UserViewModel extends ViewModel {
     }
 
     /**
-     * Calls the deleteUser cloud function, deleting a user.
+     * Calls the deleteUser cloud function, deleting a user from the database.
      * @param userId UUID identifying the user.
      * @param deviceId UUID identifying the user's device.
-     * @return True when delete completes.
+     * @return True if successful, and error if unsuccessful.
      */
     public Task<Boolean> deleteUser(UUID userId, UUID deviceId, UUID targetUserId) {
         Map<String, Object> data = new HashMap<>();
@@ -101,7 +150,7 @@ public class UserViewModel extends ViewModel {
         payload.put("target", targetUserId.toString());
         data.put("data", payload);
 
-        return FirebaseFunctions.getInstance()
+        return functions
                 .getHttpsCallable("deleteUser")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, Boolean>() {
@@ -113,21 +162,28 @@ public class UserViewModel extends ViewModel {
     }
 
     /**
-     * Calls the updateUser cloud function, updating a user's details.
-     * @param userId UUID identifying the user.
-     * @param deviceId UUID identifying the user's device.
-     * @param name Updated user name.
-     * @param email Updated user email.
+     * Calls the updateUser cloud function, updating existing user details.
+     * @param userId UUID to identify the user.
+     * @param deviceId UUID to verify users device.
+     * @param name new user name (optional).
+     * @param email new user email (optional).
      * @param phone Updated phone (optional).
      * @param receiveNotifications Updated notification preference (optional).
      * @return UUID identifying the user's ID.
      */
-    public Task<String> updateUser(UUID userId, UUID deviceId, String name, String email,
-                                   String phone, Boolean receiveNotifications) {
+    public Task<String> updateUser(UUID userId, UUID deviceId,
+                                   @Nullable String name,
+                                   @Nullable String email,
+                                   @Nullable String phone,
+                                   @Nullable Boolean receiveNotifications) {
+
+        // Builds the data map to be sent to the function which contains
+        // userId, deviceId and new details to update with.
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
+        // payload... the details to update with.
         Map<String, Object> payload = new HashMap<>();
         payload.put("name", name);
         payload.put("email", email);
@@ -135,7 +191,11 @@ public class UserViewModel extends ViewModel {
         payload.put("receiveNotifications", receiveNotifications);
         data.put("data", payload);
 
-        return FirebaseFunctions.getInstance()
+        // to debug code cuz a lot of errors while testing... T-T
+        System.out.println("updateUser payload type=" + data.getClass().getName());
+        System.out.println("updateUser payload=" + data);
+
+        return functions
                 .getHttpsCallable("updateUser")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, String>() {
@@ -148,18 +208,18 @@ public class UserViewModel extends ViewModel {
     }
 
     /**
-     * Calls the getUser cloud function, returning the raw user map.
+     * Calls the getUser cloud function returns the raw user map
      *
-     * @param userId   UUID identifying the user.
-     * @param deviceId UUID identifying the user's device.
-     * @return Map containing the user's data.
+     * @param userId UUID to identify the user in database.
+     * @param deviceId UUID to verify users device.
+     * @return A Map containing the users data returned from the function.
      */
     public Task<Map<String, Object>> getUserRaw(UUID userId, UUID deviceId) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
-        return FirebaseFunctions.getInstance()
+        return functions
                 .getHttpsCallable("getUser")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, Map<String, Object>>() {
