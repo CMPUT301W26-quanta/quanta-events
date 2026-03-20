@@ -1,6 +1,7 @@
 package ca.quanta.quantaevents.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import ca.quanta.quantaevents.R;
@@ -31,6 +33,11 @@ public class EventNotificationEditorFragment extends Fragment {
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
         );
+
+        binding.saveButton.setOnClickListener(_view -> {
+            Log.d("TAG", "Click!");
+        });
+
     }
 
     @Override

@@ -51,12 +51,13 @@ dependencies {
     implementation(libs.legacy.support.v4)
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.firebase.functions)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation(platform("com.google.firebase:firebase-bom:34.10.0"))
-    implementation("com.google.firebase:firebase-functions")
+    implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
     implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-functions:21.1.0")
 
     implementation(libs.zxing.android.embedded)
 }
