@@ -1,4 +1,4 @@
-name: Typecheck Firebase Functions
+name: Build Test Firebase Functions
 
 on:
   pull_request:
@@ -7,6 +7,7 @@ on:
     
 jobs:
   tsc-check:
+    name: Build Test Firebase Functions
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo

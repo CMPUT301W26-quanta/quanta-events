@@ -9,6 +9,7 @@ on:
     
 jobs:
   deploy:
+    name: Build and Deploy Firebase Functions
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
