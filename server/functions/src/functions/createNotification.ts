@@ -10,7 +10,6 @@ import { getMessaging } from "firebase-admin/messaging";
 
 const createNotificationInterface = util.standardForm(
   z.object({
-    senderId: z.uuid(),
     message: z.string().optional(),
     title: z.string().optional(),
     eventId: z.uuid(),
@@ -27,82 +26,82 @@ export async function createNotification(request: CallableRequest) {
       request
     );
   
-    const { senderId, message, title, eventId, waited, cancelled, selected } = data;
+  const { message, title, eventId, waited, cancelled, selected } = data;
   
-    const userData = await util.verifyUser(userId, deviceId);
-    await util.requireRole(userData, "organizer");
+  const userData = await util.verifyUser(userId, deviceId);
+  await util.requireRole(userData, "organizer");
   
-    const notificationId = uuidv4();
+  const notificationId = uuidv4();
     
-    const db = getFirestore();
+  const db = getFirestore();
   
-    try {
-      await db
-      .collection("notifications")
-      .doc(notificationId)
-      .create({
-        senderId,
-        message,
-        title,
-        eventId,
-        waited,
-        cancelled,
-        selected,
-      });
-    } catch (_) {
-      throw new HttpsError("already-exists", "Notification already exists");
-    }
+  try {
+    await db
+    .collection("notifications")
+    .doc(notificationId)
+    .create({
+      message,
+      title,
+      eventId,
+      waited,
+      cancelled,
+      selected,
+    });
+  } catch (_) {
+    throw new HttpsError("already-exists", "Notification already exists");
+  }
 
-    const eventDocuments = db.collection("events") as CollectionReference<EventDocument, EventDocument>;
-    const eventDocument = (await eventDocuments.doc(eventId).get()).data();
+  const eventDocuments = db.collection("events") as CollectionReference<EventDocument, EventDocument>;
+  const eventDocument = (await eventDocuments.doc(data.eventId).get()).data();
 
-    // Store all the recipients in some collection
-    const recipients: string[] = [];
-    if (waited) {
-      const waitedList = eventDocument?.waitList as string[];
-      for (const entrantId of waitedList) {
-        if (!recipients.includes(entrantId)) {
-          recipients.push(entrantId);
-        }
+  // Store all the recipients in some collection
+  const recipients: string[] = [];
+  if (waited) {
+    const waitedList = eventDocument?.waitList as string[];
+    for (const entrantId of waitedList) {
+      if (!recipients.includes(entrantId)) {
+        recipients.push(entrantId);
       }
     }
-    if (cancelled) {
-      const cancelledList = eventDocument?.cancelledList as string[];
-      for (const entrantId of cancelledList) {
-        if (!recipients.includes(entrantId)) {
-          recipients.push(entrantId);
-        }
+  }
+  if (cancelled) {
+    const cancelledList = eventDocument?.cancelledList as string[];
+    for (const entrantId of cancelledList) {
+      if (!recipients.includes(entrantId)) {
+        recipients.push(entrantId);
       }
     }
-    if (selected) {
-      const finalList = eventDocument?.finalList as string[];
-      for (const entrantId of finalList) {
-        if (!recipients.includes(entrantId)) {
-          recipients.push(entrantId);
-        }
+  }
+  if (selected) {
+    const finalList = eventDocument?.finalList as string[];
+    for (const entrantId of finalList) {
+      if (!recipients.includes(entrantId)) {
+        recipients.push(entrantId);
       }
     }
+  }
 
-    // Get the FCM tokens by querying the user objects in the recipient list
-    const tokens: string[] = [];
-    const userDocuments = db.collection("users") as CollectionReference<UserDocument, UserDocument>;
-    for (const entrantId of recipients) {
+  // NOTE: I do realize that this function could be more efficient. There is probably a way where I don't need to loop through each recipient.
+  // Get the FCM tokens by querying the user objects in the recipient list
+  const tokens: string[] = [];
+  const userDocuments = db.collection("users") as CollectionReference<UserDocument, UserDocument>;
+  for (const entrantId of recipients) {
 
-      const userDocument = (await userDocuments.doc(entrantId).get()).data();
-      const token = userDocument?.notifToken;
-      const receiveNotifications = userDocument?.entrant?.receiveNotifications;
+    const userDocument = (await userDocuments.doc(entrantId).get()).data();
+    const token = userDocument?.notifToken;
+    const receiveNotifications = userDocument?.entrant?.receiveNotifications;
       
-      if (token != null && receiveNotifications) {
-        tokens.push(token);
-      }
+    if (token != null && receiveNotifications) {
+      tokens.push(token);
     }
+  }
 
-    // Send notification to the recipients
-    if (tokens.length > 0) {
-      const ms = getMessaging();
-      await ms.sendEachForMulticast({tokens: tokens, notification: {title: title, body: message}});
-    }
+  // Send notification to the recipients
+  if (tokens.length > 0) {
+    const ms = getMessaging();
+    await ms.sendEachForMulticast({tokens: tokens, notification: {title: title, body: message}});
+  }
 
-    logger.info("Notification Created and sent succesfully", { notificationId });
-    return { notificationId };
+  logger.info("Notification Created and sent succesfully", { notificationId });
+  return { notificationId };
 }
