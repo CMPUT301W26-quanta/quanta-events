@@ -1,5 +1,7 @@
 package ca.quanta.quantaevents.fragments;
 
+import static ca.quanta.quantaevents.fragments.RegisterFragment.normalizeEmpty;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
@@ -27,6 +30,7 @@ public class EventNotificationEditorFragment extends Fragment {
     private NotificationViewModel model;
     private UUID userId;
     private UUID deviceId;
+    private UUID eventId;
     private SessionStore sessionStore;
 
     @Override
@@ -46,6 +50,7 @@ public class EventNotificationEditorFragment extends Fragment {
             userId = uid;
             deviceId = did;
         });
+        readEventId();  // Read in the event's ID
 
         //set on click listener for the back button
         binding.backButton.setOnClickListener(
@@ -53,16 +58,17 @@ public class EventNotificationEditorFragment extends Fragment {
         );
 
         binding.saveButton.setOnClickListener(_view -> {
-            Log.d("TAG", userId.toString());
-            Log.d("TAG", deviceId.toString());
 
-            // Testing some hard-coded values
-            // Note: currently, this call to createNotification doesn't seem to do anything
-            // Will need to check this, and the cloud function
-            // Giving a 'missing required fields' error
-            model.createNotification(userId, deviceId, "This is a message",
-                    "This is a title", "71b989cf-b802-4f0a-919c-efad7b283621",
-                    true, true, true)
+            String title = normalizeEmpty(Optional.ofNullable(binding.inputTitle.getText()).map(e -> e.toString().trim()).orElse(null));
+            String message = normalizeEmpty(Optional.ofNullable(binding.inputMessage.getText()).map(e -> e.toString().trim()).orElse(null));
+
+            Boolean cancelled = binding.checkCancelled.isChecked();
+            Boolean waited = binding.checkWaitingList.isChecked();
+            Boolean selected = binding.checkSelected.isChecked();
+
+            model.createNotification(userId, deviceId, message,
+                    title, eventId.toString(),
+                    waited, cancelled, selected)
                     .addOnSuccessListener(notificationId -> {
                         binding.saveButton.setEnabled(true);
                         Toast.makeText(requireContext(), "Notification created", Toast.LENGTH_LONG).show();
@@ -86,4 +92,10 @@ public class EventNotificationEditorFragment extends Fragment {
         binding = FragmentNotificationEditorBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
+
+    private void readEventId() {
+        ca.quanta.quantaevents.fragments.EventNotificationEditorFragmentArgs args = ca.quanta.quantaevents.fragments.EventNotificationEditorFragmentArgs.fromBundle(getArguments());
+        eventId = args.getEventId();
+    }
+
 }

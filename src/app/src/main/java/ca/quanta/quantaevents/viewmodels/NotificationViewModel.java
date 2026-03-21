@@ -1,7 +1,5 @@
 package ca.quanta.quantaevents.viewmodels;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
@@ -33,8 +31,6 @@ public class NotificationViewModel extends ViewModel {
         payload.put("cancelled", cancelled);
         payload.put("selected", selected);
         data.put("data", payload);
-
-        Log.d("TAG", message);
 
         return functions
                 .getHttpsCallable("createNotification")
