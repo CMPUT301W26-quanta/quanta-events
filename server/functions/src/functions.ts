@@ -9,6 +9,7 @@ export * from "./functions/getUser";
 export * from "./functions/health";
 export * from "./functions/updateUser";
 export * from "./functions/createNotification";
+export * from "./functions/setToken";
 export * from "./functions/getEvents";
 export * from "./functions/getOrganizerName";
 export * from "./functions/getWaitlistCount";

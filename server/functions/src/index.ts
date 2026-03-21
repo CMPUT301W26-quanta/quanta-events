@@ -76,4 +76,4 @@ export const createNotification = onCall(
 
 export const getEvents = onCall({ maxInstances: 1 }, functions.getEvents);
 
-// export const setToken = onCall({ maxInstances: 1 }, functions.setToken);
+export const setToken = onCall({ maxInstances: 1 }, functions.setToken);
