@@ -31,9 +31,11 @@ import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.EventCardAdapter;
 import ca.quanta.quantaevents.adapters.EventCardItem;
 import ca.quanta.quantaevents.databinding.FragmentEntrantEventHistoryBinding;
+import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
@@ -45,6 +47,7 @@ public class EntrantEventHistoryFragment extends Fragment {
     private SessionStore sessionStore;
     private UUID userId;
     private UUID deviceId;
+    private boolean hasLoaded = false;
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
@@ -79,7 +82,10 @@ public class EntrantEventHistoryFragment extends Fragment {
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
-            loadHistoryEvents();
+            if (!hasLoaded) {
+                hasLoaded = true;
+                loadHistoryEvents();
+            }
         });
     }
 
@@ -97,29 +103,40 @@ public class EntrantEventHistoryFragment extends Fragment {
             return;
         }
         Log.d("EntrantEventHistory", "Loading history events for user " + userId);
-        eventModel.getEvents(
-                        userId,
-                        deviceId,
-                        50,
-                        null,
-                        EventViewModel.Fetch.HISTORY,
-                        null,
-                        null,
-                        null,
-                        EventViewModel.SortBy.NAME)
-                .addOnSuccessListener(this::bindEventList)
-                .addOnFailureListener(ex -> {
-                    Log.e("EntrantEventHistory", "Failed to load events", ex);
-                    if (ex instanceof FirebaseFunctionsException) {
-                        FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
-                        Log.e("EntrantEventHistory", "Functions code=" + fex.getCode() + " message=" + fex.getMessage());
-                    }
-                    if (isUserNotFound(ex)) {
-                        handleMissingUser();
-                        return;
-                    }
-                    Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
-                });
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(
+            eventModel.getEvents(
+                            userId,
+                            deviceId,
+                            50,
+                            null,
+                            EventViewModel.Fetch.HISTORY,
+                            null,
+                            null,
+                            null,
+                            EventViewModel.SortBy.NAME)
+                    .addOnSuccessListener(this::bindEventList)
+                    .addOnFailureListener(ex -> {
+                        Log.e("EntrantEventHistory", "Failed to load events", ex);
+                        if (ex instanceof FirebaseFunctionsException) {
+                            FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
+                            Log.e("EntrantEventHistory", "Functions code=" + fex.getCode() + " message=" + fex.getMessage());
+                        }
+                        if (isUserNotFound(ex)) {
+                            handleMissingUser();
+                            return;
+                        }
+                        ToastManager.show(requireContext(), "Failed to load events", Toast.LENGTH_LONG);
+                    })
+        );
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        hasLoaded = false;
+        binding = null;
     }
 
     // bind the data to the view
@@ -131,7 +148,7 @@ public class EntrantEventHistoryFragment extends Fragment {
         }
         Log.d("EntrantEventHistory", "Loaded events count=" + events.size());
         if (events.isEmpty()) {
-            Toast.makeText(requireContext(), "No events found", Toast.LENGTH_LONG).show();
+            ToastManager.show(requireContext(), "No event history", Toast.LENGTH_LONG);
             adapter.setItems(new ArrayList<>());
             return;
         }
@@ -159,7 +176,7 @@ public class EntrantEventHistoryFragment extends Fragment {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
-                    Object imageData = data.get("imageData");
+                    Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;
                     }

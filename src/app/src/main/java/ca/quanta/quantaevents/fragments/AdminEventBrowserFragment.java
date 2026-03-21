@@ -31,9 +31,11 @@ import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.EventCardAdapter;
 import ca.quanta.quantaevents.adapters.EventCardItem;
 import ca.quanta.quantaevents.databinding.FragmentAdminEventBrowserBinding;
+import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
@@ -45,6 +47,7 @@ public class AdminEventBrowserFragment extends Fragment {
     private SessionStore sessionStore;
     private UUID userId;
     private UUID deviceId;
+    private boolean hasLoaded = false;
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
@@ -83,7 +86,10 @@ public class AdminEventBrowserFragment extends Fragment {
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
-            loadAllEvents();
+            if (!hasLoaded) {
+                hasLoaded = true;
+                loadAllEvents();
+            }
         });
     }
 
@@ -103,8 +109,8 @@ public class AdminEventBrowserFragment extends Fragment {
         }
 
         Log.d("AdminEventBrowser", "Loading all events for admin " + userId);
-
-        eventModel.getEvents(
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(eventModel.getEvents(
                         userId,
                         deviceId,
                         -1,
@@ -114,7 +120,12 @@ public class AdminEventBrowserFragment extends Fragment {
                         null,
                         null,
                         EventViewModel.SortBy.REGISTRATION_END)
-                .addOnSuccessListener(this::bindEventList)
+                .addOnSuccessListener(events -> {
+                    if (!isAdded()) {
+                        return;
+                    }
+                    bindEventList(events);
+                })
                 .addOnFailureListener(ex -> {
                     Log.e("AdminEventBrowser", "Failed to load events", ex);
                     if (ex instanceof FirebaseFunctionsException) {
@@ -125,13 +136,28 @@ public class AdminEventBrowserFragment extends Fragment {
                         handleMissingUser();
                         return;
                     }
-                    Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
-                });
+                    if (isAdded()) {
+                        ToastManager.show(requireContext(), "Failed to load events", Toast.LENGTH_LONG);
+                    }
+                })
+        );
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        hasLoaded = false;
+        binding = null;
     }
 
     // binds the event list to the view
     // The following function is from OpenAI, ChatGPT, "bindEventList implementation under AdminEventBrowser", 2026-03-12
     private void bindEventList(List<Event> events) {
+        if (!isAdded()) {
+            return;
+        }
         if (events == null) {
             Log.d("AdminEventBrowser", "Event list is null");
             return;
@@ -140,7 +166,7 @@ public class AdminEventBrowserFragment extends Fragment {
         Log.d("AdminEventBrowser", "Loaded events count=" + events.size());
 
         if (events.isEmpty()) {
-            Toast.makeText(requireContext(), "No events found", Toast.LENGTH_LONG).show();
+            ToastManager.show(requireContext(), "No events to moderate", Toast.LENGTH_LONG);
             adapter.setItems(new ArrayList<>());
             return;
         }
@@ -172,7 +198,10 @@ public class AdminEventBrowserFragment extends Fragment {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
-                    Object imageData = data.get("imageData");
+                    if (!isAdded()) {
+                        return;
+                    }
+                    Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;
                     }
