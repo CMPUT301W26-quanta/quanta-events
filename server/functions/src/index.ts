@@ -66,7 +66,7 @@ export const getWaitlist = onCall({ maxInstances: 1}, functions.getWaitlist)
 
 export const createNotification = onCall(
   { maxInstances: 1 },
-  functions.createNotification
+  functions.createEventNotification
 );
 
 export const getNotification = onCall(

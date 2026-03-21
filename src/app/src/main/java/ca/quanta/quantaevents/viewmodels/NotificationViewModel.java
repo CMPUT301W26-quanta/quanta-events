@@ -1,5 +1,7 @@
 package ca.quanta.quantaevents.viewmodels;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
@@ -16,7 +18,7 @@ public class NotificationViewModel extends ViewModel {
 
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
-    public Task<String> createNotification(UUID userId, UUID deviceId, String message,
+    public Task<String> createEventNotification(UUID userId, UUID deviceId, String message,
                                     String title, String eventId, Boolean waited,
                                            Boolean cancelled, Boolean selected) {
         Map<String, Object> data = new HashMap<>();
@@ -32,8 +34,10 @@ public class NotificationViewModel extends ViewModel {
         payload.put("selected", selected);
         data.put("data", payload);
 
+        Log.d("TAG", message);
+
         return functions
-                .getHttpsCallable("createNotification")
+                .getHttpsCallable("createEventNotification")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, String>() {
                     @Override
