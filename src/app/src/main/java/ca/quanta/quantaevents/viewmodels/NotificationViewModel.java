@@ -18,7 +18,7 @@ public class NotificationViewModel extends ViewModel {
 
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
-    public Task<String> createEventNotification(UUID userId, UUID deviceId, String message,
+    public Task<String> createNotification(UUID userId, UUID deviceId, String message,
                                     String title, String eventId, Boolean waited,
                                            Boolean cancelled, Boolean selected) {
         Map<String, Object> data = new HashMap<>();
@@ -37,7 +37,7 @@ public class NotificationViewModel extends ViewModel {
         Log.d("TAG", message);
 
         return functions
-                .getHttpsCallable("createEventNotification")
+                .getHttpsCallable("createNotification")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, String>() {
                     @Override

@@ -19,7 +19,7 @@ const createNotificationInterface = util.standardForm(
   })
 );
 
-export async function createEventNotification(request: CallableRequest) {
+export async function createNotification(request: CallableRequest) {
 
   const { userId, deviceId, data } = util.parseInterface(
       createNotificationInterface,

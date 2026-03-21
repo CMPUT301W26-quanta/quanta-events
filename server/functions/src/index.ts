@@ -66,14 +66,14 @@ export const getWaitlist = onCall({ maxInstances: 1}, functions.getWaitlist)
 
 export const createNotification = onCall(
   { maxInstances: 1 },
-  functions.createEventNotification
+  functions.createNotification
 );
 
-export const getNotification = onCall(
-  { maxInstances: 1 },
-  functions.getNotification
-);
+// export const getNotification = onCall(
+//   { maxInstances: 1 },
+//   functions.getNotification
+// );
 
 export const getEvents = onCall({ maxInstances: 1 }, functions.getEvents);
 
-export const setToken = onCall({ maxInstances: 1 }, functions.setToken);
+// export const setToken = onCall({ maxInstances: 1 }, functions.setToken);

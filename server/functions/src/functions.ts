@@ -8,7 +8,7 @@ export * from "./functions/getImage";
 export * from "./functions/getUser";
 export * from "./functions/health";
 export * from "./functions/updateUser";
-export * from "./functions/createEventNotification";
+export * from "./functions/createNotification";
 export * from "./functions/getEvents";
 export * from "./functions/getOrganizerName";
 export * from "./functions/getWaitlistCount";
