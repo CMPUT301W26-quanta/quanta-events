@@ -35,6 +35,7 @@ import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
@@ -46,6 +47,7 @@ public class AdminEventBrowserFragment extends Fragment {
     private SessionStore sessionStore;
     private UUID userId;
     private UUID deviceId;
+    private boolean hasLoaded = false;
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
@@ -84,7 +86,10 @@ public class AdminEventBrowserFragment extends Fragment {
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
-            loadAllEvents();
+            if (!hasLoaded) {
+                hasLoaded = true;
+                loadAllEvents();
+            }
         });
     }
 
@@ -132,11 +137,19 @@ public class AdminEventBrowserFragment extends Fragment {
                         return;
                     }
                     if (isAdded()) {
-                        Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
+                        ToastManager.show(requireContext(), "Failed to load events", Toast.LENGTH_LONG);
                     }
                 })
         );
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        hasLoaded = false;
+        binding = null;
     }
 
     // binds the event list to the view
@@ -153,7 +166,7 @@ public class AdminEventBrowserFragment extends Fragment {
         Log.d("AdminEventBrowser", "Loaded events count=" + events.size());
 
         if (events.isEmpty()) {
-            Toast.makeText(requireContext(), "No events to moderate", Toast.LENGTH_LONG).show();
+            ToastManager.show(requireContext(), "No events to moderate", Toast.LENGTH_LONG);
             adapter.setItems(new ArrayList<>());
             return;
         }

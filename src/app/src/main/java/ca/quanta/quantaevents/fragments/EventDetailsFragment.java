@@ -29,6 +29,7 @@ import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
@@ -126,7 +127,7 @@ public class EventDetailsFragment extends Fragment {
                     .addOnSuccessListener(this::bindEvent)
                     .addOnFailureListener(ex -> {
                                 if (isAdded()) {
-                                    Toast.makeText(requireContext(), "Failed to load event", Toast.LENGTH_LONG).show();
+                                    ToastManager.show(requireContext(), "Failed to load event", Toast.LENGTH_LONG);
                                     Navigation.findNavController(requireView()).popBackStack();
                                 }
                             }
@@ -220,7 +221,7 @@ public class EventDetailsFragment extends Fragment {
                     binding.textOrganizer.setText(" Organized by " + name.trim());
                 })
                 .addOnFailureListener(exception -> {
-                    Toast.makeText(requireContext(), "Failed to fetch organizer name: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+                    ToastManager.show(requireContext(), "Failed to fetch organizer name", Toast.LENGTH_LONG);
                     Log.e("EventDetailsFragment", "Failed to fetch organizer name.", exception);
 
                     // set the organizer id as the name instead,
@@ -284,6 +285,13 @@ public class EventDetailsFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        binding = null;
+    }
+
     private void toggleWaitlist() {
         if (userId == null || deviceId == null || eventId == null) {
             Log.d("EventDetails", "toggleWaitlist: missing session or eventId");
@@ -297,12 +305,12 @@ public class EventDetailsFragment extends Fragment {
                         Log.d("EventDetails", "leaveWaitlist: success");
                         updateEnrollButtonLabel();
                         refreshWaitlistCount();
-                        Toast.makeText(requireContext(), "Left waitlist", Toast.LENGTH_SHORT).show();
+                        ToastManager.show(requireContext(), "Left waitlist", Toast.LENGTH_LONG);
                     })
                     .addOnFailureListener(ex ->
                             {
                                 Log.e("EventDetails", "leaveWaitlist: failed", ex);
-                                Toast.makeText(requireContext(), "Failed to leave waitlist", Toast.LENGTH_LONG).show();
+                                ToastManager.show(requireContext(), "Failed to leave waitlist", Toast.LENGTH_LONG);
                             }
                     );
         } else {
@@ -313,12 +321,12 @@ public class EventDetailsFragment extends Fragment {
                         Log.d("EventDetails", "joinWaitlist: success");
                         updateEnrollButtonLabel();
                         refreshWaitlistCount();
-                        Toast.makeText(requireContext(), "Joined waitlist", Toast.LENGTH_SHORT).show();
+                        ToastManager.show(requireContext(), "Joined waitlist", Toast.LENGTH_LONG);
                     })
                     .addOnFailureListener(ex ->
                             {
                                 Log.e("EventDetails", "joinWaitlist: failed", ex);
-                                Toast.makeText(requireContext(), "Failed to join waitlist", Toast.LENGTH_LONG).show();
+                                ToastManager.show(requireContext(), "Failed to join waitlist", Toast.LENGTH_LONG);
                             }
                     );
         }

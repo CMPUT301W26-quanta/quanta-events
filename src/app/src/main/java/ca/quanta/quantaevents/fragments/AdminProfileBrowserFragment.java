@@ -26,6 +26,7 @@ import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.User;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 public class AdminProfileBrowserFragment extends Fragment {
@@ -35,6 +36,7 @@ public class AdminProfileBrowserFragment extends Fragment {
 
     private UUID userId;
     private UUID deviceId;
+    private boolean hasLoaded = false;
 
     // lists all profiles to show to admin and adds them to the array
     private void listProfiles() {
@@ -62,8 +64,7 @@ public class AdminProfileBrowserFragment extends Fragment {
                     .addOnFailureListener(exception -> {
                         Log.e("AdminProfileBrowserFragment", "Failed to fetch all users.", exception);
 
-                        Toast.makeText(requireContext(), "Failed to fetch users: " + exception.getMessage(), Toast.LENGTH_LONG).show();
-
+                        ToastManager.show(requireContext(), "Failed to fetch users", Toast.LENGTH_LONG);
                         if (exception instanceof FirebaseFunctionsException) {
                             Log.e("AdminProfileBrowserFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
                         }
@@ -101,7 +102,10 @@ public class AdminProfileBrowserFragment extends Fragment {
             this.deviceId = deviceId;
 
             // set up the profiles recycler view once the userId and deviceId are ready
-            this.listProfiles();
+            if (!hasLoaded) {
+                hasLoaded = true;
+                listProfiles();
+            }
         });
 
         // *set up the backbuttons on click listener
@@ -109,6 +113,14 @@ public class AdminProfileBrowserFragment extends Fragment {
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
         );
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        hasLoaded = false;
+        binding = null;
     }
 
     @Override

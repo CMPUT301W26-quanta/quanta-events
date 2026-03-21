@@ -37,6 +37,7 @@ import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
@@ -48,6 +49,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
     private SessionStore sessionStore;
     private UUID userId;
     private UUID deviceId;
+    private boolean hasLoaded = false;
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
@@ -91,7 +93,10 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
             userId = uid;
             deviceId = did;
             Log.d("EntrantEventList", "Session updated userId=" + userId + " deviceId=" + deviceId);
-            loadEnrolledEvents();
+            if (!hasLoaded) {
+                hasLoaded = true;
+                loadEnrolledEvents();
+            }
         });
 
         new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
@@ -133,9 +138,17 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
                             handleMissingUser();
                             return;
                         }
-                        Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
+                        ToastManager.show(requireContext(), "Failed to load events", Toast.LENGTH_LONG);
                     })
         );
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        hasLoaded = false;
+        binding = null;
     }
 
     private void bindEventList(List<Event> events) {
@@ -145,7 +158,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
         }
         Log.d("EntrantEventList", "Loaded events count=" + events.size());
         if (events.isEmpty()) {
-            Toast.makeText(requireContext(), "No events found", Toast.LENGTH_LONG).show();
+            ToastManager.show(requireContext(), "Not enrolled in any event", Toast.LENGTH_LONG);
             adapter.setItems(new ArrayList<>());
             return;
         }

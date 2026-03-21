@@ -35,6 +35,7 @@ import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
@@ -46,6 +47,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
     private SessionStore sessionStore;
     private UUID userId;
     private UUID deviceId;
+    private boolean hasLoaded = false;
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
     private boolean loadedInitialEvents = false;
@@ -78,7 +80,10 @@ public class EventDashboardFragment extends Fragment implements Tagged {
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
-            maybeLoadAllEvents();
+            if (!hasLoaded) {
+                hasLoaded = true;
+                maybeLoadAllEvents();
+            }
         });
 
         new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
@@ -92,11 +97,11 @@ public class EventDashboardFragment extends Fragment implements Tagged {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (userId != null && deviceId != null) {
-            loadCreatedEvents();
-        }
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        hasLoaded = false;
+        binding = null;
     }
 
     private void maybeLoadAllEvents() {
@@ -136,7 +141,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
                             return;
                         }
                         if (isAdded()) {
-                            Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
+                            ToastManager.show(requireContext(), "Failed to load events", Toast.LENGTH_LONG);
                         }
                     })
         );
@@ -150,7 +155,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
             return;
         }
         if (events.isEmpty()) {
-            Toast.makeText(requireContext(), "No events found", Toast.LENGTH_LONG).show();
+            ToastManager.show(requireContext(), "No events found", Toast.LENGTH_LONG);
             adapter.setItems(new java.util.ArrayList<>());
             return;
         }

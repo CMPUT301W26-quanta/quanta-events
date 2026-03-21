@@ -39,6 +39,7 @@ import ca.quanta.quantaevents.databinding.FragmentEventCreateEditorBinding;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
@@ -107,6 +108,13 @@ public class EventCreateEditorFragment extends Fragment {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        binding = null;
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         imagePickerLauncher = registerForActivityResult(
@@ -123,7 +131,7 @@ public class EventCreateEditorFragment extends Fragment {
                         showPreviewFromBase64(selectedImageBase64);
                     } catch (IOException ex) {
                         selectedImageBase64 = null;
-                        Toast.makeText(requireContext(), "Failed to read image", Toast.LENGTH_LONG).show();
+                        ToastManager.show(requireContext(), "Failed to read image", Toast.LENGTH_LONG);
                     }
                 });
     }
@@ -144,11 +152,11 @@ public class EventCreateEditorFragment extends Fragment {
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(description)
                 || TextUtils.isEmpty(registrationStart) || TextUtils.isEmpty(registrationEnd)
                 || TextUtils.isEmpty(eventTime) || TextUtils.isEmpty(location) || eventCapacity == null) {
-            Toast.makeText(requireContext(), "Fill required fields", Toast.LENGTH_LONG).show();
+            ToastManager.show(requireContext(), "Fill required fields", Toast.LENGTH_LONG);
             return;
         }
         if (userId == null || deviceId == null) {
-            Toast.makeText(requireContext(), "Missing user session", Toast.LENGTH_LONG).show();
+            ToastManager.show(requireContext(), "Missing user session", Toast.LENGTH_LONG);
             return;
         }
 
@@ -168,7 +176,7 @@ public class EventCreateEditorFragment extends Fragment {
                     .addOnFailureListener(ex -> {
                         binding.saveButton.setEnabled(true);
                         Log.e(TAG, "Failed to upload image", ex);
-                        Toast.makeText(requireContext(), "Failed to upload image", Toast.LENGTH_LONG).show();
+                        ToastManager.show(requireContext(), "Failed to upload image", Toast.LENGTH_LONG);
                     });
         } else {
             createEventWithImageId(null, registrationStart, registrationEnd, eventTime, name, description,
@@ -224,7 +232,7 @@ public class EventCreateEditorFragment extends Fragment {
         eventModel.getEvent(eventId, userId, deviceId)
                 .addOnSuccessListener(this::bindEventForEdit)
                 .addOnFailureListener(ex ->
-                        Toast.makeText(requireContext(), "Failed to load event", Toast.LENGTH_LONG).show()
+                        ToastManager.show(requireContext(), "Failed to load event", Toast.LENGTH_LONG)
                 );
     }
 
@@ -293,7 +301,7 @@ public class EventCreateEditorFragment extends Fragment {
         byte[] bytes = Base64.decode(base64Data, Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         if (bitmap == null) {
-            Toast.makeText(requireContext(), "Unable to preview image", Toast.LENGTH_LONG).show();
+            ToastManager.show(requireContext(), "Unable to preview image", Toast.LENGTH_LONG);
             return;
         }
         binding.imagePreview.setImageBitmap(bitmap);
@@ -320,7 +328,7 @@ public class EventCreateEditorFragment extends Fragment {
                         eventCapacity, location, registrationLimit, imageUuid)
                 .addOnSuccessListener(eventId -> {
                     binding.saveButton.setEnabled(true);
-                    Toast.makeText(requireContext(), "Event created", Toast.LENGTH_LONG).show();
+                    ToastManager.show(requireContext(), "Event created", Toast.LENGTH_LONG);
                     if (isAdded()) {
                         Navigation.findNavController(requireView()).popBackStack();
                     }
@@ -328,7 +336,7 @@ public class EventCreateEditorFragment extends Fragment {
                 .addOnFailureListener(ex -> {
                     binding.saveButton.setEnabled(true);
                     Log.e(TAG, "Failed to create event", ex);
-                    Toast.makeText(requireContext(), "Failed to create event", Toast.LENGTH_LONG).show();
+                    ToastManager.show(requireContext(), "Failed to create event", Toast.LENGTH_LONG);
                 });
     }
 
@@ -350,7 +358,7 @@ public class EventCreateEditorFragment extends Fragment {
                         .addOnFailureListener(ex -> {
                             binding.saveButton.setEnabled(true);
                             Log.e(TAG, "Failed to upload image", ex);
-                            Toast.makeText(requireContext(), "Failed to upload image", Toast.LENGTH_LONG).show();
+                            ToastManager.show(requireContext(), "Failed to upload image", Toast.LENGTH_LONG);
                         });
             } else {
                 updateEventWithImageId(null, registrationStart, registrationEnd, eventTime,
@@ -384,7 +392,7 @@ public class EventCreateEditorFragment extends Fragment {
                         geolocation, eventCapacity, location, registrationLimit, imageUuid)
                 .addOnSuccessListener(_done -> {
                     binding.saveButton.setEnabled(true);
-                    Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_LONG).show();
+                    ToastManager.show(requireContext(), "Event updated", Toast.LENGTH_LONG);
                     if (isAdded()) {
                         Navigation.findNavController(requireView()).popBackStack();
                     }
@@ -392,7 +400,7 @@ public class EventCreateEditorFragment extends Fragment {
                 .addOnFailureListener(ex -> {
                     binding.saveButton.setEnabled(true);
                     Log.e(TAG, "Failed to update event", ex);
-                    Toast.makeText(requireContext(), "Failed to update event", Toast.LENGTH_LONG).show();
+                    ToastManager.show(requireContext(), "Failed to update event", Toast.LENGTH_LONG);
                 });
     }
 

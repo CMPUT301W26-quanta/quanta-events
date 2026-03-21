@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +23,7 @@ import java.util.UUID;
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentShowQrBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 
 public class ShowQRFragment extends Fragment {
     private FragmentShowQrBinding binding;
@@ -78,7 +80,7 @@ public class ShowQRFragment extends Fragment {
                 startActivity(Intent.createChooser(shareIntent, "Share QR Code"));
 
             } catch (Exception e) {
-                android.widget.Toast.makeText(requireContext(), "Failed to share QR code", android.widget.Toast.LENGTH_SHORT).show();
+                ToastManager.show(requireContext(), "Failed to share QR code", Toast.LENGTH_LONG);
             }
         });
     }

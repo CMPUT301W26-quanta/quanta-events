@@ -35,6 +35,7 @@ import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
@@ -47,6 +48,7 @@ public class EntrantEventBrowserFragment extends Fragment {
     private UUID userId;
     private UUID deviceId;
     private boolean loadedInitialEvents = false;
+    private boolean hasLoaded = false;
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
@@ -93,7 +95,10 @@ public class EntrantEventBrowserFragment extends Fragment {
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
-            maybeLoadAllEvents();
+            if (!hasLoaded) {
+                hasLoaded = true;
+                maybeLoadAllEvents();
+            }
         });
 
     }
@@ -106,14 +111,14 @@ public class EntrantEventBrowserFragment extends Fragment {
         return binding.getRoot();
     }
 
-
     @Override
-    public void onResume() {
-        super.onResume();
-        if (userId != null && deviceId != null) {
-            loadAvailableEvents();
-        }
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        hasLoaded = false;
+        binding = null;
     }
+
     // decides if events should be loaded based on if they
     // have been loaded before or if session is valid
     private void maybeLoadAllEvents() {
@@ -165,7 +170,7 @@ public class EntrantEventBrowserFragment extends Fragment {
                             return;
                         }
                         if (isAdded()) {
-                            Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
+                            ToastManager.show(requireContext(), "Failed to load events", Toast.LENGTH_LONG);
                         }
                     })
         );
@@ -183,7 +188,7 @@ public class EntrantEventBrowserFragment extends Fragment {
         }
         Log.d("EntrantEventBrowser", "Loaded events count=" + events.size());
         if (events.isEmpty()) {
-            Toast.makeText(requireContext(), "No events created!", Toast.LENGTH_LONG).show();
+            ToastManager.show(requireContext(), "No events created!", Toast.LENGTH_LONG);
             adapter.setItems(new ArrayList<>());
             return;
         }
