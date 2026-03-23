@@ -3,22 +3,30 @@
 export interface Admin {}
 
 export interface Organizer {
-	createdEvents: [];
-	sentNotifications: [];
+  createdEvents: [];
+  sentNotifications: [];
 }
 
 export interface Entrant {
-	enteredEvents: [];
-	history: [];
-	receiveNotifications: boolean;
+  enteredEvents: [];
+  history: [];
+  receiveNotifications: boolean;
 }
 
 export interface User {
-	deviceId: string;
-	email: string;
-	organizer: Organizer;
-	admin: Admin;
-	entrant: Entrant;
-	name: string;
-	phone: string;
+  deviceId: string;
+  name: string;
+  email: string;
+  phone: string;
+  entrant: Entrant;
+  organizer: Organizer;
+  admin: Admin;
+}
+
+export interface ExternalUser {
+  userId: string;
+  name: string;
+  isAdmin: boolean;
+  isOrganizer: boolean;
+  isEntrant: boolean;
 }

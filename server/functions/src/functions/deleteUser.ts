@@ -6,12 +6,15 @@ import { FieldValue, getFirestore } from "firebase-admin/firestore";
 
 const deleteUserInterface = util.standardForm(
   z.object({
-    target: z.uuid()
-  })
+    target: z.uuid(),
+  }),
 );
 
 export async function deleteUser(request: CallableRequest) {
-  const { userId, deviceId, data } = util.parseInterface(deleteUserInterface, request);
+  const { userId, deviceId, data } = util.parseInterface(
+    deleteUserInterface,
+    request,
+  );
 
   const userData = await util.verifyUser(userId, deviceId);
 
@@ -23,7 +26,7 @@ export async function deleteUser(request: CallableRequest) {
   logger.log(targetDoc);
 
   if (!targetDoc.exists) {
-        throw new HttpsError("not-found", "Target user does not exist")
+    throw new HttpsError("not-found", "Target user does not exist");
   }
 
   if (target !== userId) {
@@ -59,4 +62,4 @@ export async function deleteUser(request: CallableRequest) {
 
   logger.info("Deleted user and all references", { target });
   return {};
-};
+}
