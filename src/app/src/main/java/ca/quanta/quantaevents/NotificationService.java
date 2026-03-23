@@ -6,6 +6,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -31,13 +32,14 @@ public class NotificationService extends FirebaseMessagingService {
         String userId = prefs.getString(SessionStore.KEY_USER_ID, null);
         String deviceId = prefs.getString(SessionStore.KEY_DEVICE_ID, null);
         updateToken(token, userId, deviceId).addOnFailureListener(Throwable::printStackTrace);
+        Log.d("ZZZZZZZZZZZZZZZZZ", "onNewToken!!!!!!!!!!!!!!");
     }
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
         message.getData();
-        showNotification();
+        Log.d("ZZZZZZZZZZZZZZZZZ", "onReceiveToken!!!!!!!!!!!!!!");
     }
 
     private void showNotification() {

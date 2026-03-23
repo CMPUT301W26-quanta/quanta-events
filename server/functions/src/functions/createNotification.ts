@@ -112,9 +112,11 @@ export async function createNotification(request: CallableRequest) {
         body: "This is a message"
       },
       android: {
-        priority: "high",
-        notification: {
-          channelId: "default_channel"
+        priority: "high"
+      },
+      apns: {
+        headers: {
+          "apns-priority": "5"
         }
       }
     };
