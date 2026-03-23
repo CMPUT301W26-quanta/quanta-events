@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { CollectionReference, getFirestore } from "firebase-admin/firestore";
 import { EventDocument } from "../schema";
 import { UserDocument } from "../schema";
-import { getMessaging } from "firebase-admin/messaging";
+import { getMessaging, Message } from "firebase-admin/messaging";
 
 const createNotificationInterface = util.standardForm(
   z.object({
@@ -58,6 +58,7 @@ export async function createNotification(request: CallableRequest) {
   const recipients: string[] = [];
   if (waited) {
     const waitedList = eventDocument?.waitList as string[];
+    logger.info("This is the waited list", {waitedList});
     for (const entrantId of waitedList) {
       if (!recipients.includes(entrantId)) {
         recipients.push(entrantId);
@@ -66,6 +67,7 @@ export async function createNotification(request: CallableRequest) {
   }
   if (cancelled) {
     const cancelledList = eventDocument?.cancelledList as string[];
+    logger.info("This is the cancelled list", {cancelledList});
     for (const entrantId of cancelledList) {
       if (!recipients.includes(entrantId)) {
         recipients.push(entrantId);
@@ -74,6 +76,7 @@ export async function createNotification(request: CallableRequest) {
   }
   if (selected) {
     const finalList = eventDocument?.finalList as string[];
+    logger.info("This is the final list", {finalList});
     for (const entrantId of finalList) {
       if (!recipients.includes(entrantId)) {
         recipients.push(entrantId);
@@ -83,7 +86,7 @@ export async function createNotification(request: CallableRequest) {
 
   // NOTE: I do realize that this function could be more efficient. There is probably a way where I don't need to loop through each recipient.
   // Get the FCM tokens by querying the user objects in the recipient list
-  const tokens: string[] = [];
+  const deviceTokens: string[] = [];
   const userDocuments = db.collection("users") as CollectionReference<UserDocument, UserDocument>;
   for (const entrantId of recipients) {
 
@@ -92,16 +95,32 @@ export async function createNotification(request: CallableRequest) {
     const receiveNotifications = userDocument?.entrant?.receiveNotifications;
       
     if (token != null && receiveNotifications) {
-      tokens.push(token);
+      deviceTokens.push(token);
+      logger.info("This is a token", {token});
     }
   }
 
-  // Send notification to the recipients
-  if (tokens.length > 0) {
-    const ms = getMessaging();
-    await ms.sendEachForMulticast({tokens: tokens, notification: {title: title, body: message}});
-  }
+  console.log("Tokens here", {deviceTokens});
 
-  logger.info("Notification Created and sent succesfully", { notificationId });
+  // Send notification to the recipients
+  // From testing, nothing happens here, but no errors occur either
+  for (const t of deviceTokens) {
+    const finalNotification: Message = {
+      token: t,
+      notification: {
+        title: "This is a title",
+        body: "This is a message"
+      },
+      android: {
+        priority: "high",
+        notification: {
+          channelId: "default_channel"
+        }
+      }
+    };
+    await getMessaging().send(finalNotification);
+  };
+
+  logger.info("Everything worked.", { notificationId });
   return { notificationId };
-}
+};

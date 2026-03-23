@@ -37,6 +37,7 @@ public class NotificationService extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
         message.getData();
+        showNotification();
     }
 
     private void showNotification() {
