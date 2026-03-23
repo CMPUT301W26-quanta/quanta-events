@@ -22,9 +22,11 @@ import java.util.UUID;
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.ProfileAdapter;
 import ca.quanta.quantaevents.databinding.FragmentAdminProfileBrowserBinding;
+import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.User;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 public class AdminProfileBrowserFragment extends Fragment {
@@ -34,37 +36,40 @@ public class AdminProfileBrowserFragment extends Fragment {
 
     private UUID userId;
     private UUID deviceId;
+    private boolean hasLoaded = false;
 
     // lists all profiles to show to admin and adds them to the array
     private void listProfiles() {
-        this.userModel.getAllUsers()
-                .addOnSuccessListener(users -> {
-                    // filter out admins
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(
+            this.userModel.getAllUsers()
+                    .addOnSuccessListener(users -> {
+                        // filter out admins
 
-                    ArrayList<User> nonAdminProfiles = new ArrayList<User>();
+                        ArrayList<User> nonAdminProfiles = new ArrayList<User>();
 
-                    for (User user : users) {
-                        if (!user.isAdmin()) {
-                            nonAdminProfiles.add(user);
+                        for (User user : users) {
+                            if (!user.isAdmin()) {
+                                nonAdminProfiles.add(user);
+                            }
                         }
-                    }
 
-                    // use the adapter to display them
+                        // use the adapter to display them
 
-                    ProfileAdapter profilesAdapter = new ProfileAdapter(nonAdminProfiles, this);
+                        ProfileAdapter profilesAdapter = new ProfileAdapter(nonAdminProfiles, this);
 
-                    binding.profilesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                    binding.profilesRecyclerView.setAdapter(profilesAdapter);
-                })
-                .addOnFailureListener(exception -> {
-                    Log.e("AdminProfileBrowserFragment", "Failed to fetch all users.", exception);
+                        binding.profilesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        binding.profilesRecyclerView.setAdapter(profilesAdapter);
+                    })
+                    .addOnFailureListener(exception -> {
+                        Log.e("AdminProfileBrowserFragment", "Failed to fetch all users.", exception);
 
-                    Toast.makeText(requireContext(), "Failed to fetch users: " + exception.getMessage(), Toast.LENGTH_LONG).show();
-
-                    if (exception instanceof FirebaseFunctionsException) {
-                        Log.e("AdminProfileBrowserFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
-                    }
-                });;
+                        ToastManager.show(requireContext(), "Failed to fetch users", Toast.LENGTH_LONG);
+                        if (exception instanceof FirebaseFunctionsException) {
+                            Log.e("AdminProfileBrowserFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
+                        }
+                    })
+        );
     }
 
     @Override
@@ -97,7 +102,10 @@ public class AdminProfileBrowserFragment extends Fragment {
             this.deviceId = deviceId;
 
             // set up the profiles recycler view once the userId and deviceId are ready
-            this.listProfiles();
+            if (!hasLoaded) {
+                hasLoaded = true;
+                listProfiles();
+            }
         });
 
         // *set up the backbuttons on click listener
@@ -105,6 +113,14 @@ public class AdminProfileBrowserFragment extends Fragment {
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
         );
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        hasLoaded = false;
+        binding = null;
     }
 
     @Override

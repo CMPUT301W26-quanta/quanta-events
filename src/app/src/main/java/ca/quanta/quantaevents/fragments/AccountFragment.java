@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,9 +20,11 @@ import java.util.UUID;
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentAccountBinding;
+import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.User;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 public class AccountFragment extends Fragment implements Tagged {
@@ -125,20 +128,23 @@ public class AccountFragment extends Fragment implements Tagged {
             return;
         }
         binding.deleteButton.setEnabled(false);
-        userModel.deleteUser(userId, deviceId, userId)
-                .addOnSuccessListener(_done -> {
-                    sessionStore.clearSession();
-                    binding.deleteButton.setEnabled(true);
-                    android.widget.Toast.makeText(requireContext(), "Account deleted", android.widget.Toast.LENGTH_LONG).show();
-                    if (isAdded()) {
-                        NavDirections action = AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
-                        Navigation.findNavController(requireView()).navigate(action);
-                    }
-                })
-                .addOnFailureListener(ex -> {
-                    binding.deleteButton.setEnabled(true);
-                    android.widget.Toast.makeText(requireContext(), "Failed to delete account", android.widget.Toast.LENGTH_LONG).show();
-                });
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(
+                userModel.deleteUser(userId, deviceId, userId)
+                        .addOnSuccessListener(_done -> {
+                            sessionStore.clearSession();
+                            binding.deleteButton.setEnabled(true);
+                            ToastManager.show(requireContext(), "Account deleted", Toast.LENGTH_LONG);
+                            if (isAdded()) {
+                                NavDirections action = AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
+                                Navigation.findNavController(requireView()).navigate(action);
+                            }
+                        })
+                        .addOnFailureListener(ex -> {
+                            binding.deleteButton.setEnabled(true);
+                            ToastManager.show(requireContext(), "Failed to delete account", Toast.LENGTH_LONG);
+                        })
+        );
     }
 
     // update user details in database and
@@ -158,17 +164,20 @@ public class AccountFragment extends Fragment implements Tagged {
         Boolean receiveNotifications = binding.checkNotifications.isChecked();
 
         binding.saveButton.setEnabled(false);
-        userModel.updateUser(userId, deviceId, name, email, phone, receiveNotifications)
-                .addOnSuccessListener(_userId -> {
-                    binding.saveButton.setEnabled(true);
-                    android.widget.Toast.makeText(requireContext(), "Account updated", android.widget.Toast.LENGTH_LONG).show();
-                    NavDirections action = AccountFragmentDirections.actionAccountfragmentToHomefragment();
-                    Navigation.findNavController(requireView()).navigate(action);
-                })
-                .addOnFailureListener(ex -> {
-                    binding.saveButton.setEnabled(true);
-                    android.widget.Toast.makeText(requireContext(), "Failed to update account", android.widget.Toast.LENGTH_LONG).show();
-                });
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(
+                userModel.updateUser(userId, deviceId, name, email, phone, receiveNotifications)
+                        .addOnSuccessListener(_userId -> {
+                            binding.saveButton.setEnabled(true);
+                            ToastManager.show(requireContext(), "Account updated", Toast.LENGTH_LONG);
+                            NavDirections action = AccountFragmentDirections.actionAccountfragmentToHomefragment();
+                            Navigation.findNavController(requireView()).navigate(action);
+                        })
+                        .addOnFailureListener(ex -> {
+                            binding.saveButton.setEnabled(true);
+                            ToastManager.show(requireContext(), "Failed to update account", Toast.LENGTH_LONG);
+                        })
+        );
     }
 
     private void handleMissingUser() {

@@ -27,6 +27,8 @@ import ca.quanta.quantaevents.fragments.AdminPanelFragment;
 import ca.quanta.quantaevents.fragments.EntrantEventListFragment;
 import ca.quanta.quantaevents.fragments.EventDashboardFragment;
 import ca.quanta.quantaevents.fragments.HomeFragment;
+import ca.quanta.quantaevents.models.User;
+import ca.quanta.quantaevents.loading.Loader;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
@@ -100,30 +102,32 @@ public class MainActivity extends AppCompatActivity {
                 sessionStore.setRoleMask(0);
                 return;
             }
-            userModel.getUserRaw(userId, deviceId)
+            userModel.getUser(userId, deviceId)
                     .addOnSuccessListener(data -> sessionStore.setRoleMask(extractRoleMask(data)))
                     .addOnFailureListener(_ex -> sessionStore.setRoleMask(0));
         });
 
         sessionStore.getRoleMask().observe(this, mask -> burgerState.setGroupFilter(mask == null ? 0 : mask));
+
+        new Loader(this, binding.loadingFrame).inject();
     }
 
     @SuppressWarnings("unchecked")
-    private int extractRoleMask(Map<String, Object> userData) {
+    private int extractRoleMask(User userData) {
         int mask = 0;
         if (userData == null) {
             return mask;
         }
-        Object entrant = userData.get("entrant");
-        Object organizer = userData.get("organizer");
-        Object admin = userData.get("admin");
-        if (entrant instanceof Map) {
+        Boolean entrant = userData.isEntrant();
+        Boolean organizer = userData.isOrganizer();
+        Boolean admin = userData.isAdmin();
+        if (entrant) {
             mask |= SmartBurger.ENTRANT_GROUP;
         }
-        if (organizer instanceof Map) {
+        if (organizer) {
             mask |= SmartBurger.ORGANIZER_GROUP;
         }
-        if (admin instanceof Map) {
+        if (admin) {
             mask |= SmartBurger.ADMIN_GROUP;
         }
         return mask;

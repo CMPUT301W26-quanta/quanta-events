@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,8 +19,10 @@ import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentRegisterBinding;
+import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 
@@ -88,18 +91,21 @@ public class RegisterFragment extends Fragment {
         Boolean getNotifications = binding.checkNotifications.isChecked();
         UUID deviceId = UUID.randomUUID();
         binding.saveButton.setEnabled(false);
-        model.createUser(name, email, phone, isEntrant, isOrganizer, isAdmin, getNotifications, deviceId)
-                .addOnSuccessListener(userId -> {
-                    sessionStore.setSession(userId, deviceId);
-                    binding.saveButton.setEnabled(true);
-                    android.widget.Toast.makeText(requireContext(), "Account created", android.widget.Toast.LENGTH_LONG).show();
-                    tryRedirect();
-                })
-                .addOnFailureListener(ex -> {
-                    binding.saveButton.setEnabled(true);
-                    Log.e(TAG, "Failed to create account", ex);
-                    android.widget.Toast.makeText(requireContext(), "Failed to create account", android.widget.Toast.LENGTH_LONG).show();
-                });
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(
+                model.createUser(name, email, phone, isEntrant, isOrganizer, isAdmin, getNotifications, deviceId)
+                        .addOnSuccessListener(userId -> {
+                            sessionStore.setSession(userId, deviceId);
+                            binding.saveButton.setEnabled(true);
+                            ToastManager.show(requireContext(), "Account created", Toast.LENGTH_LONG);
+                            tryRedirect();
+                        })
+                        .addOnFailureListener(ex -> {
+                            binding.saveButton.setEnabled(true);
+                            Log.e(TAG, "Failed to create account", ex);
+                            ToastManager.show(requireContext(), "Failed to create account", Toast.LENGTH_LONG);
+                        })
+        );
 
     }
 
