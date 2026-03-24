@@ -1,10 +1,8 @@
 package ca.quanta.quantaevents;
 
 import android.Manifest;
-import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 
 import androidx.annotation.NonNull;
@@ -28,6 +26,14 @@ import ca.quanta.quantaevents.stores.SessionStore;
  */
 public class NotificationService extends FirebaseMessagingService {
 
+    private SessionStore sessionStore;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        sessionStore = new SessionStore(getApplication());
+    }
+
     /**
      * Listener which activates on creation of a new messaging token.
      * @param token The token used for sending messages to this application instance.
@@ -35,9 +41,8 @@ public class NotificationService extends FirebaseMessagingService {
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
-        SharedPreferences prefs = getSharedPreferences(SessionStore.PREFS_NAME, Application.MODE_PRIVATE);
-        String userId = prefs.getString(SessionStore.KEY_USER_ID, null);
-        String deviceId = prefs.getString(SessionStore.KEY_DEVICE_ID, null);
+        String userId = sessionStore.getUserId().getValue();
+        String deviceId = sessionStore.getDeviceId().getValue();
         updateToken(token, userId, deviceId).addOnFailureListener(Throwable::printStackTrace);
     }
 
