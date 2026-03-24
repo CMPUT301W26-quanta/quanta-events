@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +23,7 @@ import java.util.UUID;
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentShowQrBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 
 public class ShowQRFragment extends Fragment {
     private FragmentShowQrBinding binding;
@@ -55,10 +57,31 @@ public class ShowQRFragment extends Fragment {
 
         // set up the share button listener
         binding.shareButton.setOnClickListener(v -> {
-            Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            shareIntent.setType("text/plain");
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "Scan this QR code to join the event!");
-            startActivity(Intent.createChooser(shareIntent, "Share QR Code"));
+            Bitmap bitmap = ((android.graphics.drawable.BitmapDrawable) binding.qrCodeImage.getDrawable()).getBitmap();
+
+            try {
+                android.content.ContentValues values = new android.content.ContentValues();
+                values.put(android.provider.MediaStore.Images.Media.DISPLAY_NAME, "qr_code.png");
+                values.put(android.provider.MediaStore.Images.Media.MIME_TYPE, "image/png");
+
+                android.net.Uri uri = requireContext().getContentResolver().insert(
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values
+                );
+
+                try (java.io.OutputStream stream = requireContext().getContentResolver().openOutputStream(uri)) {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                }
+
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("image/png");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, "Scan this QR code to join the event!");
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(Intent.createChooser(shareIntent, "Share QR Code"));
+
+            } catch (Exception e) {
+                ToastManager.show(requireContext(), "Failed to share QR code", Toast.LENGTH_LONG);
+            }
         });
     }
 
