@@ -92,6 +92,7 @@ public class UserViewModel extends ViewModel {
                            Boolean isEntrant = (Boolean) userObject.get("isEntrant");
                            Boolean isOrganizer = (Boolean) userObject.get("isOrganizer");
                            Boolean isAdmin = (Boolean) userObject.get("isAdmin");
+                           System.out.println(userId + name + isEntrant + isOrganizer + isAdmin);
 
                            // verify that they have a userId, otherwise just skip them
 
@@ -171,7 +172,7 @@ public class UserViewModel extends ViewModel {
      * @param receiveNotifications Updated notification preference (optional).
      * @return UUID identifying the user's ID.
      */
-    public Task<String> updateUser(UUID userId, UUID deviceId,
+    public Task<Void> updateUser(UUID userId, UUID deviceId,
                                    @Nullable String name,
                                    @Nullable String email,
                                    @Nullable String phone,
@@ -198,34 +199,11 @@ public class UserViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("updateUser")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, String>() {
+                .continueWith(new Continuation<HttpsCallableResult, Void>() {
                     @Override
-                    public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                    public Void then(@NonNull Task<HttpsCallableResult> task) throws Exception {
                         Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
-                        return (String) result.get("userId");
-                    }
-                });
-    }
-
-    /**
-     * Calls the getUser cloud function returns the raw user map
-     *
-     * @param userId UUID to identify the user in database.
-     * @param deviceId UUID to verify users device.
-     * @return A Map containing the users data returned from the function.
-     */
-    public Task<Map<String, Object>> getUserRaw(UUID userId, UUID deviceId) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("userId", userId.toString());
-        data.put("deviceId", deviceId.toString());
-
-        return functions
-                .getHttpsCallable("getUser")
-                .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Map<String, Object>>() {
-                    @Override
-                    public Map<String, Object> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        return (Map<String, Object>) task.getResult().getData();
+                        return null;
                     }
                 });
     }

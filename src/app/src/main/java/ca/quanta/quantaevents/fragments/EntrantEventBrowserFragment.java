@@ -31,9 +31,11 @@ import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.EventCardAdapter;
 import ca.quanta.quantaevents.adapters.EventCardItem;
 import ca.quanta.quantaevents.databinding.FragmentEntrantEventBrowserBinding;
+import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
@@ -46,6 +48,7 @@ public class EntrantEventBrowserFragment extends Fragment {
     private UUID userId;
     private UUID deviceId;
     private boolean loadedInitialEvents = false;
+    private boolean hasLoaded = false;
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
@@ -92,7 +95,10 @@ public class EntrantEventBrowserFragment extends Fragment {
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
-            maybeLoadAllEvents();
+            if (!hasLoaded) {
+                hasLoaded = true;
+                maybeLoadAllEvents();
+            }
         });
 
     }
@@ -105,14 +111,14 @@ public class EntrantEventBrowserFragment extends Fragment {
         return binding.getRoot();
     }
 
-
     @Override
-    public void onResume() {
-        super.onResume();
-        if (userId != null && deviceId != null) {
-            loadAvailableEvents();
-        }
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        hasLoaded = false;
+        binding = null;
     }
+
     // decides if events should be loaded based on if they
     // have been loaded before or if session is valid
     private void maybeLoadAllEvents() {
@@ -134,42 +140,55 @@ public class EntrantEventBrowserFragment extends Fragment {
             return;
         }
         Log.d("EntrantEventBrowser", "Loading available events for user " + userId + deviceId);
-        eventModel.getEvents(
-                        userId,
-                        deviceId,
-                        50,
-                        null,
-                        EventViewModel.Fetch.AVAILABLE,
-                        null,
-                        null,
-                        null,
-                        EventViewModel.SortBy.REGISTRATION_END)
-                .addOnSuccessListener(this::bindEventList)
-                .addOnFailureListener(ex -> {
-                    Log.e("EntrantEventBrowser", "Failed to load events", ex);
-                    if (ex instanceof FirebaseFunctionsException) {
-                        FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
-                        Log.e("EntrantEventBrowser", "Functions code=" + fex.getCode() + " message="
-                                + fex.getMessage());
-                    }
-                    if (isUserNotFound(ex)) {
-                        handleMissingUser();
-                        return;
-                    }
-                    Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
-                });
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(
+            eventModel.getEvents(
+                            userId,
+                            deviceId,
+                            50,
+                            null,
+                            EventViewModel.Fetch.AVAILABLE,
+                            null,
+                            null,
+                            null,
+                            EventViewModel.SortBy.REGISTRATION_START)
+                    .addOnSuccessListener(events -> {
+                        if (!isAdded()) {
+                            return;
+                        }
+                        bindEventList(events);
+                    })
+                    .addOnFailureListener(ex -> {
+                        Log.e("EntrantEventBrowser", "Failed to load events", ex);
+                        if (ex instanceof FirebaseFunctionsException) {
+                            FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
+                            Log.e("EntrantEventBrowser", "Functions code=" + fex.getCode() + " message="
+                                    + fex.getMessage());
+                        }
+                        if (isUserNotFound(ex)) {
+                            handleMissingUser();
+                            return;
+                        }
+                        if (isAdded()) {
+                            ToastManager.show(requireContext(), "Failed to load events", Toast.LENGTH_LONG);
+                        }
+                    })
+        );
     }
     //bind the events to the array adapter and the card item
     // The following function is from OpenAI, ChatGPT, "bindEventList implementation for EntrantEventBrowser", 2026-03-11
 
     private void bindEventList(List<Event> events) {
+        if (!isAdded()) {
+            return;
+        }
         if (events == null) {
             Log.d("EntrantEventBrowser", "Event list is null");
             return;
         }
         Log.d("EntrantEventBrowser", "Loaded events count=" + events.size());
         if (events.isEmpty()) {
-            Toast.makeText(requireContext(), "No events found", Toast.LENGTH_LONG).show();
+            ToastManager.show(requireContext(), "No events created!", Toast.LENGTH_LONG);
             adapter.setItems(new ArrayList<>());
             return;
         }
@@ -196,7 +215,10 @@ public class EntrantEventBrowserFragment extends Fragment {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
-                    Object imageData = data.get("imageData");
+                    if (!isAdded()) {
+                        return;
+                    }
+                    Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;
                     }

@@ -25,9 +25,11 @@ import java.util.UUID;
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.burger.SmartBurger;
 import ca.quanta.quantaevents.databinding.FragmentEventDetailsBinding;
+import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
@@ -48,6 +50,7 @@ public class EventDetailsFragment extends Fragment {
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
     private UserViewModel model;
+    private boolean isOrganizer = false;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -118,15 +121,18 @@ public class EventDetailsFragment extends Fragment {
             Navigation.findNavController(requireView()).navigate(action);
             return;
         }
-        eventModel.getEvent(eventId, userId, deviceId)
-                .addOnSuccessListener(this::bindEvent)
-                .addOnFailureListener(ex -> {
-                            if (isAdded()) {
-                                Toast.makeText(requireContext(), "Failed to load event", Toast.LENGTH_LONG).show();
-                                Navigation.findNavController(requireView()).popBackStack();
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(
+            eventModel.getEvent(eventId, userId, deviceId)
+                    .addOnSuccessListener(this::bindEvent)
+                    .addOnFailureListener(ex -> {
+                                if (isAdded()) {
+                                    ToastManager.show(requireContext(), "Failed to load event", Toast.LENGTH_LONG);
+                                    Navigation.findNavController(requireView()).popBackStack();
+                                }
                             }
-                        }
-                );
+                    )
+        );
     }
 
     // bind the event details to the
@@ -137,9 +143,10 @@ public class EventDetailsFragment extends Fragment {
         }
 
         binding.textEventTitle.setText(stringValue(event.getEventName(), "Event"));
-        String organizer = event.getOrganizerId() == null ? "Unknown" : event.getOrganizerId().toString();
 
-        binding.textDateTime.setText(" " + formatLocalTime(event.getRegistrationStartTime()));
+        String organizer = event.getOrganizerId() == null ? "Unknown" : event.getOrganizerId().toString();
+        System.out.println(organizer);
+        binding.eventStartTime.setText(" " + formatLocalTime(event.getRegistrationStartTime()));
         binding.textLocation.setText(" " + stringValue(event.getLocation(), "TBD"));
 
         waitlistCount = event.getWaitList() == null ? 0 : event.getWaitList().size();
@@ -156,7 +163,7 @@ public class EventDetailsFragment extends Fragment {
         if (imageUuid != null) {
             imageModel.getImage(imageUuid, userId, deviceId)
                     .addOnSuccessListener(imageData -> {
-                        Object imageBase64 = imageData.get("imageData");
+                        Object imageBase64 = imageData.getImageData();
                         if (imageBase64 != null) {
                             Bitmap bitmap = decodeBase64ToBitmap(imageBase64.toString());
                             if (bitmap != null) {
@@ -172,9 +179,11 @@ public class EventDetailsFragment extends Fragment {
         if (isAdmin && fromAdmin) {
             binding.enrollButton.setText("Delete");
             binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
+            isOrganizer = false;
             return;
         }
         if (userId != null && organizerId != null && organizerId.equals(userId.toString())) {
+            isOrganizer = true;
             binding.enrollButton.setText("Manage");
             binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
             binding.enrollButton.setOnClickListener(v -> {
@@ -183,6 +192,7 @@ public class EventDetailsFragment extends Fragment {
             });
             return;
         }
+        isOrganizer = false;
         binding.enrollButton.setOnClickListener(v -> toggleWaitlist());
     }
 
@@ -211,7 +221,7 @@ public class EventDetailsFragment extends Fragment {
                     binding.textOrganizer.setText(" Organized by " + name.trim());
                 })
                 .addOnFailureListener(exception -> {
-                    Toast.makeText(requireContext(), "Failed to fetch organizer name: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+                    ToastManager.show(requireContext(), "Failed to fetch organizer name", Toast.LENGTH_LONG);
                     Log.e("EventDetailsFragment", "Failed to fetch organizer name.", exception);
 
                     // set the organizer id as the name instead,
@@ -221,6 +231,9 @@ public class EventDetailsFragment extends Fragment {
     }
 
     private void updateWaitlistState() {
+        if (isOrganizer || (isAdmin && fromAdmin)) {
+            return;
+        }
         if (userId == null || deviceId == null || eventId == null) {
             Log.d("EventDetails", "updateWaitlistState: missing session or eventId");
             return;
@@ -260,6 +273,9 @@ public class EventDetailsFragment extends Fragment {
         if (!isAdded()) {
             return;
         }
+        if (isOrganizer || (isAdmin && fromAdmin)) {
+            return;
+        }
         if (inWaitlist) {
             binding.enrollButton.setText("Leave Waitlist");
             binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
@@ -267,6 +283,13 @@ public class EventDetailsFragment extends Fragment {
             binding.enrollButton.setText("Join Waitlist");
             binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_green));
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        binding = null;
     }
 
     private void toggleWaitlist() {
@@ -282,12 +305,12 @@ public class EventDetailsFragment extends Fragment {
                         Log.d("EventDetails", "leaveWaitlist: success");
                         updateEnrollButtonLabel();
                         refreshWaitlistCount();
-                        Toast.makeText(requireContext(), "Left waitlist", Toast.LENGTH_SHORT).show();
+                        ToastManager.show(requireContext(), "Left waitlist", Toast.LENGTH_LONG);
                     })
                     .addOnFailureListener(ex ->
                             {
                                 Log.e("EventDetails", "leaveWaitlist: failed", ex);
-                                Toast.makeText(requireContext(), "Failed to leave waitlist", Toast.LENGTH_LONG).show();
+                                ToastManager.show(requireContext(), "Failed to leave waitlist", Toast.LENGTH_LONG);
                             }
                     );
         } else {
@@ -298,12 +321,12 @@ public class EventDetailsFragment extends Fragment {
                         Log.d("EventDetails", "joinWaitlist: success");
                         updateEnrollButtonLabel();
                         refreshWaitlistCount();
-                        Toast.makeText(requireContext(), "Joined waitlist", Toast.LENGTH_SHORT).show();
+                        ToastManager.show(requireContext(), "Joined waitlist", Toast.LENGTH_LONG);
                     })
                     .addOnFailureListener(ex ->
                             {
                                 Log.e("EventDetails", "joinWaitlist: failed", ex);
-                                Toast.makeText(requireContext(), "Failed to join waitlist", Toast.LENGTH_LONG).show();
+                                ToastManager.show(requireContext(), "Failed to join waitlist", Toast.LENGTH_LONG);
                             }
                     );
         }

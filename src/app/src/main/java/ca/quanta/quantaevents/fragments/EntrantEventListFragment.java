@@ -33,9 +33,11 @@ import ca.quanta.quantaevents.adapters.EventCardItem;
 import ca.quanta.quantaevents.burger.SmartBurgerState;
 import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentEntrantEventListBinding;
+import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
@@ -47,6 +49,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
     private SessionStore sessionStore;
     private UUID userId;
     private UUID deviceId;
+    private boolean hasLoaded = false;
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
@@ -90,7 +93,10 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
             userId = uid;
             deviceId = did;
             Log.d("EntrantEventList", "Session updated userId=" + userId + " deviceId=" + deviceId);
-            loadEnrolledEvents();
+            if (!hasLoaded) {
+                hasLoaded = true;
+                loadEnrolledEvents();
+            }
         });
 
         new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
@@ -109,29 +115,40 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
             return;
         }
         Log.d("EntrantEventList", "Loading enrolled events for user " + userId);
-        eventModel.getEvents(
-                        userId,
-                        deviceId,
-                        50,
-                        null,
-                        EventViewModel.Fetch.IN,
-                        null,
-                        null,
-                        null,
-                        null)
-                .addOnSuccessListener(this::bindEventList)
-                .addOnFailureListener(ex -> {
-                    Log.e("EntrantEventList", "Failed to load events", ex);
-                    if (ex instanceof FirebaseFunctionsException) {
-                        FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
-                        Log.e("EntrantEventList", "Functions code=" + fex.getCode() + " message=" + fex.getMessage());
-                    }
-                    if (isUserNotFound(ex)) {
-                        handleMissingUser();
-                        return;
-                    }
-                    Toast.makeText(requireContext(), "Failed to load events", Toast.LENGTH_LONG).show();
-                });
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(
+            eventModel.getEvents(
+                            userId,
+                            deviceId,
+                            50,
+                            null,
+                            EventViewModel.Fetch.IN,
+                            null,
+                            null,
+                            null,
+                            null)
+                    .addOnSuccessListener(this::bindEventList)
+                    .addOnFailureListener(ex -> {
+                        Log.e("EntrantEventList", "Failed to load events", ex);
+                        if (ex instanceof FirebaseFunctionsException) {
+                            FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
+                            Log.e("EntrantEventList", "Functions code=" + fex.getCode() + " message=" + fex.getMessage());
+                        }
+                        if (isUserNotFound(ex)) {
+                            handleMissingUser();
+                            return;
+                        }
+                        ToastManager.show(requireContext(), "Failed to load events", Toast.LENGTH_LONG);
+                    })
+        );
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        hasLoaded = false;
+        binding = null;
     }
 
     private void bindEventList(List<Event> events) {
@@ -141,7 +158,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
         }
         Log.d("EntrantEventList", "Loaded events count=" + events.size());
         if (events.isEmpty()) {
-            Toast.makeText(requireContext(), "No events found", Toast.LENGTH_LONG).show();
+            ToastManager.show(requireContext(), "Not enrolled in any event", Toast.LENGTH_LONG);
             adapter.setItems(new ArrayList<>());
             return;
         }
@@ -168,7 +185,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
-                    Object imageData = data.get("imageData");
+                    Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;
                     }

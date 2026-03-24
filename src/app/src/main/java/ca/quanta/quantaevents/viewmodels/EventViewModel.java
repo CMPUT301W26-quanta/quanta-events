@@ -79,7 +79,7 @@ public class EventViewModel extends ViewModel {
      * @param imageId UUID identifying the image for the event (optional).
      * @return UUID assigned to the newly created event.
      */
-    public Task<String> createEvent(UUID userId, UUID deviceId, String registrationStartTime,
+    public Task<UUID> createEvent(UUID userId, UUID deviceId, String registrationStartTime,
                                     String registrationEndTime, String eventTime,
                                     String eventName, String eventDescription,
                                     String eventCategory, String eventGuidelines,
@@ -107,11 +107,11 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("createEvent")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, String>() {
+                .continueWith(new Continuation<HttpsCallableResult, UUID>() {
                     @Override
-                    public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                    public UUID then(@NonNull Task<HttpsCallableResult> task) throws Exception {
                         Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
-                        return (String) result.get("eventId");
+                        return UUID.fromString((String) result.get("eventId"));
                     }
                 });
     }
@@ -139,7 +139,8 @@ public class EventViewModel extends ViewModel {
                     @Override
                     public Event then(@NonNull Task<HttpsCallableResult> task) throws Exception {
                         Map<String, Object> eventData = (Map<String, Object>) task.getResult().getData();
-                        return mapToEvent(eventId, eventData);
+
+                        return new Event(eventId, eventData);
                     }
                 });
     }
@@ -207,11 +208,12 @@ public class EventViewModel extends ViewModel {
                             return events;
                         }
                         for (Map<String, Object> item : result) {
-                            Event event = mapToEvent(item);
+                            Event event = new Event(item);
                             if (event != null) {
                                 events.add(event);
                             }
                         }
+                        System.out.println("EVENTS ARRAY" + events);
                         return events;
                     }
                 });
@@ -423,140 +425,5 @@ public class EventViewModel extends ViewModel {
                         return null;
                     }
                 });
-    }
-
-    /**
-     * Calls the constructor for an event and creates an event by mapping data to an event model.
-     * @param eventId UUID to identify event.
-     * @param data Map of Object identified using String(key) which holds the event data.
-     * @return Mapped Event object.
-     */
-    @SuppressWarnings("unchecked")
-    private static Event mapToEvent(UUID eventId, Map<String, Object> data) {
-        if (data == null) {
-            return null;
-        }
-        UUID organizerId = parseUUID(valueToString(data.get("organizer")));
-        UUID organizerDeviceId = parseUUID(valueToString(data.get("organizerDeviceId")));
-
-        ArrayList<UUID> waitList = parseUuidList(data.get("waitList"));
-        ArrayList<UUID> cancelledList = parseUuidList(data.get("cancelledList"));
-        ArrayList<UUID> finalList = parseUuidList(data.get("finalList"));
-        ArrayList<UUID> commentsList = parseUuidList(data.get("commentsList"));
-
-        ZonedDateTime start = parseZonedDateTime(valueToString(data.get("registrationStartTime")));
-        ZonedDateTime end = parseZonedDateTime(valueToString(data.get("registrationEndTime")));
-        ZonedDateTime eventTime = parseZonedDateTime(valueToString(data.get("eventTime")));
-
-        String eventName = valueToString(data.get("eventName"));
-        String eventDescription = valueToString(data.get("eventDescription"));
-        String location = valueToString(data.get("location"));
-        String eventCategory = valueToString(data.get("eventCategory"));
-        String eventGuidelines = valueToString(data.get("eventGuidelines"));
-        boolean geolocation = Boolean.TRUE.equals(data.get("geolocation"));
-        Integer eventCapacity = parseInteger(data.get("eventCapacity"));
-        Integer registrationLimit = parseInteger(data.get("registrationLimit"));
-        UUID imageId = parseUUID(valueToString(data.get("imageId")));
-
-        return new Event(eventId, organizerId, organizerDeviceId, waitList, cancelledList, finalList, commentsList,
-                start, end, eventTime, eventName, eventDescription, location,
-                eventCategory, eventGuidelines, geolocation, eventCapacity,
-                registrationLimit, imageId);
-    }
-
-    private static Event mapToEvent(Map<String, Object> data) {
-        if (data == null) {
-            return null;
-        }
-        UUID eventId = parseUUID(valueToString(data.get("eventId")));
-        if (eventId == null) {
-            return null;
-        }
-        return mapToEvent(eventId, data);
-    }
-
-    /**
-     * Converts a value to a string.
-     * @param value Object to convert to string.
-     * @return String representation of value if value is not null, null otherwise.
-     */
-    private static String valueToString(Object value) {
-        if (value == null) {
-            return null;
-        }
-        String result = value.toString().trim();
-        return result.isEmpty() ? null : result;
-    }
-
-    /**
-     * Converts a string representation of time to a ZonedDateTime object.
-     * @param value Time string to be converted.
-     * @return Converted ZonedDateTime if value is not null, null otherwise.
-     */
-    private static ZonedDateTime parseZonedDateTime(String value) {
-        if (value == null) {
-            return null;
-        }
-        try {
-            return ZonedDateTime.parse(value);
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-
-    /**
-     * Converts the value of an object to an integer.
-     * @param value Object value to be converted.
-     * @return Integer representation of value if value is not null, null otherwise.
-     */
-    private static Integer parseInteger(Object value) {
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof Number) {
-            return ((Number) value).intValue();
-        }
-        try {
-            return Integer.parseInt(value.toString());
-        } catch (NumberFormatException ex) {
-            return null;
-        }
-    }
-
-    /**
-     * Converts a list of objects to a list of UUIDs.
-     * @param value Object to be converted.
-     * @return List of converted UUIDs.
-     */
-    @SuppressWarnings("unchecked")
-    private static ArrayList<UUID> parseUuidList(Object value) {
-        ArrayList<UUID> result = new ArrayList<>();
-        if (!(value instanceof List)) {
-            return result;
-        }
-        for (Object item : (List<Object>) value) {
-            UUID id = parseUUID(valueToString(item));
-            if (id != null) {
-                result.add(id);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Converts a string to a UUID.
-     * @param value String to be converted.
-     * @return UUID converted from input string.
-     */
-
-    private static UUID parseUUID(String value) {
-        if (value == null || value.isEmpty()) {
-            return null;
-        }
-        try {
-            return UUID.fromString(value);
-        } catch (IllegalArgumentException ex) {
-            return null;
-        }
     }
 }
