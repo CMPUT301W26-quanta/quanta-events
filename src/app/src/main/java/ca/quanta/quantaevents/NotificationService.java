@@ -6,7 +6,6 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -40,7 +39,6 @@ public class NotificationService extends FirebaseMessagingService {
         String userId = prefs.getString(SessionStore.KEY_USER_ID, null);
         String deviceId = prefs.getString(SessionStore.KEY_DEVICE_ID, null);
         updateToken(token, userId, deviceId).addOnFailureListener(Throwable::printStackTrace);
-        Log.d("ZZZZZZZZZZZZZZZZZ", "onNewToken!!!!!!!!!!!!!!");
     }
 
     /**
@@ -50,15 +48,10 @@ public class NotificationService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
-<<<<<<< HEAD
         Map<String, String> data = message.getData();
         String title = data.get("title");
         String body = data.get("body");
         showNotification(title, body);
-=======
-        message.getData();
-        Log.d("ZZZZZZZZZZZZZZZZZ", "onReceiveToken!!!!!!!!!!!!!!");
->>>>>>> 89db0021373c957dfcbd7a2d02c10cd2fa7d81a8
     }
 
     /**
