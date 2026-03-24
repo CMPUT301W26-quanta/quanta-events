@@ -20,8 +20,6 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.security.ProviderInstaller;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.functions.FirebaseFunctions;  // Emulator import TEMP)
-import com.google.firebase.firestore.FirebaseFirestore;  // Emulator import (TEMP)
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Map;
@@ -73,12 +71,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         FirebaseApp.initializeApp(this);
-
-        // Emulator stuff (TEMPORARY)
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        firestore.useEmulator("10.0.2.2", 8090);
-        FirebaseFunctions functions = FirebaseFunctions.getInstance();
-        functions.useEmulator("10.0.2.2", 5001);
 
         FragmentInfoStore infoStore = new ViewModelProvider(this).get(FragmentInfoStore.class);
         SessionStore sessionStore = new ViewModelProvider(this).get(SessionStore.class);
