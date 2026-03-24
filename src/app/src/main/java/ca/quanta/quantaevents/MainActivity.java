@@ -1,11 +1,15 @@
 package ca.quanta.quantaevents;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -115,6 +119,8 @@ public class MainActivity extends AppCompatActivity {
         sessionStore.getRoleMask().observe(this, mask -> burgerState.setGroupFilter(mask == null ? 0 : mask));
 
         new Loader(this, binding.loadingFrame).inject();
+
+        requestNotificationPermission();
     }
 
     @SuppressWarnings("unchecked")
@@ -137,4 +143,16 @@ public class MainActivity extends AppCompatActivity {
         }
         return mask;
     }
+
+    /**
+     * Requests permissions to receive notifications from the app.
+     */
+    private void requestNotificationPermission() {
+        Boolean hasPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+        if (!hasPermission) {
+            String[] perm = {Manifest.permission.POST_NOTIFICATIONS};
+            ActivityCompat.requestPermissions(this, perm, 0);
+        }
+    }
+
 }

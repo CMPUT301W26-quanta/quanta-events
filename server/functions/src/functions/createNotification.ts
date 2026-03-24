@@ -84,7 +84,6 @@ export async function createNotification(request: CallableRequest) {
     }
   }
 
-  // NOTE: I do realize that this function could be more efficient. There is probably a way where I don't need to loop through each recipient.
   // Get the FCM tokens by querying the user objects in the recipient list
   const deviceTokens: string[] = [];
   const userDocuments = db.collection("users") as CollectionReference<UserDocument, UserDocument>;
@@ -103,22 +102,29 @@ export async function createNotification(request: CallableRequest) {
   console.log("Tokens here", {deviceTokens});
 
   // Send notification to the recipients
-  // From testing, nothing happens here, but no errors occur either
   for (const t of deviceTokens) {
     const finalNotification: Message = {
       token: t,
-      notification: {
-        title: "This is a title",
-        body: "This is a message"
+      data: {
+        title: String(data.title),
+        body: String(data.message),
       },
       android: {
-        priority: "high",
-        notification: {
-          channelId: "default_channel"
+        priority: "high"
+      },
+      apns: {
+        headers: {
+          "apns-priority": "5"
         }
       }
     };
-    await getMessaging().send(finalNotification);
+    await getMessaging().send(finalNotification)
+    .then((response: string) => {
+        logger.info("Message sent succesfully");
+      })
+      .catch((error: string) => {
+        console.log("Message failed to send", error);
+      });;
   };
 
   logger.info("Everything worked.", { notificationId });

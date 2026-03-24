@@ -23,7 +23,15 @@ import java.util.Map;
 
 import ca.quanta.quantaevents.stores.SessionStore;
 
+/**
+ * Service for handling firebase cloud messaging and app notifications.
+ */
 public class NotificationService extends FirebaseMessagingService {
+
+    /**
+     * Listener which activates on creation of a new messaging token.
+     * @param token The token used for sending messages to this application instance.
+     */
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
@@ -33,14 +41,25 @@ public class NotificationService extends FirebaseMessagingService {
         updateToken(token, userId, deviceId).addOnFailureListener(Throwable::printStackTrace);
     }
 
+    /**
+     * Listener which activates when a device receives a notification message.
+     * @param message Task object containing message data.
+     */
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
-        message.getData();
-        showNotification();
+        Map<String, String> data = message.getData();
+        String title = data.get("title");
+        String body = data.get("body");
+        showNotification(title, body);
     }
 
-    private void showNotification() {
+    /**
+     * Shows notifications in the device notification wall.
+     * @param title Title of the notification.
+     * @param body Message text of the notification.
+     */
+    private void showNotification(String title, String body) {
         String channelId = "default_channel";
         CharSequence name = "Default Channel";
         int importance = NotificationManager.IMPORTANCE_DEFAULT;
@@ -54,8 +73,8 @@ public class NotificationService extends FirebaseMessagingService {
 
         Notification notification = new NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle("Hello")
-                .setContentText("This is a notification")
+                .setContentTitle(title)
+                .setContentText(body)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
                 .build();
@@ -67,6 +86,13 @@ public class NotificationService extends FirebaseMessagingService {
         notificationManager.notify(1, notification);
     }
 
+    /**
+     *
+     * @param token Device's cloud messaging token.
+     * @param userId UUID identifying the user.
+     * @param deviceId UUID identifying the user's device.
+     * @return Boolean task object confirming successful execution.
+     */
     public static Task<Boolean> updateToken(@NonNull String token, String userId, String deviceId) {
         Map<String, Object> data = new HashMap<>();
 

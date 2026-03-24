@@ -12,13 +12,28 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * View-model for managing notification-related data and cloud functions.
+ */
 public class NotificationViewModel extends ViewModel {
 
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
-    public Task<String> createNotification(UUID userId, UUID deviceId, String message,
-                                    String title, String eventId, Boolean waited,
-                                           Boolean cancelled, Boolean selected) {
+    /**
+     * Calls the createNotification cloud function, creating and sending a notification.
+     * @param userId UUID identifying sender.
+     * @param deviceId UUID identifying sender's device.
+     * @param message Notification message.
+     * @param title Notification title.
+     * @param eventId UUID identifying the event associated with the notification.
+     * @param waited Boolean that's true when the user wishes to send to people on the event's waitlist.
+     * @param cancelled Boolean that's true when the user wishes to send to people on the event's canceled list.
+     * @param selected Boolean that's true when the user wishes to send to people on the event's selected list.
+     * @return UUID identifying the newly created notification.
+     */
+    public Task<UUID> createNotification(UUID userId, UUID deviceId, String message,
+                                         String title, String eventId, Boolean waited,
+                                         Boolean cancelled, Boolean selected) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -35,11 +50,11 @@ public class NotificationViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("createNotification")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, String>() {
+                .continueWith(new Continuation<HttpsCallableResult, UUID>() {
                     @Override
-                    public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                    public UUID then(@NonNull Task<HttpsCallableResult> task) throws Exception {
                         Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
-                        return (String) result.get("notificationId");
+                        return UUID.fromString((String) result.get("notificationId"));
                     }
                 });
     }
