@@ -1,11 +1,15 @@
 package ca.quanta.quantaevents;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -16,6 +20,7 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.security.ProviderInstaller;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Map;
 
@@ -57,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                  GooglePlayServicesNotAvailableException e) {
             throw new RuntimeException(e);
         }
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -105,11 +111,16 @@ public class MainActivity extends AppCompatActivity {
             userModel.getUser(userId, deviceId)
                     .addOnSuccessListener(data -> sessionStore.setRoleMask(extractRoleMask(data)))
                     .addOnFailureListener(_ex -> sessionStore.setRoleMask(0));
+            FirebaseMessaging.getInstance().getToken().addOnSuccessListener(
+                    token -> NotificationService.updateToken(token, userId.toString(), deviceId.toString()).addOnFailureListener(Throwable::printStackTrace)
+            );
         });
 
         sessionStore.getRoleMask().observe(this, mask -> burgerState.setGroupFilter(mask == null ? 0 : mask));
 
         new Loader(this, binding.loadingFrame).inject();
+
+        requestNotificationPermission();
     }
 
     @SuppressWarnings("unchecked")
@@ -132,4 +143,16 @@ public class MainActivity extends AppCompatActivity {
         }
         return mask;
     }
+
+    /**
+     * Requests permissions to receive notifications from the app.
+     */
+    private void requestNotificationPermission() {
+        Boolean hasPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+        if (!hasPermission) {
+            String[] perm = {Manifest.permission.POST_NOTIFICATIONS};
+            ActivityCompat.requestPermissions(this, perm, 0);
+        }
+    }
+
 }
