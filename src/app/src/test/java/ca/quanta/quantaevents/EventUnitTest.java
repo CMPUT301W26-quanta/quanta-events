@@ -44,9 +44,11 @@ public class EventUnitTest {
         ArrayList<UUID> waitingList = mockList();
         ArrayList<UUID> cancelledList = mockList();
         ArrayList<UUID> finalList = mockList();
+        ArrayList<UUID> commentsList = mockList();
+
 
         Event event = new Event(EVENT_ID, null, null,
-                waitingList, cancelledList, finalList,
+                waitingList, cancelledList, finalList, commentsList,
                 START, END,
                 EVENT_TIME, NAME, DESCRIPTION, LOCATION,
                 CATEGORY, GUIDELINES, true, CAPACITY,
@@ -59,6 +61,8 @@ public class EventUnitTest {
         assertEquals(waitingList, event.getWaitList());
         assertNotNull(event.getCancelledList());
         assertEquals(cancelledList, event.getCancelledList());
+        assertNotNull(event.getCommentsList());
+        assertEquals(commentsList, event.getCommentsList());
         assertNotNull(event.getFinalList());
         assertEquals(finalList, event.getFinalList());
         assertEquals(START, event.getRegistrationStartTime());
@@ -74,7 +78,7 @@ public class EventUnitTest {
         assertEquals(IMAGE_ID, event.getImageId());
 
         event = new Event(EVENT_ID, null, null,
-                null, null, null,
+                null, null, null, null,
                 START, END,
                 EVENT_TIME, NAME, DESCRIPTION, LOCATION,
                 CATEGORY, GUIDELINES, false, CAPACITY,
@@ -86,6 +90,8 @@ public class EventUnitTest {
         assertEquals(0, event.getCancelledList().size());
         assertNotNull(event.getFinalList());
         assertEquals(0, event.getFinalList().size());
+        assertNotNull(event.getFinalList());
+        assertEquals(0, event.getCommentsList().size());
         assertFalse(event.isGeolocationEnabled());
     }
 }
