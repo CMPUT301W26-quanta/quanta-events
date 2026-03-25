@@ -172,6 +172,7 @@ public class Event {
                  ArrayList<UUID> waitList,
                  ArrayList<UUID> cancelledList,
                  ArrayList<UUID> finalList,
+                 ArrayList<UUID> commentsList,
                  ZonedDateTime registrationStartTime,
                  ZonedDateTime registrationEndTime,
                  @Nullable ZonedDateTime eventTime,

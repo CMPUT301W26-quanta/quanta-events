@@ -53,6 +53,7 @@ public class EventUnitTest {
                 waitingList,
                 cancelledList,
                 finalList,
+                commentsList,
                 START,
                 END,
                 EVENT_TIME,
@@ -90,6 +91,7 @@ public class EventUnitTest {
 
         event = new Event(
                 EVENT_ID,
+                null,
                 null,
                 null,
                 null,
