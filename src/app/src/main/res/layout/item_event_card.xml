@@ -73,36 +73,14 @@
 
             </LinearLayout>
 
-            <!-- Time -->
-            <TextView
-                android:id="@+id/registration_start_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:drawableStart="@drawable/material_symbols_event_available"
-                app:drawableTint="@color/color_light_green"
-                android:text="Some Time"
-                android:textSize="16sp"
-                android:textColor="@color/text_color" />
-
-            <TextView
-                android:id="@+id/registration_end_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:drawableStart="@drawable/material_symbols_event_busy"
-                app:drawableTint="@color/color_light_red"
-                android:text="Some Time"
-                android:textSize="16sp"
-                android:textColor="@color/text_color" />
 
             <TextView
                 android:id="@+id/event_start_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:drawableStart="@drawable/ic_round_schedule"
-                app:drawableTint="@color/color_dark"
+                android:drawableStart="@drawable/material_symbols_event_outline"
+                app:drawableTint="@color/color_light_red"
                 android:text="Some Time"
                 android:textSize="16sp"
                 android:textColor="@color/text_color" />
@@ -114,7 +92,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:drawableStart="@drawable/material_symbols_location_rounded"
-                android:drawableTint="@color/color_dark_purple"
+                android:drawableTint="@color/color_dark_gray"
                 android:text="Some location"
                 android:textSize="16sp"
                 android:textColor="@color/text_color" />

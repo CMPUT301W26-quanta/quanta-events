@@ -148,6 +148,26 @@
 
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/border" />
+
+            <!-- Description -->
+            <TextView
+                android:id="@+id/textGuidelines"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="16dp"
+                android:drawableStart="@drawable/material_symbols_rule_rounded"
+                app:drawableTint="@color/color_dark_gray"
+                android:text=" Here are some guidelines for the event."
+                android:textSize="16sp"
+                android:textColor="@color/text_color" />
+
             <!-- Divider -->
             <View
                 android:layout_width="match_parent"

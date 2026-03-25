@@ -18,7 +18,7 @@ public class EventCardItem {
      * Constructor for an EventCardItem.
      * @param eventId the event id of event
      * @param title TItle of the event
-     * @param eventStartTime Registration start time
+     * @param eventStartTime Event start time
      * @param location Event location
      * @param image Bitmap of the event image/poster if any uploaded
      */
