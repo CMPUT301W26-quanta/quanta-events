@@ -4,7 +4,7 @@ import * as z from "zod";
 
 export function parseInterface<Z extends z.ZodObject>(
   zodInterface: Z,
-  source: CallableRequest
+  source: CallableRequest,
 ): z.output<Z> {
   const result = zodInterface.safeParse(source.data);
 

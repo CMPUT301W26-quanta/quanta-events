@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -29,12 +28,10 @@ import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
-import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.ImageCardViewHolder> {
     private final ArrayList<Event> events;
 
-    private UserViewModel userModel;
     private EventViewModel eventModel;
     private ImageViewModel imageModel;
 
@@ -47,7 +44,6 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
     public ImageCardAdapter(List<Event> events, Fragment parentFragment) {
         this.parentFragment = parentFragment;
 
-        this.userModel = new ViewModelProvider(this.parentFragment.getActivity()).get(UserViewModel.class);
         this.eventModel = new ViewModelProvider(this.parentFragment.getActivity()).get(EventViewModel.class);
         this.imageModel = new ViewModelProvider(this.parentFragment.getActivity()).get(ImageViewModel.class);
         this.events = new ArrayList<Event>();
