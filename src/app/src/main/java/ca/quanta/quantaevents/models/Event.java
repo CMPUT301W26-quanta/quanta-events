@@ -21,6 +21,8 @@ public class Event {
     private ArrayList<UUID> cancelledList;
     private ArrayList<UUID> finalList;
 
+    private ArrayList<UUID> commentsList;
+
     private ZonedDateTime registrationStartTime;
     private ZonedDateTime registrationEndTime;
     @Nullable
@@ -87,6 +89,7 @@ public class Event {
         this.waitList = new ArrayList<>();
         this.cancelledList = new ArrayList<>();
         this.finalList = new ArrayList<>();
+        this.commentsList = new ArrayList<>();
         this.registrationStartTime = registrationStartTime;
         this.registrationEndTime = registrationEndTime;
         this.eventTime = null;
@@ -116,6 +119,7 @@ public class Event {
         this.waitList = new ArrayList<>();
         this.cancelledList = new ArrayList<>();
         this.finalList = new ArrayList<>();
+        this.commentsList = new ArrayList<>();
         this.registrationStartTime = registrationStartTime;
         this.registrationEndTime = registrationEndTime;
         this.eventTime = null;
@@ -145,6 +149,7 @@ public class Event {
         this.waitList = new ArrayList<>();
         this.cancelledList = new ArrayList<>();
         this.finalList = new ArrayList<>();
+        this.commentsList = new ArrayList<>();
         this.registrationStartTime = registrationStartTime;
         this.registrationEndTime = registrationEndTime;
         this.eventTime = null;
@@ -185,6 +190,7 @@ public class Event {
         this.waitList = waitList == null ? new ArrayList<>() : waitList;
         this.cancelledList = cancelledList == null ? new ArrayList<>() : cancelledList;
         this.finalList = finalList == null ? new ArrayList<>() : finalList;
+        this.commentsList = commentsList == null ? new ArrayList<>() : commentsList;
         this.registrationStartTime = registrationStartTime;
         this.registrationEndTime = registrationEndTime;
         this.eventTime = eventTime;
@@ -258,6 +264,10 @@ public class Event {
 
     public ArrayList<UUID> getFinalList() {
         return finalList;
+    }
+
+    public ArrayList<UUID> getCommentsList(){
+        return commentsList;
     }
 
     public ZonedDateTime getRegistrationStartTime() {
