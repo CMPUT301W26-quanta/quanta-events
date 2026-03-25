@@ -17,9 +17,6 @@ public class Event {
     @Nullable
     private final UUID organizerId;
 
-    @Nullable
-    private final UUID organizerDeviceId;
-
     private ArrayList<UUID> waitList;
     private ArrayList<UUID> cancelledList;
     private ArrayList<UUID> finalList;
@@ -58,7 +55,6 @@ public class Event {
                  UUID imageId) {
         this.eventId = UUID.randomUUID();
         this.organizerId = null;
-        this.organizerDeviceId = null;
         this.waitList = new ArrayList<>();
         this.cancelledList = new ArrayList<>();
         this.finalList = new ArrayList<>();
@@ -88,7 +84,6 @@ public class Event {
                  String eventName, String eventDescription, Float price, Integer registrationLimit) {
         this.eventId = UUID.randomUUID();
         this.organizerId = null;
-        this.organizerDeviceId = null;
         this.waitList = new ArrayList<>();
         this.cancelledList = new ArrayList<>();
         this.finalList = new ArrayList<>();
@@ -118,7 +113,6 @@ public class Event {
                  String eventName, String eventDescription, Float price, UUID imageId) {
         this.eventId = UUID.randomUUID();
         this.organizerId = null;
-        this.organizerDeviceId = null;
         this.waitList = new ArrayList<>();
         this.cancelledList = new ArrayList<>();
         this.finalList = new ArrayList<>();
@@ -148,7 +142,6 @@ public class Event {
                  String eventName, String eventDescription, Float price) {
         this.eventId = UUID.randomUUID();
         this.organizerId = null;
-        this.organizerDeviceId = null;
         this.waitList = new ArrayList<>();
         this.cancelledList = new ArrayList<>();
         this.finalList = new ArrayList<>();
@@ -169,16 +162,26 @@ public class Event {
     /**
      * Constructor for an Event object when loading from storage.
      */
-    public Event(UUID eventId, @Nullable UUID organizerId, @Nullable UUID organizerDeviceId,
-                 ArrayList<UUID> waitList, ArrayList<UUID> cancelledList, ArrayList<UUID> finalList,
-                 ZonedDateTime registrationStartTime, ZonedDateTime registrationEndTime,
-                 @Nullable ZonedDateTime eventTime, String eventName, String eventDescription,
-                 String location, @Nullable String eventCategory, @Nullable String eventGuidelines,
-                 boolean geolocation, @Nullable Integer eventCapacity,
-                 @Nullable Integer registrationLimit, @Nullable UUID imageId) {
+    public Event(UUID eventId,
+                 @Nullable UUID organizerId,
+                 ArrayList<UUID> waitList,
+                 ArrayList<UUID> cancelledList,
+                 ArrayList<UUID> finalList,
+                 ZonedDateTime registrationStartTime,
+                 ZonedDateTime registrationEndTime,
+                 @Nullable ZonedDateTime eventTime,
+                 String eventName,
+                 String eventDescription,
+                 String location,
+                 @Nullable String eventCategory,
+                 @Nullable String eventGuidelines,
+                 boolean geolocation,
+                 @Nullable Integer eventCapacity,
+                 @Nullable Integer registrationLimit,
+                 @Nullable UUID imageId
+    ) {
         this.eventId = eventId;
         this.organizerId = organizerId;
-        this.organizerDeviceId = organizerDeviceId;
         this.waitList = waitList == null ? new ArrayList<>() : waitList;
         this.cancelledList = cancelledList == null ? new ArrayList<>() : cancelledList;
         this.finalList = finalList == null ? new ArrayList<>() : finalList;
@@ -199,7 +202,6 @@ public class Event {
     public Event(UUID eventId, Map<String, Object> data){
         this.eventId = eventId;
         this.organizerId = data.get("organizer") == null ? null : UUID.fromString((String) data.get("organizer"));
-        this.organizerDeviceId = data.get("organizerDeviceId") == null ? null : UUID.fromString(data.get("organizerDeviceId").toString());
         this.waitList = data.get("waitList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("waitList");
         this.cancelledList = data.get("cancelledList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("cancelledList");
         this.finalList = data.get("finalList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("finalList");
@@ -220,7 +222,6 @@ public class Event {
     public Event(Map<String, Object> data) {
         this.eventId = UUID.fromString((String) data.get("eventId"));
         this.organizerId = data.get("organizer") == null ? null : UUID.fromString((String) data.get("organizer"));
-        this.organizerDeviceId = data.get("organizerDeviceId") == null ? null : UUID.fromString(data.get("organizerDeviceId").toString());
         this.waitList = data.get("waitList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("waitList");
         this.cancelledList = data.get("cancelledList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("cancelledList");
         this.finalList = data.get("finalList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("finalList");
@@ -245,11 +246,6 @@ public class Event {
     @Nullable
     public UUID getOrganizerId() {
         return organizerId;
-    }
-
-    @Nullable
-    public UUID getOrganizerDeviceId() {
-        return organizerDeviceId;
     }
 
     public ArrayList<UUID> getWaitList() {
