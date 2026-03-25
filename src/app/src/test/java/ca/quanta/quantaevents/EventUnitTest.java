@@ -54,7 +54,6 @@ public class EventUnitTest {
 
         assertEquals(EVENT_ID, event.getEventId());
         assertNull(event.getOrganizerId());
-        assertNull(event.getOrganizerDeviceId());
         assertNotNull(event.getWaitList());
         assertEquals(waitingList, event.getWaitList());
         assertNotNull(event.getCancelledList());
