@@ -209,6 +209,7 @@ public class Event {
         this.waitList = data.get("waitList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("waitList");
         this.cancelledList = data.get("cancelledList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("cancelledList");
         this.finalList = data.get("finalList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("finalList");
+        this.commentsList = data.get("commentsList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("commentsList");
         this.registrationStartTime = ZonedDateTime.parse(data.get("registrationStartTime").toString());
         this.registrationEndTime = ZonedDateTime.parse(data.get("registrationEndTime").toString());
         this.eventTime = data.get("eventTime") == null ? null : ZonedDateTime.parse(data.get("eventTime").toString());
@@ -230,6 +231,7 @@ public class Event {
         this.waitList = data.get("waitList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("waitList");
         this.cancelledList = data.get("cancelledList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("cancelledList");
         this.finalList = data.get("finalList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("finalList");
+        this.commentsList = data.get("commentsList") == null ? new ArrayList<>() : (ArrayList<UUID>) data.get("commentsList");
         this.registrationStartTime = ZonedDateTime.parse(data.get("registrationStartTime").toString());
         this.registrationEndTime = ZonedDateTime.parse(data.get("registrationEndTime").toString());
         this.eventTime = data.get("eventTime") == null ? null : ZonedDateTime.parse(data.get("eventTime").toString());
