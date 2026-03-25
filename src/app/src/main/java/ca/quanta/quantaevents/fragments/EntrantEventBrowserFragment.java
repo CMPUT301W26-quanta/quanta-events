@@ -49,6 +49,10 @@ public class EntrantEventBrowserFragment extends Fragment {
     private UUID deviceId;
     private boolean loadedInitialEvents = false;
     private boolean hasLoaded = false;
+    private String filterFrom = null;
+    private String filterTo = null;
+    private String filterCategory = null;
+
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
@@ -97,9 +101,44 @@ public class EntrantEventBrowserFragment extends Fragment {
             deviceId = did;
             if (!hasLoaded) {
                 hasLoaded = true;
+
+                Object savedFilters = Navigation.findNavController(requireView())
+                        .getCurrentBackStackEntry()
+                        .getSavedStateHandle()
+                        .get("filters");
+                if (savedFilters != null) {
+                    Bundle filters = (Bundle) savedFilters;
+                    filterFrom = filters.getString("from");
+                    filterTo = filters.getString("to");
+                    filterCategory = filters.getString("category");
+
+                    Navigation.findNavController(requireView())
+                            .getCurrentBackStackEntry()
+                            .getSavedStateHandle()
+                            .remove("filters");
+                }
+
                 maybeLoadAllEvents();
             }
         });
+        Navigation.findNavController(requireView())
+                .getCurrentBackStackEntry()
+                .getSavedStateHandle()
+                .getLiveData("filters")
+                .observe(getViewLifecycleOwner(), result -> {
+                    if (result == null) return;
+                    Bundle filters = (Bundle) result;
+                    filterFrom = filters.getString("from");
+                    filterTo = filters.getString("to");
+                    filterCategory = filters.getString("category");
+
+                    Navigation.findNavController(requireView())
+                            .getCurrentBackStackEntry()
+                            .getSavedStateHandle()
+                            .remove("filters");
+
+                    loadAvailableEvents();
+                });
 
     }
 
@@ -116,6 +155,7 @@ public class EntrantEventBrowserFragment extends Fragment {
         super.onDestroyView();
         ToastManager.cancel();
         hasLoaded = false;
+        loadedInitialEvents = false;
         binding = null;
     }
 
@@ -148,9 +188,9 @@ public class EntrantEventBrowserFragment extends Fragment {
                             50,
                             null,
                             EventViewModel.Fetch.AVAILABLE,
-                            null,
-                            null,
-                            null,
+                            filterFrom,
+                            filterTo,
+                            filterCategory,
                             EventViewModel.SortBy.REGISTRATION_START)
                     .addOnSuccessListener(events -> {
                         if (!isAdded()) {
@@ -186,9 +226,10 @@ public class EntrantEventBrowserFragment extends Fragment {
             Log.d("EntrantEventBrowser", "Event list is null");
             return;
         }
+        ToastManager.cancel();
         Log.d("EntrantEventBrowser", "Loaded events count=" + events.size());
         if (events.isEmpty()) {
-            ToastManager.show(requireContext(), "No events created!", Toast.LENGTH_LONG);
+            ToastManager.show(requireContext(), "No events to enroll in", Toast.LENGTH_LONG);
             adapter.setItems(new ArrayList<>());
             return;
         }
@@ -199,7 +240,7 @@ public class EntrantEventBrowserFragment extends Fragment {
             }
             UUID eventId = event.getEventId();
             String title = stringValue(event.getEventName(), "Event");
-            String time = formatLocalTime(event.getRegistrationStartTime());
+            String time = formatLocalTime(event.getEventTime());
             String location = stringValue(event.getLocation(), "TBD");
             items.add(new EventCardItem(eventId, title, time, location, null));
         }
