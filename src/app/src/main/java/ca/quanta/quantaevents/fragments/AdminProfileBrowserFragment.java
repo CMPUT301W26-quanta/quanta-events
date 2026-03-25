@@ -23,7 +23,7 @@ import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.ProfileAdapter;
 import ca.quanta.quantaevents.databinding.FragmentAdminProfileBrowserBinding;
 import ca.quanta.quantaevents.loading.LoaderState;
-import ca.quanta.quantaevents.models.User;
+import ca.quanta.quantaevents.models.ExternalUser;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.utils.ToastManager;
@@ -42,13 +42,13 @@ public class AdminProfileBrowserFragment extends Fragment {
     private void listProfiles() {
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(
-            this.userModel.getAllUsers()
+            this.userModel.getAllUsers(this.userId, this.deviceId)
                     .addOnSuccessListener(users -> {
                         // filter out admins
 
-                        ArrayList<User> nonAdminProfiles = new ArrayList<User>();
+                        ArrayList<ExternalUser> nonAdminProfiles = new ArrayList<ExternalUser>();
 
-                        for (User user : users) {
+                        for (ExternalUser user : users) {
                             if (!user.isAdmin()) {
                                 nonAdminProfiles.add(user);
                             }

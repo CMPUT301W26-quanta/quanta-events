@@ -47,16 +47,28 @@ public class EventUnitTest {
         ArrayList<UUID> commentsList = mockList();
 
 
-        Event event = new Event(EVENT_ID, null, null,
-                waitingList, cancelledList, finalList, commentsList,
-                START, END,
-                EVENT_TIME, NAME, DESCRIPTION, LOCATION,
-                CATEGORY, GUIDELINES, true, CAPACITY,
-                REG_LIMIT, IMAGE_ID);
+        Event event = new Event(
+                EVENT_ID,
+                null,
+                waitingList,
+                cancelledList,
+                finalList,
+                commentsList,
+                START,
+                END,
+                EVENT_TIME,
+                NAME,
+                DESCRIPTION,
+                LOCATION,
+                CATEGORY,
+                GUIDELINES,
+                true,
+                CAPACITY,
+                REG_LIMIT,
+                IMAGE_ID);
 
         assertEquals(EVENT_ID, event.getEventId());
         assertNull(event.getOrganizerId());
-        assertNull(event.getOrganizerDeviceId());
         assertNotNull(event.getWaitList());
         assertEquals(waitingList, event.getWaitList());
         assertNotNull(event.getCancelledList());
@@ -77,12 +89,26 @@ public class EventUnitTest {
         assertEquals(REG_LIMIT, event.getRegistrationLimit());
         assertEquals(IMAGE_ID, event.getImageId());
 
-        event = new Event(EVENT_ID, null, null,
-                null, null, null, null,
-                START, END,
-                EVENT_TIME, NAME, DESCRIPTION, LOCATION,
-                CATEGORY, GUIDELINES, false, CAPACITY,
-                REG_LIMIT, IMAGE_ID);
+        event = new Event(
+                EVENT_ID,
+                null,
+                null,
+                null,
+                null,
+                null,
+                START,
+                END,
+                EVENT_TIME,
+                NAME,
+                DESCRIPTION,
+                LOCATION,
+                CATEGORY,
+                GUIDELINES,
+                false,
+                CAPACITY,
+                REG_LIMIT,
+                IMAGE_ID
+        );
 
         assertNotNull(event.getWaitList());
         assertEquals(0, event.getWaitList().size());
