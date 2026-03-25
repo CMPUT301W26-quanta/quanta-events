@@ -11,8 +11,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,12 +21,12 @@ import java.util.List;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
-import ca.quanta.quantaevents.models.User;
+import ca.quanta.quantaevents.models.ExternalUser;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileViewHolder> {
-    private final List<User> profiles;
+    private final List<ExternalUser> profiles;
 
     private UserViewModel model;
 
@@ -39,7 +37,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     private UUID userId;
     private UUID deviceId;
 
-    public ProfileAdapter(List<User> profiles, Fragment parentFragment) {
+    public ProfileAdapter(List<ExternalUser> profiles, Fragment parentFragment) {
         this.parentFragment = parentFragment;
 
         this.model = new ViewModelProvider(this.parentFragment.getActivity()).get(UserViewModel.class);
@@ -60,7 +58,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
 
     @Override
     public int getItemCount() {
-        return profiles.size();
+        return this.profiles.size();
     }
 
     @Override
@@ -74,7 +72,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
 
     @Override
     public void onBindViewHolder(@NonNull ProfileViewHolder holder, int position) {
-        User user = profiles.get(position);
+        ExternalUser user = this.profiles.get(position);
 
         String name = user.getName();
         holder.name.setText(name != null ? name : "[null username]");
