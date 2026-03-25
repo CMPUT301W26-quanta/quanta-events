@@ -3,7 +3,7 @@ import { logger } from "firebase-functions";
 import { CallableRequest } from "firebase-functions/https";
 import z from "zod";
 import * as util from "../util";
-import { ExternalUser } from "./schema";
+import { ExternalUser } from "../schema";
 
 const getAllUsersInterface = util.standardForm(z.object({}));
 
