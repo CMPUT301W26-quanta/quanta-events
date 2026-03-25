@@ -44,7 +44,7 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         EventCardItem item = items.get(position);
         holder.title.setText(item.getTitle());
-        holder.eventStartTime.setText(item.getEventStartTime());
+        holder.eventStartTime.setText(item.getRegistrationStartTime());
         holder.location.setText(item.getLocation());
 
         // set the event card's background colour

@@ -79,8 +79,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:drawableStart="@drawable/material_symbols_event_outline"
-                app:drawableTint="@color/color_light_red"
+                android:drawableStart="@drawable/material_symbols_event_available"
+                app:drawableTint="@color/color_light_green"
                 android:text="Some Time"
                 android:textSize="16sp"
                 android:textColor="@color/text_color" />
