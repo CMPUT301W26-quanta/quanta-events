@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
@@ -26,6 +25,10 @@ import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileViewHolder> {
+    public interface OnNotificationsButtonClickedListener {
+        void onNotificationsButtonClicked(UUID profileID);
+    }
+
     private final List<ExternalUser> profiles;
 
     private UserViewModel model;
@@ -36,12 +39,15 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
 
     private UUID userId;
     private UUID deviceId;
+    private final OnNotificationsButtonClickedListener onNotificationsButtonClickedListener;
 
-    public ProfileAdapter(List<ExternalUser> profiles, Fragment parentFragment) {
+    public ProfileAdapter(List<ExternalUser> profiles, Fragment parentFragment, OnNotificationsButtonClickedListener onNotificationsButtonClickedListener) {
         this.parentFragment = parentFragment;
 
         this.model = new ViewModelProvider(this.parentFragment.getActivity()).get(UserViewModel.class);
         this.profiles = profiles;
+
+        this.onNotificationsButtonClickedListener = onNotificationsButtonClickedListener;
 
         // **** set up the session store
 
@@ -117,7 +123,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
             // add a click listener to the notification button
 
             holder.buttonIconNotifications.setOnClickListener(view -> {
-                Navigation.findNavController(view).navigate(R.id.action_adminprofilebrowserFragment_to_adminNotificationHistoryFragment);
+                this.onNotificationsButtonClickedListener.onNotificationsButtonClicked(user.getUserId());
             });
         }
     }

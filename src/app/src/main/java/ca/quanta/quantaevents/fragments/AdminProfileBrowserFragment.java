@@ -56,7 +56,9 @@ public class AdminProfileBrowserFragment extends Fragment {
 
                         // use the adapter to display them
 
-                        ProfileAdapter profilesAdapter = new ProfileAdapter(nonAdminProfiles, this);
+                        ProfileAdapter profilesAdapter = new ProfileAdapter(nonAdminProfiles, this, () -> {
+                            
+                        });
 
                         binding.profilesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
                         binding.profilesRecyclerView.setAdapter(profilesAdapter);
