@@ -44,8 +44,13 @@ declare global {
     eventTime: Timestamp;
     eventName: string;
     eventDescription: string;
+    eventGuidelines: string;
     location: string;
+    eventCategory: string;
+    geolocation: boolean;
+    eventCapacity: number;
     registrationLimit: number | null;
     imageId: string | null;
+    drawn: undefined | boolean;
   }
 }

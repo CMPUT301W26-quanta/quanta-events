@@ -15,9 +15,9 @@ const createEventInterface = util.standardForm(
     eventCategory: z.string().nullable(),
     eventGuidelines: z.string().nullable(),
     geolocation: z.boolean(),
-    eventCapacity: z.int(),
+    eventCapacity: z.int().positive(),
     location: z.string(),
-    registrationLimit: z.number().int().nullable(),
+    registrationLimit: z.int().positive().nullable(),
     imageId: z.uuid().nullable(),
   })
 );
@@ -58,7 +58,6 @@ export async function createEvent(request: CallableRequest) {
       .create({
         eventId,
         organizer: userId,
-        organizerDeviceId: deviceId,
         waitList: [],
         cancelledList: [],
         finalList: [],
