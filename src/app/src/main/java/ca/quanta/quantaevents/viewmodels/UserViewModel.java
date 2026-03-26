@@ -26,6 +26,10 @@ public class UserViewModel extends ViewModel {
 
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
+    public UserViewModel() {
+        functions.useEmulator("10.0.0.2", 5001);
+    }
+
     /**
      * Calls the createUser cloud function, creating and adding a user to the database.
      * @param name             Name of the user.

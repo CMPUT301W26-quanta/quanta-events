@@ -27,6 +27,10 @@ public class EventViewModel extends ViewModel {
     // Initialize an instance of cloud functions
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
+    public EventViewModel() {
+        functions.useEmulator("10.0.0.2", 5001);
+    }
+
     public enum Fetch {
         ALL("all"),
         CREATED("created"),
