@@ -94,6 +94,7 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
     @Override
     public void onBindViewHolder(@NonNull ImageCardViewHolder holder, int position) {
         Event event = this.events.get(position);
+        UUID imageId = event.getImageId();
 
         if (this.userId == null || this.deviceId == null) {
             Log.e("ImageCardAdapter", "Failed to bind image; userId or deviceId is NULL.");
@@ -101,7 +102,7 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
             return;
         }
 
-        this.imageModel.getImage(event.getImageId(), this.userId, this.deviceId)
+        this.imageModel.getImage(imageId, this.userId, this.deviceId)
                 .addOnSuccessListener(image -> {
                     Object imageData = image.getImageData();
 
@@ -131,8 +132,8 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
         holder.buttonRemove.setOnClickListener(view -> {
             int eventPosition = holder.getBindingAdapterPosition();
 
-            this.imageModel.deleteImage(event.getImageId(), this.userId, this.deviceId)
-                    .addOnSuccessListener(nil -> {
+            this.imageModel.deleteImage(imageId, this.userId, this.deviceId)
+                    .addOnSuccessListener(success -> {
                         this.events.remove(eventPosition);
                         this.notifyItemRemoved(eventPosition);
                     })

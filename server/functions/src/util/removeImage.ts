@@ -1,6 +1,5 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
-import { EventDocument } from "../schema";
 
 /**
  * Removes the image from the database.
@@ -14,19 +13,9 @@ export async function removeImage(imageId: string) {
 	const targetDoc = await db.collection("images").doc(imageId).get();
 	if (!targetDoc.exists) return;
 
-	const eventsSnapshot = await db.collection("events").get();
+	const eventsSnapshot = await db.collection("events").where("imageId", "==", imageId).get();
+	await Promise.all(eventsSnapshot.docs.map((eventDoc) => eventDoc.ref.update({ imageId: null })));
 
-	const eventUpdates = eventsSnapshot.docs.map(async (eventDoc) => {
-		const event = eventDoc.data() as EventDocument;
-
-		if (event.imageId === imageId) {
-			eventDoc.ref.update({ imageId: null });
-		}
-
-		return;
-	});
-
-	await Promise.all(eventUpdates);
 	await db.collection("images").doc(imageId).delete();
 
 	logger.info("Deleted image and all references", { imageId });

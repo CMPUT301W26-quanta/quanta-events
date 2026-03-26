@@ -27,7 +27,7 @@ public class UserViewModel extends ViewModel {
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
     public UserViewModel() {
-        functions.useEmulator("10.0.0.2", 5001);
+        functions.useEmulator("10.0.2.2", 5001);
     }
 
     /**

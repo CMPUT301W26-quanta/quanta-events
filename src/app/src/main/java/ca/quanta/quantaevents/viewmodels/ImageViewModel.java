@@ -23,7 +23,7 @@ public class ImageViewModel extends ViewModel {
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
     public ImageViewModel() {
-        functions.useEmulator("10.0.0.2", 5001);
+        functions.useEmulator("10.0.2.2", 5001);
     }
 
     /**
@@ -96,7 +96,7 @@ public class ImageViewModel extends ViewModel {
         data.put("deviceId", deviceId.toString());
 
         Map<String, Object> payload = new HashMap<>();
-        payload.put("imageId", imageId.toString());
+        payload.put("target", imageId.toString());
         data.put("data", payload);
 
         return functions

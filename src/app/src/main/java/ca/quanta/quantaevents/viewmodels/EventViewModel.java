@@ -28,7 +28,7 @@ public class EventViewModel extends ViewModel {
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
     public EventViewModel() {
-        functions.useEmulator("10.0.0.2", 5001);
+        functions.useEmulator("10.0.2.2", 5001);
     }
 
     public enum Fetch {
