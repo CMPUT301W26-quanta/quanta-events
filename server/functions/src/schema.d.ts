@@ -39,6 +39,8 @@ declare global {
 		eventId: string;
 		organizer: string;
 		waitList: string[];
+		selectedList: string[];
+		rejectedList: string[];
 		cancelledList: string[];
 		finalList: string[];
 		registrationStartTime: Timestamp;
@@ -46,14 +48,14 @@ declare global {
 		eventTime: Timestamp;
 		eventName: string;
 		eventDescription: string;
-		eventGuidelines: string;
+		eventGuidelines: string | null;
 		location: string;
-		eventCategory: string;
+		eventCategory: string | null;
 		geolocation: boolean;
 		eventCapacity: number;
 		registrationLimit: number | null;
 		imageId: string | null;
-		drawn: undefined | boolean;
+		drawn?: boolean;
 	}
 
 	interface ExternalUser {

@@ -5,3 +5,4 @@ export * from "./util/standardForm";
 export * from "./util/timestamps";
 export * from "./util/userDocToExternalUser";
 export * from "./util/verifyUser";
+export * from "./util/enforce";

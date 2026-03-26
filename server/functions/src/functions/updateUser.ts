@@ -5,36 +5,56 @@ import * as util from "../util";
 import { getFirestore } from "firebase-admin/firestore";
 
 const updateUserInterface = z.object({
-  userId: z.uuid(),
-  deviceId: z.uuid(),
-  data: z.object({
-    name: z.string().nullable(),
-    email: z.email().nullable(),
-    phone: z.string().nullable(),
-    receiveNotifications: z.boolean().nullable(),
-  }),
+	userId: z.uuid(),
+	deviceId: z.uuid(),
+	data: z.object({
+		name: z.string().nullable(),
+		email: z.email().nullable(),
+		phone: z.string().nullable(),
+		receiveNotifications: z.boolean().nullable(),
+	}),
 });
 
 export async function updateUser(request: CallableRequest) {
-  const { userId, deviceId, data } = util.parseInterface(updateUserInterface, request);
+	const { userId, deviceId, data } = util.parseInterface(
+		updateUserInterface,
+		request
+	);
 
-  const { name, email, phone, receiveNotifications } = data;
+	const { name, email, phone, receiveNotifications } = data;
 
-  await util.verifyUser(userId, deviceId);
+	await util.verifyUser(userId, deviceId);
 
-  const db = getFirestore();
+	const db = getFirestore();
 
-  const updates: Record<string, any> = {
-    ...(name !== null && { name }),
-    ...(email !== null && { email }),
-    ...(phone !== null && { phone }),
-    ...(receiveNotifications !== null && {
-    "entrant.receiveNotifications": receiveNotifications,
-    }),
-  };
+	const updates: {
+		name?: string;
+		email?: string;
+		phone?: string;
+		"entrant.receiveNotifications"?: boolean;
+	} = {};
 
-  await db.collection("users").doc(userId).update(updates);
+	if (name !== null) {
+		updates.name = name;
+	}
 
-  logger.info("Updated user", { userId });
-  return { };
+	if (email !== null) {
+		updates.email = email;
+	}
+
+	if (phone !== null) {
+		updates.phone = phone;
+	}
+
+	if (receiveNotifications !== null) {
+		updates["entrant.receiveNotifications"] = receiveNotifications;
+	}
+
+	await db
+		.collection("users")
+		.doc(userId)
+		.update(util.enforcePartial<UserDocument>(updates));
+
+	logger.info("Updated user", { userId });
+	return {};
 }
