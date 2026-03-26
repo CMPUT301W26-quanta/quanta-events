@@ -22,10 +22,6 @@ import ca.quanta.quantaevents.models.Notification;
 public class NotificationViewModel extends ViewModel {
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
-    public NotificationViewModel() {
-        functions.useEmulator("10.0.2.2", 5001);
-    }
-
     /**
      * Calls the createNotification cloud function, creating and sending a notification.
      * @param userId UUID identifying sender.
@@ -72,7 +68,7 @@ public class NotificationViewModel extends ViewModel {
         data.put("deviceId", deviceId.toString());
 
         Map<String, Object> payload = new HashMap<>();
-        payload.put("sentById", sentById);
+        payload.put("sentById", sentById.toString());
         data.put("data", payload);
 
         return functions

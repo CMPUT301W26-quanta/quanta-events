@@ -63,7 +63,7 @@ public class AdminNotificationHistoryFragment extends Fragment {
             this.deviceId = deviceId;
 
             // set up the notifications recycler view once the userId and deviceId are ready
-            listNotifications(UUID.fromString(args.getProfileId()));
+            listNotifications(args.getProfileId());
         });
 
         // **** set up the back buttons on click listener
@@ -98,6 +98,12 @@ public class AdminNotificationHistoryFragment extends Fragment {
 
         binding.notificationsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.notificationsRecyclerView.setAdapter(notificationAdapter);
+
+        // **** display toast in case there are none
+
+        if (notifications.isEmpty()) {
+            ToastManager.show(requireContext(), "No notifications to display.", Toast.LENGTH_LONG);
+        }
     }
 
     @Override
