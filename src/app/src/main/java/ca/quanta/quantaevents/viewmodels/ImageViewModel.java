@@ -8,12 +8,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.models.Image;
-import ca.quanta.quantaevents.models.User;
 
 /**
  * View-model for managing image-related data and cloud functions.
@@ -50,6 +51,39 @@ public class ImageViewModel extends ViewModel {
                     public UUID then(@NonNull Task<HttpsCallableResult> task) throws Exception {
                         Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
                         return UUID.fromString((String) result.get("imageId"));
+                    }
+                });
+    }
+
+    /**
+     * Calls the getAllImages cloud function, getting all image IDs stored in the database.
+     * @param userId This user's id (for permissions checking).
+     * @param deviceId This user's device id (for permissions checking).
+     * @return List of image UUIDs.
+     */
+    public Task<ArrayList<UUID>> getAllImages(UUID userId, UUID deviceId) {
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("getAllImages")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, ArrayList<UUID>>() {
+                    @Override
+                    public ArrayList<UUID> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                        List<String> imageIDs = (List<String>) task.getResult().getData();
+                        ArrayList<UUID> imageUUIDs = new ArrayList<>();
+
+                        for (String imageID : imageIDs) {
+                            imageUUIDs.add(UUID.fromString(imageID));
+                        }
+
+                        return imageUUIDs;
                     }
                 });
     }

@@ -8,22 +8,22 @@ import * as util from "../util";
 const getAllUsersInterface = util.standardForm(z.object({}));
 
 export async function getAllUsers(
-  request: CallableRequest,
+	request: CallableRequest,
 ): Promise<ExternalUser[]> {
-  const { userId, deviceId } = util.parseInterface(
-    getAllUsersInterface,
-    request,
-  );
+	const { userId, deviceId } = util.parseInterface(
+		getAllUsersInterface,
+		request,
+	);
 
-  const userData = await util.verifyUser(userId, deviceId);
-  await util.requireRole(userData, "admin");
+	const userData = await util.verifyUser(userId, deviceId);
+	await util.requireRole(userData, "admin");
 
-  const db = getFirestore();
+	const db = getFirestore();
 
-  const users = (await db.collection("users").get()).docs.map((doc) =>
-    util.userDocToExternalUser(doc),
-  );
+	const users = (await db.collection("users").get()).docs.map((doc) =>
+		util.userDocToExternalUser(doc),
+	);
 
-  logger.info("Get all users.");
-  return users;
+	logger.info("Get all users.");
+	return users;
 }

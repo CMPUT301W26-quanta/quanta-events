@@ -22,8 +22,6 @@ import com.google.android.gms.security.ProviderInstaller;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import java.util.Map;
-
 import ca.quanta.quantaevents.burger.SmartBurger;
 import ca.quanta.quantaevents.burger.SmartBurgerState;
 import ca.quanta.quantaevents.databinding.ActivityMainBinding;

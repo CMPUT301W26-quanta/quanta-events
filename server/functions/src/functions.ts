@@ -5,6 +5,7 @@ export * from "./functions/createNotification";
 export * from "./functions/createUser";
 export * from "./functions/deleteImage";
 export * from "./functions/deleteUser";
+export * from "./functions/getAllImages";
 export * from "./functions/getAllUsers";
 export * from "./functions/getEvent";
 export * from "./functions/getEvents";
@@ -19,4 +20,3 @@ export * from "./functions/leaveWaitlist";
 export * from "./functions/setToken";
 export * from "./functions/updateEvent";
 export * from "./functions/updateUser";
-
