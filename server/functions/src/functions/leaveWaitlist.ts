@@ -3,7 +3,6 @@ import * as util from "../util";
 import * as z from "zod";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
-import { EventDocument } from "../schema";
 
 const leaveWaitlistInterface = util.standardForm(
   z.object({
@@ -34,14 +33,20 @@ export async function leaveWaitlist(request: CallableRequest) {
   const event = eventDoc.data() as EventDocument;
 
   if (!event.waitList?.includes(userId)) {
-    throw new HttpsError("failed-precondition", "User is not on the waitlist for this event");
+    throw new HttpsError(
+      "failed-precondition",
+      "User is not on the waitlist for this event"
+    );
   }
 
   const now = new Date();
   const registrationEnd = event.registrationEndTime.toDate();
 
   if (now > registrationEnd) {
-    throw new HttpsError("failed-precondition", "Registration has closed — cannot leave waitlist");
+    throw new HttpsError(
+      "failed-precondition",
+      "Registration has closed — cannot leave waitlist"
+    );
   }
 
   await db

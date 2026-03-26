@@ -8,11 +8,11 @@ import { ExternalUser } from "./schema";
 const getAllUsersInterface = util.standardForm(z.object({}));
 
 export async function getAllUsers(
-  request: CallableRequest,
+  request: CallableRequest
 ): Promise<ExternalUser[]> {
   const { userId, deviceId } = util.parseInterface(
     getAllUsersInterface,
-    request,
+    request
   );
 
   const userData = await util.verifyUser(userId, deviceId);
@@ -21,7 +21,7 @@ export async function getAllUsers(
   const db = getFirestore();
 
   const users = (await db.collection("users").get()).docs.map((doc) =>
-    util.userDocToExternalUser(doc),
+    util.userDocToExternalUser(doc)
   );
 
   logger.info("Get all users.");

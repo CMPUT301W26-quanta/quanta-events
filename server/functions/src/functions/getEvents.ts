@@ -7,7 +7,6 @@ import {
   Query,
   Timestamp,
 } from "firebase-admin/firestore";
-import { EventDocument } from "../schema";
 import Fuse from "fuse.js";
 import { logger } from "firebase-functions";
 
@@ -78,7 +77,8 @@ export async function getEvents(
         .where(
           "eventId",
           "not-in",
-          (entrant.entrant.enteredEvents || []).concat(["NOTHING"]))
+          (entrant.entrant.enteredEvents || []).concat(["NOTHING"])
+        )
         .where("registrationEndTime", ">=", Timestamp.now());
     }
   }

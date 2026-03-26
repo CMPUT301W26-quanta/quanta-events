@@ -3,7 +3,6 @@ import * as util from "../util";
 import * as z from "zod";
 import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
-import { EventDocument } from "../schema";
 
 const checkWaitlistInterface = util.standardForm(
   z.object({

@@ -1,5 +1,4 @@
 import { HttpsError } from "firebase-functions/https";
-import { UserDocument, UserRole, WithRole } from "../schema";
 
 export function requireRole<U extends UserDocument, R extends UserRole>(
   userData: U,

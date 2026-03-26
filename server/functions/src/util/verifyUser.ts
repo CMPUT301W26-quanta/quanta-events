@@ -1,6 +1,5 @@
 import { DocumentSnapshot, getFirestore } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/https";
-import { UserDocument } from "../schema";
 
 export async function verifyUser(
   userId: string,
