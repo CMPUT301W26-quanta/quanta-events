@@ -26,13 +26,11 @@ import java.util.UUID;
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.SessionStore;
-import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
 public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.ImageCardViewHolder> {
     private final ArrayList<Event> events;
 
-    private EventViewModel eventModel;
     private ImageViewModel imageModel;
 
     private Fragment parentFragment;
@@ -44,7 +42,6 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
     public ImageCardAdapter(List<Event> events, Fragment parentFragment) {
         this.parentFragment = parentFragment;
 
-        this.eventModel = new ViewModelProvider(this.parentFragment.getActivity()).get(EventViewModel.class);
         this.imageModel = new ViewModelProvider(this.parentFragment.getActivity()).get(ImageViewModel.class);
         this.events = new ArrayList<Event>();
 
@@ -134,29 +131,13 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
         holder.buttonRemove.setOnClickListener(view -> {
             int eventPosition = holder.getBindingAdapterPosition();
 
-            this.eventModel.updateEvent(
-                    this.userId,
-                    this.deviceId,
-                    event.getEventId(),
-                    event.getRegistrationStartTime().toString(),
-                    event.getRegistrationEndTime().toString(),
-                    event.getEventTime() == null ? null : event.getEventTime().toString(),
-                    event.getEventName(),
-                    event.getEventDescription(),
-                    event.getEventCategory(),
-                    event.getEventGuidelines(),
-                    event.isGeolocationEnabled(),
-                    event.getEventCapacity(),
-                    event.getLocation(),
-                    event.getRegistrationLimit(),
-                    null
-            )
+            this.imageModel.deleteImage(event.getImageId(), this.userId, this.deviceId)
                     .addOnSuccessListener(nil -> {
                         this.events.remove(eventPosition);
                         this.notifyItemRemoved(eventPosition);
                     })
                     .addOnFailureListener(exception -> {
-                        Log.e("ImageCardAdapter", "Failed to update an event.", exception);
+                        Log.e("ImageCardAdapter", "Failed to delete an image.", exception);
 
                         Toast.makeText(this.parentFragment.requireContext(), "Failed to remove image: " + exception.getMessage(), Toast.LENGTH_LONG).show();
 

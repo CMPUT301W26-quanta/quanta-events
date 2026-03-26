@@ -48,6 +48,8 @@ export const getImage = onCall({ maxInstances: 1 }, functions.getImage);
 
 export const deleteUser = onCall({ maxInstances: 1 }, functions.deleteUser);
 
+export const deleteImage = onCall({ maxInstances: 1 }, functions.deleteImage);
+
 export const updateUser = onCall({ maxInstances: 1 }, functions.updateUser);
 
 export const getOrganizerName = onCall({ maxInstances: 1 }, functions.getOrganizerName);

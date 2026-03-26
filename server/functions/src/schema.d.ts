@@ -27,7 +27,7 @@ declare interface UserDocument {
 
 declare interface ExternalUser {
   userId: string;
-  name: string;
+  name: string | null;
   isAdmin: boolean;
   isOrganizer: boolean;
   isEntrant: boolean;

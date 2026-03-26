@@ -77,4 +77,32 @@ public class ImageViewModel extends ViewModel {
                 });
 
     }
+
+    /**
+     * Calls the deleteImage cloud function and deletes the image (and all references to it)
+     * from the database.
+     * @param imageId UUID to identify the image to delete.
+     * @param userId UUID to identify this user.
+     * @param deviceId UUID to identify this user's device.
+     * @return True if successful, and error if unsuccessful.
+     */
+    public Task<Boolean> deleteImage(UUID imageId, UUID userId, UUID deviceId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("imageId", imageId.toString());
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("deleteImage")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, Boolean>() {
+                    @Override
+                    public Boolean then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                        return true;
+                    }
+                });
+    }
 }

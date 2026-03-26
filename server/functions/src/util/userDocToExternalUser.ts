@@ -1,4 +1,4 @@
-import { ExternalUser, User } from "../functions/schema";
+import { ExternalUser, UserDocument } from "../schema";
 
 export function userDocToExternalUser(
   doc: FirebaseFirestore.QueryDocumentSnapshot<
@@ -6,7 +6,7 @@ export function userDocToExternalUser(
     FirebaseFirestore.DocumentData
   >,
 ): ExternalUser {
-  const user = doc.data() as User;
+  const user = doc.data() as UserDocument;
 
   return {
     userId: doc.id,
