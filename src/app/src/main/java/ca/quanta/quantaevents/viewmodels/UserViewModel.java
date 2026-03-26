@@ -23,7 +23,6 @@ import ca.quanta.quantaevents.models.User;
  */
 public class UserViewModel extends ViewModel {
     // Initialize an instance of cloud functions
-
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
     /**
@@ -67,6 +66,8 @@ public class UserViewModel extends ViewModel {
 
     /**
      * Calls the getAllUsers cloud function, getting all users stored in the database.
+     * @param userId This user's id (for permissions checking).
+     * @param deviceId This user's device id (for permissions checking).
      * @return List of User Objects.
      */
     public Task<ArrayList<ExternalUser>> getAllUsers(UUID userId, UUID deviceId) {

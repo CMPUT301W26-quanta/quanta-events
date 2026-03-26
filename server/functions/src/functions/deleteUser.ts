@@ -1,8 +1,8 @@
+import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
 import { CallableRequest, HttpsError } from "firebase-functions/https";
 import * as z from "zod";
 import * as util from "../util";
-import { FieldValue, getFirestore } from "firebase-admin/firestore";
 
 const deleteUserInterface = util.standardForm(
   z.object({

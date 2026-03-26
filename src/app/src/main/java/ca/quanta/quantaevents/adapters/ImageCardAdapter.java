@@ -20,19 +20,15 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.functions.FirebaseFunctionsException;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
-import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.SessionStore;
-import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
 public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.ImageCardViewHolder> {
-    private final ArrayList<Event> events;
+    private final ArrayList<UUID> imageIDs;
 
-    private EventViewModel eventModel;
     private ImageViewModel imageModel;
 
     private Fragment parentFragment;
@@ -41,21 +37,11 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
     private UUID userId;
     private UUID deviceId;
 
-    public ImageCardAdapter(List<Event> events, Fragment parentFragment) {
+    public ImageCardAdapter(ArrayList<UUID> imageIDs, Fragment parentFragment) {
         this.parentFragment = parentFragment;
 
-        this.eventModel = new ViewModelProvider(this.parentFragment.getActivity()).get(EventViewModel.class);
         this.imageModel = new ViewModelProvider(this.parentFragment.getActivity()).get(ImageViewModel.class);
-        this.events = new ArrayList<Event>();
-
-        for (Event event : events) {
-            UUID imageId = event.getImageId();
-
-            // only add events that have images
-            if (imageId != null) {
-                this.events.add(event);
-            }
-        }
+        this.imageIDs = imageIDs;
 
         // **** set up the session store
 
@@ -72,7 +58,7 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
 
     @Override
     public int getItemCount() {
-        return events.size();
+        return imageIDs.size();
     }
 
     @Override
@@ -96,7 +82,7 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
 
     @Override
     public void onBindViewHolder(@NonNull ImageCardViewHolder holder, int position) {
-        Event event = this.events.get(position);
+        UUID imageId = this.imageIDs.get(position);
 
         if (this.userId == null || this.deviceId == null) {
             Log.e("ImageCardAdapter", "Failed to bind image; userId or deviceId is NULL.");
@@ -104,7 +90,7 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
             return;
         }
 
-        this.imageModel.getImage(event.getImageId(), this.userId, this.deviceId)
+        this.imageModel.getImage(imageId, this.userId, this.deviceId)
                 .addOnSuccessListener(image -> {
                     Object imageData = image.getImageData();
 
@@ -134,29 +120,13 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
         holder.buttonRemove.setOnClickListener(view -> {
             int eventPosition = holder.getBindingAdapterPosition();
 
-            this.eventModel.updateEvent(
-                    this.userId,
-                    this.deviceId,
-                    event.getEventId(),
-                    event.getRegistrationStartTime().toString(),
-                    event.getRegistrationEndTime().toString(),
-                    event.getEventTime() == null ? null : event.getEventTime().toString(),
-                    event.getEventName(),
-                    event.getEventDescription(),
-                    event.getEventCategory(),
-                    event.getEventGuidelines(),
-                    event.isGeolocationEnabled(),
-                    event.getEventCapacity(),
-                    event.getLocation(),
-                    event.getRegistrationLimit(),
-                    null
-            )
-                    .addOnSuccessListener(nil -> {
-                        this.events.remove(eventPosition);
+            this.imageModel.deleteImage(imageId, this.userId, this.deviceId)
+                    .addOnSuccessListener(success -> {
+                        this.imageIDs.remove(eventPosition);
                         this.notifyItemRemoved(eventPosition);
                     })
                     .addOnFailureListener(exception -> {
-                        Log.e("ImageCardAdapter", "Failed to update an event.", exception);
+                        Log.e("ImageCardAdapter", "Failed to delete an image.", exception);
 
                         Toast.makeText(this.parentFragment.requireContext(), "Failed to remove image: " + exception.getMessage(), Toast.LENGTH_LONG).show();
 
