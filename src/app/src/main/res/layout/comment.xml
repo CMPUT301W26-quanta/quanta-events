@@ -31,45 +31,62 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Comment Information-->
-        <LinearLayout
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingStart="12dp">
+
+
+        <!-- Time -->
+
+        <!-- User -->
+        <TextView
+            android:id="@+id/event_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:paddingStart="12dp">
+            android:layout_marginTop="4dp"
+            android:drawableStart="@drawable/ic_round_schedule"
+            android:text="Some Time"
+            android:textColor="@color/text_color"
+            android:textSize="16sp"
+            app:drawableTint="@color/color_dark_gray" />
 
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="User Name"
+            android:textColor="@color/text_color"
+            android:textSize="16sp" />
 
-            <!-- Time -->
-            <TextView
-                android:id="@+id/event_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:drawableStart="@drawable/ic_round_schedule"
-                app:drawableTint="@color/color_dark_gray"
-                android:text="Some Time"
-                android:textSize="16sp"
-                android:textColor="@color/text_color" />
+        <!-- Comment -->
+        <TextView
+            android:id="@+id/comment_info"
+            android:layout_width="match_parent"
+            android:layout_height="61dp"
+            android:layout_marginTop="2dp"
+            android:text="Some comment"
+            android:textColor="@color/text_color"
+            android:textSize="16sp" />
 
-            <!-- User -->
-            <TextView
-                android:id="@+id/user_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="User Name"
-                android:textSize="16sp"
-                android:textColor="@color/text_color" />
-
-            <!-- Comment -->
-            <TextView
-                android:id="@+id/comment_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Some comment"
-                android:textSize="16sp"
-                android:textColor="@color/text_color" />
+        <ImageButton
+            android:id="@+id/delete_comment_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginVertical="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_icon_container"
+            android:backgroundTint="@color/color_light_red"
+            android:contentDescription="Delete"
+            android:padding="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/material_symbols_delete_rounded" />
 
     </LinearLayout>
 

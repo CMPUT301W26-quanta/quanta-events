@@ -41,7 +41,9 @@ public class EventQRCodeFragment extends Fragment {
                 v -> Navigation.findNavController(binding.getRoot()).popBackStack()
         );
 
-        // Request camer permission
+        binding.errorText.setText("");
+
+        // Request camera permission
 
         if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -65,10 +67,14 @@ public class EventQRCodeFragment extends Fragment {
                     UUID uuid = UUID.fromString(uuidStr);
                     NavDirections action = EventQRCodeFragmentDirections.actionEventQRCodeFragmentToEventDetailsFragment(uuid);
                     Navigation.findNavController(binding.getRoot()).navigate(action);
+                    return;
                 } catch (IllegalArgumentException ignored) {
+                    binding.errorText.setText("Event code not valid");
+                    return;
                 }
             }
 
+            binding.errorText.setText("Not a valid Quanta Events code");
         });
     }
 
