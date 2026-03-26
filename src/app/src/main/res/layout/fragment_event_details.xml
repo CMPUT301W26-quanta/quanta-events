@@ -200,6 +200,8 @@
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxStrokeColor="@color/border"
                 app:hintTextColor="@color/text_color"
+                app:placeholderText="eg. Here is a comment about this event. This event is very important, and it was a very good event"
+                app:placeholderTextColor="@color/color_dark_gray"
                 app:boxBackgroundColor="@color/color_light_gray"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
@@ -209,6 +211,22 @@
                     android:layout_height="wrap_content"
                     android:inputType="textMultiLine"
                     android:textColor="@color/text_color" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/comments_recycler_view"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="2dp"
+                    android:clipToPadding="false"
+                    android:scrollbars="vertical"
+                    android:fadingEdge="vertical"
+                    android:requiresFadingEdge="vertical"
+                    android:fadingEdgeLength="20dp"
+                    android:overScrollMode="ifContentScrolls"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/comment"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
             </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
