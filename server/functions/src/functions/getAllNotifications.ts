@@ -2,7 +2,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
 import { CallableRequest } from "firebase-functions/https";
 import z from "zod";
-import { EventDocument, NotificationDocument } from "../schema";
+import { NotificationDocument } from "../schema";
 import * as util from "../util";
 
 const getAllNotificationsInterface = util.standardForm(
@@ -24,16 +24,19 @@ export async function getAllNotifications(
 
 	const db = getFirestore();
 
-	const sendersEvents = (
+	const sendersEventsIds = (
 		await db.collection("events").where("organizer", "==", data.sentById).get()
-	).docs.map((doc) => ({ ...doc.data() })) as EventDocument[];
+	).docs.map((doc) => doc.id);
 
-	const notifications = (
-		await db
-			.collection("notifications")
-			.where("eventId", "in", sendersEvents)
-			.get()
-	).docs.map((doc) => ({ ...doc.data() })) as NotificationDocument[];
+	const notifications =
+		sendersEventsIds.length == 0
+			? []
+			: ((
+					await db
+						.collection("notifications")
+						.where("eventId", "in", sendersEventsIds)
+						.get()
+				).docs.map((doc) => ({ ...doc.data() })) as NotificationDocument[]);
 
 	logger.info(`Get all notifications sent by ${data.sentById}.`);
 	return notifications;

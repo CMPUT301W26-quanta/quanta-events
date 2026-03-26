@@ -38,6 +38,8 @@ export const getUser = onCall({ maxInstances: 1 }, functions.getUser);
 
 export const getAllImages = onCall({ maxInstances: 1 }, functions.getAllImages);
 
+export const getAllNotifications = onCall({ maxInstances: 1}, functions.getAllNotifications);
+
 export const getAllUsers = onCall({ maxInstances: 1 }, functions.getAllUsers);
 
 export const createEvent = onCall({ maxInstances: 1 }, functions.createEvent);
