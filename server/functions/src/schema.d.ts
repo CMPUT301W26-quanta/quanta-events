@@ -23,6 +23,7 @@ declare interface UserDocument {
   entrant: EntrantMap | null;
   organizer: OrganizerMap | null;
   admin: AdminMap | null;
+  notifToken: string | null;
 }
 
 declare interface ExternalUser {
