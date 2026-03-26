@@ -73,7 +73,7 @@
             android:textSize="16sp" />
 
         <ImageButton
-            android:id="@+id/info_button"
+            android:id="@+id/delete_comment_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginHorizontal="20dp"
