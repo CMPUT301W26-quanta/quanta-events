@@ -23,13 +23,8 @@ import ca.quanta.quantaevents.models.Event;
  * View-model for managing event-related data and cloud functions.
  */
 public class EventViewModel extends ViewModel {
-
     // Initialize an instance of cloud functions
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
-
-    public EventViewModel() {
-        functions.useEmulator("10.0.2.2", 5001);
-    }
 
     public enum Fetch {
         ALL("all"),

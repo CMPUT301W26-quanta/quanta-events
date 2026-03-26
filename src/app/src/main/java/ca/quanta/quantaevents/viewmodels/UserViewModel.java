@@ -23,12 +23,7 @@ import ca.quanta.quantaevents.models.User;
  */
 public class UserViewModel extends ViewModel {
     // Initialize an instance of cloud functions
-
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
-
-    public UserViewModel() {
-        functions.useEmulator("10.0.2.2", 5001);
-    }
 
     /**
      * Calls the createUser cloud function, creating and adding a user to the database.

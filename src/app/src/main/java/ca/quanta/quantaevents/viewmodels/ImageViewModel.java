@@ -23,10 +23,6 @@ public class ImageViewModel extends ViewModel {
     // Initialize an instance of cloud functions
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
-    public ImageViewModel() {
-        functions.useEmulator("10.0.2.2", 5001);
-    }
-
     /**
      * Calls the createImage cloud function, creating and adding an image to the database.
      * @param userId UUID to identify user.
