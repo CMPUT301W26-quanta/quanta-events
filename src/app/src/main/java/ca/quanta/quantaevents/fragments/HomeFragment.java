@@ -1,6 +1,7 @@
 package ca.quanta.quantaevents.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentHomeBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.viewmodels.CommentViewModel;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 public class HomeFragment extends Fragment implements Tagged {
@@ -34,7 +36,6 @@ public class HomeFragment extends Fragment implements Tagged {
     public HomeFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -55,6 +56,20 @@ public class HomeFragment extends Fragment implements Tagged {
             this.deviceId = did;
 
             maybeValidateUser();
+
+            CommentViewModel cvm = new ViewModelProvider(this).get(CommentViewModel.class);
+            cvm.deleteComment(
+                    UUID.fromString("a414b513-e4cf-4852-8f63-b93d96249a3c"),
+                    UUID.fromString("a414b513-e4cf-4852-8f63-b93d96249a3c"),
+                    UUID.fromString("f0227946-b81d-4d29-82ed-1bfa2a3b294d"),
+                    UUID.fromString("8c8fb12e-d7ff-47c3-b53d-27f5f3646024")
+                    )
+                    .addOnSuccessListener(a -> {
+                        Log.d("COMMENT", "SUCCESS");
+                    })
+                    .addOnFailureListener(exception -> {
+                        Log.e("COMMENT", "FAILURE");
+                    });
         });
 
         // listener for info button

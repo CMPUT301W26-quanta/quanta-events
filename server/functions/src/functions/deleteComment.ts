@@ -3,6 +3,7 @@ import { logger } from "firebase-functions";
 import { CallableRequest, HttpsError } from "firebase-functions/https";
 import * as z from "zod";
 import * as util from "../util";
+import { CommentDocument, EventDocument } from "../schema";
 
 const deleteCommentInterface = util.standardForm(
 	z.object({
@@ -13,7 +14,7 @@ const deleteCommentInterface = util.standardForm(
 
 export async function deleteComment(request: CallableRequest): Promise<{}> {
 	const payload = util.parseInterface(deleteCommentInterface, request);
-	await util.verifyUser(payload.userId, payload.deviceId);
+	const userData = await util.verifyUser(payload.userId, payload.deviceId);
 
 	logger.info(
 		`Deleting comment ${payload.data.commentId} from event ${payload.data.eventId}.`,
@@ -28,17 +29,24 @@ export async function deleteComment(request: CallableRequest): Promise<{}> {
 		throw new HttpsError("not-found", "Event not found");
 	}
 
+	const eventDoc = event.data() as EventDocument;
+
 	const commentRef = eventRef
 		.collection("comments")
 		.doc(payload.data.commentId);
 
 	const comment = await commentRef.get();
+	const commentDoc = comment.data() as CommentDocument;
 
 	if (!comment.exists) {
 		throw new HttpsError("not-found", "Comment not found");
 	}
 
-	commentRef.delete();
+	if (![commentDoc.senderId, eventDoc.organizer].includes(payload.userId)) {
+		util.requireRole(userData, "admin");
+	}
+
+	await commentRef.delete();
 
 	return {};
 }

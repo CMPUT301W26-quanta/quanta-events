@@ -12,7 +12,7 @@ export async function getAllUsers(
 ): Promise<ExternalUser[]> {
 	const payload = util.parseInterface(getAllUsersInterface, request);
 	const userData = await util.verifyUser(payload.userId, payload.deviceId);
-	await util.requireRole(userData, "admin");
+	util.requireRole(userData, "admin");
 
 	logger.info("Retrieving all users.");
 
