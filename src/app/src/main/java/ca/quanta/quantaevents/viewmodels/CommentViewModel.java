@@ -23,10 +23,6 @@ public class CommentViewModel extends ViewModel {
     // Initialize an instance of cloud functions
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
-    public CommentViewModel() {
-        functions.useEmulator("10.0.2.2", 5001);
-    }
-
     /**
      * Calls the createComment cloud function, creating and adding a comment to the database.
      * @param userId This user's id (for permissions checking).
