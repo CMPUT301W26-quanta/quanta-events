@@ -57,3 +57,14 @@ declare interface EventDocument {
   registrationLimit: number | null;
   imageId: string | null;
 }
+
+declare interface NotificationDocument {
+  eventId: string;
+
+  title: string;
+  message: string;
+
+  waited: boolean;
+  selected: boolean;
+  cancelled: boolean;
+}

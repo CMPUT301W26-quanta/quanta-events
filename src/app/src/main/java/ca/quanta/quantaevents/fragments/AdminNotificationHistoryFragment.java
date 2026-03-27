@@ -1,9 +1,11 @@
 package ca.quanta.quantaevents.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,23 +14,31 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.firebase.functions.FirebaseFunctionsException;
+
 import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.NotificationAdapter;
 import ca.quanta.quantaevents.databinding.FragmentAdminNotificationHistoryBinding;
 import ca.quanta.quantaevents.models.Notification;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
+import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
+import ca.quanta.quantaevents.viewmodels.NotificationViewModel;
 
 public class AdminNotificationHistoryFragment extends Fragment {
     private FragmentAdminNotificationHistoryBinding binding;
+    private NotificationViewModel notificationModel;
+    private UUID userId;
+    private UUID deviceId;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // set up the header
+        // **** set up the header
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
 
@@ -36,27 +46,64 @@ public class AdminNotificationHistoryFragment extends Fragment {
         infoStore.setSubtitle("View user notification history.");
         infoStore.setIconRes(R.drawable.material_symbols_history);
 
-        // set up the notification recycler view
+        // **** set up the args
 
-        // TODO: fetch all notifications from the database instead
+        AdminNotificationHistoryFragmentArgs args = AdminNotificationHistoryFragmentArgs.fromBundle(this.getArguments());
 
-        List<Notification> notifications = new ArrayList<Notification>();
+        // **** set up the view models
 
-        notifications.add(new Notification(null, null, "Hotdog Eating Contest Notice", "Event starting soon! Remember that refreshments are provided. Make sure to bring a friend!"));
-        notifications.add(new Notification(null, null, "Hotdog Condiments", "Relish is overrated. For that reason, only ketchup and mustard will be provided during the contest. Sorry not sorry!"));
+        this.notificationModel = new ViewModelProvider(this.requireActivity()).get(NotificationViewModel.class);
 
-        // use the adapter to display them
+        // **** set up the session store
 
-        NotificationAdapter notificationAdapter = new NotificationAdapter(notifications);
+        SessionStore sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
 
-        binding.notificationsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        binding.notificationsRecyclerView.setAdapter(notificationAdapter);
+        sessionStore.observeSession(getViewLifecycleOwner(), (userId, deviceId) -> {
+            this.userId = userId;
+            this.deviceId = deviceId;
 
-        // set up the back buttons on click listener
+            // set up the notifications recycler view once the userId and deviceId are ready
+            listNotifications(args.getProfileId());
+        });
+
+        // **** set up the back buttons on click listener
 
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
         );
+    }
+
+    private void listNotifications(UUID profileID) {
+        // display the notifications belonging to the profile
+
+        this.notificationModel.getAllNotifications(this.userId, this.deviceId, profileID)
+                .addOnSuccessListener(this::getAndDisplayNotifications)
+                .addOnFailureListener(exception -> {
+                    Log.e("AdminNotificationHistoryFragment", "Failed to fetch notifications.", exception);
+
+                    ToastManager.show(requireContext(), "Failed to fetch notifications", Toast.LENGTH_LONG);
+
+                    if (exception instanceof FirebaseFunctionsException) {
+                        Log.e("AdminNotificationHistoryFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
+                    }
+                });
+    }
+
+    private void getAndDisplayNotifications(ArrayList<Notification> notifications) {
+        // **** use the adapter to display them
+
+        NotificationAdapter notificationAdapter = new NotificationAdapter(notifications);
+
+        // **** set up the notification recycler view
+
+        binding.notificationsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.notificationsRecyclerView.setAdapter(notificationAdapter);
+
+        // **** display toast in case there are none
+
+        if (notifications.isEmpty()) {
+            ToastManager.show(requireContext(), "No notifications to display.", Toast.LENGTH_LONG);
+        }
     }
 
     @Override
