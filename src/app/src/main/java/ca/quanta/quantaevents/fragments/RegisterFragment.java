@@ -116,7 +116,7 @@ public class RegisterFragment extends Fragment {
     }
 
     @Nullable
-    private static String normalizeEmpty(@Nullable String value) {
+    static String normalizeEmpty(@Nullable String value) {
         if (value == null || value.isEmpty()) {
             return null;
         }

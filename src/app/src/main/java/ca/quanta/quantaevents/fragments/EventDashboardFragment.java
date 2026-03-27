@@ -102,6 +102,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
         ToastManager.cancel();
         hasLoaded = false;
         binding = null;
+        loadedInitialEvents = false;
     }
 
     private void maybeLoadAllEvents() {
@@ -166,7 +167,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
             }
             UUID eventId = event.getEventId();
             String title = stringValue(event.getEventName(), "Event");
-            String time = formatLocalTime(event.getRegistrationStartTime());
+            String time = formatLocalTime(event.getEventTime());
             String location = stringValue(event.getLocation(), "TBD");
             items.add(new EventCardItem(eventId, title, time, location, null));
         }

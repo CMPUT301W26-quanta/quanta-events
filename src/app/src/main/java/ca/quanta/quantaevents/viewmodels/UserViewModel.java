@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import ca.quanta.quantaevents.models.ExternalUser;
 import ca.quanta.quantaevents.models.User;
 
 /**
@@ -22,7 +23,6 @@ import ca.quanta.quantaevents.models.User;
  */
 public class UserViewModel extends ViewModel {
     // Initialize an instance of cloud functions
-
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 
     /**
@@ -66,33 +66,34 @@ public class UserViewModel extends ViewModel {
 
     /**
      * Calls the getAllUsers cloud function, getting all users stored in the database.
+     * @param userId This user's id (for permissions checking).
+     * @param deviceId This user's device id (for permissions checking).
      * @return List of User Objects.
      */
-    public Task<ArrayList<User>> getAllUsers() {
-//        TODO: pass user information and verify the user is an admin when calling this
-//        Map<String, Object> data = new HashMap<>();
-//
-//        data.put("userId", userId.toString());
-//        data.put("deviceId", deviceId.toString());
+    public Task<ArrayList<ExternalUser>> getAllUsers(UUID userId, UUID deviceId) {
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        data.put("data", payload);
 
         return functions
                .getHttpsCallable("getAllUsers")
-               .call(new HashMap<>())
-               .continueWith(new Continuation<HttpsCallableResult, ArrayList<User>>() {
+               .call(data)
+               .continueWith(new Continuation<HttpsCallableResult, ArrayList<ExternalUser>>() {
                    @Override
-                   public ArrayList<User> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                   public ArrayList<ExternalUser> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
                        List<Map<String, Object>> userObjects = (List<Map<String, Object>>) task.getResult().getData();
-                       ArrayList<User> users = new ArrayList<User>();
+                       ArrayList<ExternalUser> users = new ArrayList<ExternalUser>();
 
                        for (Map<String, Object> userObject : userObjects) {
-                           // we only get a limited amount of info back about each user
-
                            String userId = (String) userObject.get("userId");
                            String name = (String) userObject.get("name");
                            Boolean isEntrant = (Boolean) userObject.get("isEntrant");
                            Boolean isOrganizer = (Boolean) userObject.get("isOrganizer");
                            Boolean isAdmin = (Boolean) userObject.get("isAdmin");
-                           System.out.println(userId + name + isEntrant + isOrganizer + isAdmin);
 
                            // verify that they have a userId, otherwise just skip them
 
@@ -102,7 +103,7 @@ public class UserViewModel extends ViewModel {
 
                            UUID userUUID = UUID.fromString(userId);
 
-                           users.add(new User(name, null, null, null, isEntrant, isOrganizer, isAdmin, userUUID, null));
+                           users.add(new ExternalUser(userUUID, name, isEntrant, isOrganizer, isAdmin));
                        }
 
                        return users;

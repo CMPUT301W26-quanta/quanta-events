@@ -36,6 +36,8 @@ export const createUser = onCall({ maxInstances: 1 }, functions.createUser);
 
 export const getUser = onCall({ maxInstances: 1 }, functions.getUser);
 
+export const getAllImages = onCall({ maxInstances: 1 }, functions.getAllImages);
+
 export const getAllUsers = onCall({ maxInstances: 1 }, functions.getAllUsers);
 
 export const createEvent = onCall({ maxInstances: 1 }, functions.createEvent);
@@ -47,6 +49,8 @@ export const createImage = onCall({ maxInstances: 1 }, functions.createImage);
 export const getImage = onCall({ maxInstances: 1 }, functions.getImage);
 
 export const deleteUser = onCall({ maxInstances: 1 }, functions.deleteUser);
+
+export const deleteImage = onCall({ maxInstances: 1 }, functions.deleteImage);
 
 export const updateUser = onCall({ maxInstances: 1 }, functions.updateUser);
 
@@ -69,4 +73,11 @@ export const createNotification = onCall(
   functions.createNotification
 );
 
+// export const getNotification = onCall(
+//   { maxInstances: 1 },
+//   functions.getNotification
+// );
+
 export const getEvents = onCall({ maxInstances: 1 }, functions.getEvents);
+
+export const setToken = onCall({ maxInstances: 1 }, functions.setToken);

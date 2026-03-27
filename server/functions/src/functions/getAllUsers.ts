@@ -1,32 +1,29 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
 import { CallableRequest } from "firebase-functions/https";
-import { User } from "./schema";
+import z from "zod";
+import { ExternalUser } from "../schema";
+import * as util from "../util";
 
-interface Result {
-  userId: string;
-  deviceId: string;
-  name: string;
-  isAdmin: boolean;
-  isOrganizer: boolean;
-  isEntrant: boolean;
-}
+const getAllUsersInterface = util.standardForm(z.object({}));
 
-export async function getAllUsers(_request: CallableRequest): Promise<Result[]> {
-  const db = getFirestore();
+export async function getAllUsers(
+	request: CallableRequest,
+): Promise<ExternalUser[]> {
+	const { userId, deviceId } = util.parseInterface(
+		getAllUsersInterface,
+		request,
+	);
 
-  const users = (await db.collection("users").get()).docs.map((doc) => {
-    const user = doc.data() as User;
-    return {
-      userId: doc.id,
-      deviceId: user.deviceId,
-      name: user.name,
-      isAdmin: !!user.admin,
-      isOrganizer: !!user.organizer,
-      isEntrant: !!user.entrant,
-    };
-  });
+	const userData = await util.verifyUser(userId, deviceId);
+	await util.requireRole(userData, "admin");
 
-  logger.info("Get all users.");
-  return users;
+	const db = getFirestore();
+
+	const users = (await db.collection("users").get()).docs.map((doc) =>
+		util.userDocToExternalUser(doc),
+	);
+
+	logger.info("Get all users.");
+	return users;
 }

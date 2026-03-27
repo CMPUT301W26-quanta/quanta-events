@@ -25,13 +25,11 @@ import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.utils.ToastManager;
-import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
 public class AdminImageBrowserFragment extends Fragment {
     private FragmentAdminImageBrowserBinding binding;
 
-    private EventViewModel eventModel;
     private ImageViewModel imageModel;
     private boolean hasLoaded = false;
 
@@ -41,28 +39,19 @@ public class AdminImageBrowserFragment extends Fragment {
     private void listImageCards() {
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(
-            this.eventModel.getEvents(
-                            this.userId,
-                            this.deviceId,
-                            -1,
-                            null,
-                            EventViewModel.Fetch.ALL,
-                            null,
-                            null,
-                            null,
-                            EventViewModel.SortBy.REGISTRATION_END)
-                    .addOnSuccessListener(events -> {
+            this.imageModel.getAllImages(this.userId, this.deviceId)
+                    .addOnSuccessListener(imageIDs -> {
                         // use the adapter to display them
 
-                        ImageCardAdapter imageCardsAdapter = new ImageCardAdapter(events, this);
+                        ImageCardAdapter imageCardsAdapter = new ImageCardAdapter(imageIDs, this);
 
                         binding.imageCardsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
                         binding.imageCardsRecyclerView.setAdapter(imageCardsAdapter);
                     })
                     .addOnFailureListener(exception -> {
-                        Log.e("AdminImageBrowserFragment", "Failed to fetch events.", exception);
+                        Log.e("AdminImageBrowserFragment", "Failed to fetch images.", exception);
 
-                        ToastManager.show(requireContext(), "Failed to fetch events", Toast.LENGTH_LONG);
+                        ToastManager.show(requireContext(), "Failed to fetch images", Toast.LENGTH_LONG);
 
                         if (exception instanceof FirebaseFunctionsException) {
                             Log.e("AdminImageBrowserFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
@@ -85,7 +74,6 @@ public class AdminImageBrowserFragment extends Fragment {
 
         // **** set up the view models
 
-        this.eventModel = new ViewModelProvider(this.requireActivity()).get(EventViewModel.class);
         this.imageModel = new ViewModelProvider(this.requireActivity()).get(ImageViewModel.class);
 
         // **** set up the session store
