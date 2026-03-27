@@ -1,8 +1,7 @@
-import { getFirestore } from "firebase-admin/firestore";
-import { logger } from "firebase-functions";
-import { CallableRequest, HttpsError } from "firebase-functions/https";
+import { CallableRequest } from "firebase-functions/https";
 import * as z from "zod";
 import * as util from "../util";
+import { logger } from "firebase-functions";
 
 const deleteImageInterface = util.standardForm(
   z.object({
@@ -11,25 +10,17 @@ const deleteImageInterface = util.standardForm(
 );
 
 export async function deleteImage(request: CallableRequest) {
-  const { userId, deviceId, data } = util.parseInterface(
+  const payload = util.parseInterface(
     deleteImageInterface,
     request,
   );
 
-  const userData = await util.verifyUser(userId, deviceId);
+  const userData = await util.verifyUser(payload.userId, payload.deviceId);
   await util.requireRole(userData, "admin");
 
-  const db = getFirestore();
-  const imageToDeleteId = data.target;
+  logger.info(`Deleting image ${payload.data.target}.`);
 
-  const targetDoc = await db.collection("images").doc(imageToDeleteId).get();
-  logger.log(targetDoc);
-
-  if (!targetDoc.exists) {
-    throw new HttpsError("not-found", "Target image does not exist");
-  }
-
-  await util.removeImage(data.target);
+  await util.removeImage(payload.data.target);
 
   return {};
 }

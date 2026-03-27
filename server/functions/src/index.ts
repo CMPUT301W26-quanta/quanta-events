@@ -32,9 +32,13 @@ initializeApp();
 
 export const health = onCall({ maxInstances: 1 }, functions.health);
 
+export const createComment = onCall({ maxInstances: 1 }, functions.createComment);
+
 export const createUser = onCall({ maxInstances: 1 }, functions.createUser);
 
 export const getUser = onCall({ maxInstances: 1 }, functions.getUser);
+
+export const getAllComments = onCall({ maxInstances: 1 }, functions.getAllComments);
 
 export const getAllImages = onCall({ maxInstances: 1 }, functions.getAllImages);
 
@@ -50,9 +54,11 @@ export const createImage = onCall({ maxInstances: 1 }, functions.createImage);
 
 export const getImage = onCall({ maxInstances: 1 }, functions.getImage);
 
-export const deleteUser = onCall({ maxInstances: 1 }, functions.deleteUser);
+export const deleteComment = onCall({ maxInstances: 1 }, functions.deleteComment);
 
 export const deleteImage = onCall({ maxInstances: 1 }, functions.deleteImage);
+
+export const deleteUser = onCall({ maxInstances: 1 }, functions.deleteUser);
 
 export const updateUser = onCall({ maxInstances: 1 }, functions.updateUser);
 

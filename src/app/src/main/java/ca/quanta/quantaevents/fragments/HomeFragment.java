@@ -51,8 +51,9 @@ public class HomeFragment extends Fragment implements Tagged {
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
         userModel = new ViewModelProvider(this).get(UserViewModel.class);
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
-            userId = uid;
-            deviceId = did;
+            this.userId = uid;
+            this.deviceId = did;
+
             maybeValidateUser();
         });
 

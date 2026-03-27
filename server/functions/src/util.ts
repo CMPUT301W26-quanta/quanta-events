@@ -1,3 +1,4 @@
+export * from "./util/commentDocToExternalComment";
 export * from "./util/parseInterface";
 export * from "./util/removeImage";
 export * from "./util/requireRole";
