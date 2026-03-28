@@ -1,5 +1,8 @@
 package ca.quanta.quantaevents.fragments;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -46,6 +49,8 @@ public class EventDetailsFragment extends Fragment {
     private boolean fromAdmin = false;
     private boolean inWaitlist = false;
     private int waitlistCount = 0;
+
+    private boolean isDrawn = false;
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
@@ -59,6 +64,8 @@ public class EventDetailsFragment extends Fragment {
         // set up the header
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
+
+        binding.getRoot().setVisibility(INVISIBLE);
 
         // set title of the page to Event and the subtitle.
         // also sets the icon for the page
@@ -142,6 +149,10 @@ public class EventDetailsFragment extends Fragment {
             return;
         }
 
+        isDrawn = event.isDrawn();
+
+        binding.getRoot().setVisibility(VISIBLE);
+
         binding.textEventTitle.setText(stringValue(event.getEventName(), "Event"));
 
         String organizer = event.getOrganizerId() == null ? "Unknown" : event.getOrganizerId().toString();
@@ -189,7 +200,7 @@ public class EventDetailsFragment extends Fragment {
             binding.enrollButton.setText("Manage");
             binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
             binding.enrollButton.setOnClickListener(v -> {
-                NavDirections action = EventDetailsFragmentDirections.actionEventdetailsfragmentToEventmanagerfragment(eventId);
+                NavDirections action = EventDetailsFragmentDirections.actionEventdetailsfragmentToEventmanagerfragment(eventId, isDrawn);
                 Navigation.findNavController(v).navigate(action);
             });
             return;
