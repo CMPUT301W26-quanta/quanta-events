@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
 
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -70,8 +69,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         FirebaseApp.initializeApp(this);
-
-        FirebaseFunctions.getInstance().useEmulator("192.168.0.67", 5001);
 
         FragmentInfoStore infoStore = new ViewModelProvider(this).get(FragmentInfoStore.class);
         SessionStore sessionStore = new ViewModelProvider(this).get(SessionStore.class);
