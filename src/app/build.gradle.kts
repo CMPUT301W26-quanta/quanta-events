@@ -69,4 +69,5 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 
     implementation(libs.zxing.android.embedded)
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 }

@@ -8,6 +8,13 @@ import { EventDocument } from "../schema";
 const joinWaitlistInterface = util.standardForm(
   z.object({
     eventId: z.uuid(),
+    joinLocation: z
+          .object({
+            latitude: z.number(),
+            longitude: z.number(),
+            accuracyM: z.number().nullable().optional(),
+          })
+          .optional(),
   })
 );
 
@@ -17,9 +24,10 @@ export async function joinWaitlist(request: CallableRequest) {
     request
   );
 
-  const { eventId } = data;
+  const { eventId, joinLocation } = data;
 
   const userData = await util.verifyUser(userId, deviceId);
+  util.requireRole(userData, "entrant");
 
   util.requireRole(userData, "entrant");
 
@@ -60,6 +68,15 @@ export async function joinWaitlist(request: CallableRequest) {
     throw new HttpsError("resource-exhausted", "Waitlist is full");
   }
 
+  const requiresGeolocation = !!event.geolocation;
+
+  if (requiresGeolocation && !joinLocation) {
+      throw new HttpsError(
+        "failed-precondition",
+        "Location is required for this event"
+      );
+  }
+
   await db.collection("events").doc(eventId).update({
     waitList: FieldValue.arrayUnion(userId),
   });
@@ -67,6 +84,21 @@ export async function joinWaitlist(request: CallableRequest) {
   await db.collection("users").doc(userId).update({
     "entrant.enteredEvents": FieldValue.arrayUnion(eventId),
   });
+
+  if (joinLocation) {
+      await db
+        .collection("events")
+        .doc(eventId)
+        .collection("waitlistEntries")
+        .doc(userId)
+        .set({
+          userId,
+          latitude: joinLocation.latitude,
+          longitude: joinLocation.longitude,
+          accuracyM: joinLocation.accuracyM ?? null,
+          joinedAt: FieldValue.serverTimestamp(),
+        });
+  }
 
   logger.info("User joined waitlist", { userId, eventId });
   return {};

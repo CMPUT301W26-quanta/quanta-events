@@ -43,6 +43,7 @@ declare interface EventDocument {
   eventName: string;
   eventDescription: string;
   location: string;
+  geolocation: boolean;
   registrationLimit: number | null;
   imageId: string | null;
 }
