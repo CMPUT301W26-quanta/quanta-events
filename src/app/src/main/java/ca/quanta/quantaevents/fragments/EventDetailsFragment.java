@@ -189,7 +189,9 @@ public class EventDetailsFragment extends Fragment {
         System.out.println(organizer);
         binding.eventStartTime.setText(" " + formatLocalTime(event.getRegistrationStartTime()));
         binding.textLocation.setText(" " + stringValue(event.getLocation(), "TBD"));
-
+        binding.registrationEndTime.setText(" " + formatLocalTime(event.getRegistrationEndTime()));
+        binding.registrationStartTime.setText(" " + formatLocalTime(event.getRegistrationStartTime()));
+        binding.textGuidelines.setText(" " + stringValue(event.getEventGuidelines(), "No Event Guidelines!"));
         waitlistCount = event.getWaitList() == null ? 0 : event.getWaitList().size();
         updateWaitlistText();
 

@@ -51,6 +51,7 @@ export async function createUser(request: CallableRequest) {
           ? { createdEvents: [], sentNotifications: [] }
           : null,
         admin: isAdmin ? {} : null,
+        notifToken: null,
       });
   } catch (_) {
     throw new HttpsError("already-exists", "User already exists");

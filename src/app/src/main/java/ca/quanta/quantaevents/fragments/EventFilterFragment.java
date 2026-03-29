@@ -43,11 +43,27 @@ public class EventFilterFragment extends Fragment {
         infoStore.setSubtitle("Apply filters to search events");
         infoStore.setIconRes(R.drawable.material_symbols_filter_alt_outline);
 
-        binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).popBackStack()
-        );
+        binding.applyButton.setOnClickListener(v -> {
+            Bundle result = new Bundle();
+            String from = getTagValue(binding.inputFrom);
+            String to = getTagValue(binding.inputTo);
+            String category = getTextValue(binding.inputCategory);
+
+            if (from != null) result.putString("from", from);
+            if (to != null) result.putString("to", to);
+            if (category != null) result.putString("category", category);
+
+            Navigation.findNavController(v)
+                    .getPreviousBackStackEntry()
+                    .getSavedStateHandle()
+                    .set("filters", result);
+
+            Navigation.findNavController(v).popBackStack();
+        });
+
         binding.inputTo.setOnClickListener(v -> showDateTimePicker(binding.inputTo));
         binding.inputFrom.setOnClickListener(v -> showDateTimePicker(binding.inputFrom));
+
         binding.resetButton.setOnClickListener(v -> {
             binding.inputFrom.setText(null);
             binding.inputFrom.setTag(null);
@@ -83,4 +99,27 @@ public class EventFilterFragment extends Fragment {
                 }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
     }
 
+
+    /**
+     * Gets the value stored in the tag of the field, which is used to store the UTC value of the date time.
+     * @param field
+     * @return
+     */
+    @Nullable
+    private String getTagValue(TextInputEditText field) {
+        Object tag = field.getTag();
+        return tag != null ? tag.toString() : null;
+    }
+
+    /**
+     * Gets the text value of the field, which is used for the category filter.
+     * @param field
+     * @return
+     */
+    @Nullable
+    private String getTextValue(TextInputEditText field) {
+        CharSequence text = field.getText();
+        if (text == null || text.toString().trim().isEmpty()) return null;
+        return text.toString().trim();
+    }
 }

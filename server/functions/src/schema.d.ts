@@ -1,14 +1,6 @@
-import { Timestamp } from "firebase-admin/firestore";
+// the actual underlying forms of each of the documents
 
-declare interface UserDocument {
-  deviceId: string;
-  name: string | null;
-  email: string | null;
-  phone: string | null;
-  entrant: EntrantMap | null;
-  organizer: OrganizerMap | null;
-  admin: AdminMap | null;
-}
+import { Timestamp } from "firebase-admin/firestore";
 
 declare interface EntrantMap {
   enteredEvents: string[];
@@ -22,6 +14,25 @@ declare interface OrganizerMap {
 }
 
 declare interface AdminMap {}
+
+declare interface UserDocument {
+  deviceId: string;
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+  entrant: EntrantMap | null;
+  organizer: OrganizerMap | null;
+  admin: AdminMap | null;
+  notifToken: string | null;
+}
+
+declare interface ExternalUser {
+  userId: string;
+  name: string | null;
+  isAdmin: boolean;
+  isOrganizer: boolean;
+  isEntrant: boolean;
+}
 
 declare type UserRole = "entrant" | "admin" | "organizer";
 
@@ -46,4 +57,15 @@ declare interface EventDocument {
   geolocation: boolean;
   registrationLimit: number | null;
   imageId: string | null;
+}
+
+declare interface NotificationDocument {
+  eventId: string;
+
+  title: string;
+  message: string;
+
+  waited: boolean;
+  selected: boolean;
+  cancelled: boolean;
 }

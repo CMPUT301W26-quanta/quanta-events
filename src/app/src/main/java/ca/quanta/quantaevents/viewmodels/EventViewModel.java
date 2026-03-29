@@ -24,7 +24,6 @@ import androidx.annotation.Nullable;
  * View-model for managing event-related data and cloud functions.
  */
 public class EventViewModel extends ViewModel {
-
     // Initialize an instance of cloud functions
     private FirebaseFunctions functions = FirebaseFunctions.getInstance();
 

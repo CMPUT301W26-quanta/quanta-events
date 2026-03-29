@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "firebase-functions": "^7.0.6"
+    "firebase-functions": "^7.0.6",
+    "zod": "^4.3.6"
   }
 }
