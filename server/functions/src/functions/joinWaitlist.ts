@@ -12,9 +12,9 @@ const joinWaitlistInterface = util.standardForm(
           .object({
             latitude: z.number(),
             longitude: z.number(),
-            accuracyM: z.number().nullable().optional(),
+            accuracyM: z.number().nullable(),
           })
-          .optional(),
+          .nullable(),
   })
 );
 
@@ -27,7 +27,6 @@ export async function joinWaitlist(request: CallableRequest) {
   const { eventId, joinLocation } = data;
 
   const userData = await util.verifyUser(userId, deviceId);
-  util.requireRole(userData, "entrant");
 
   util.requireRole(userData, "entrant");
 

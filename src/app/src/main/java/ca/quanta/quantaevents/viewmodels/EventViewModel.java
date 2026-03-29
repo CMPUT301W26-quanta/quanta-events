@@ -332,6 +332,8 @@ public class EventViewModel extends ViewModel {
             joinLocation.put("longitude", longitude);
             joinLocation.put("accuracyM", accuracyM);
             payload.put("joinLocation", joinLocation);
+        } else  {
+            payload.put("joinLocation", null);
         }
 
         data.put("data", payload);

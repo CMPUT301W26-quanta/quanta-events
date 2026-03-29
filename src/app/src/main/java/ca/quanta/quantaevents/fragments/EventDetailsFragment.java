@@ -328,31 +328,6 @@ public class EventDetailsFragment extends Fragment {
         }
     }
 
-    private void performNormalJoin() {
-        Log.d("EventDetails", "joinWaitlist: eventId=" + eventId); // keep the current join logging
-
-        eventModel.joinWaitlist(userId, deviceId, eventId, null, null, null) // keep the existing normal join request
-                .addOnSuccessListener(_done -> {
-                    inWaitlist = true; // update local state after a successful join
-                    Log.d("EventDetails", "joinWaitlist: success"); // keep success logging
-                    updateEnrollButtonLabel(); // refresh the button text/color
-                    refreshWaitlistCount(); // refresh the displayed waitlist count
-                    ToastManager.show(requireContext(), "Joined waitlist", Toast.LENGTH_LONG); // show the same success toast
-                })
-                .addOnFailureListener(ex -> {
-                    Log.e("EventDetails", "joinWaitlist: failed", ex); // keep failure logging
-                    ToastManager.show(requireContext(), "Failed to join waitlist", Toast.LENGTH_LONG); // show the same failure toast
-                });
-    }
-
-    private void startGeolocationJoinFlow() {
-        ToastManager.show(
-                requireContext(),
-                "This event requires geolocation. Geolocation flow will be added here.", // placeholder for the next step
-                Toast.LENGTH_LONG
-        );
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
