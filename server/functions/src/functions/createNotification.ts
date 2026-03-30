@@ -4,9 +4,6 @@ import * as z from "zod";
 import * as util from "../util";
 import { v4 as uuidv4 } from "uuid";
 import { CollectionReference, getFirestore } from "firebase-admin/firestore";
-import { EventDocument } from "../schema";
-import { UserDocument } from "../schema";
-import { getMessaging, Message } from "firebase-admin/messaging";
 
 const createNotificationInterface = util.standardForm(
 	z.object({
@@ -83,52 +80,7 @@ export async function createNotification(request: CallableRequest) {
 		}
 	}
 
-	// Get the FCM tokens by querying the user objects in the recipient list
-	const deviceTokens: string[] = [];
-	const userDocuments = db.collection("users") as CollectionReference<
-		UserDocument,
-		UserDocument
-	>;
-	for (const entrantId of recipients) {
-		const userDocument = (await userDocuments.doc(entrantId).get()).data();
-		const token = userDocument?.notifToken;
-		const receiveNotifications = userDocument?.entrant?.receiveNotifications;
+	util.sendBatchNotifications(recipients, data.title || "", data.message || "");
 
-		if (token != null && receiveNotifications) {
-			deviceTokens.push(token);
-			logger.info("This is a token", { token });
-		}
-	}
-
-	console.log("Tokens here", { deviceTokens });
-
-	// Send notification to the recipients
-	for (const t of deviceTokens) {
-		const finalNotification: Message = {
-			token: t,
-			data: {
-				title: String(data.title),
-				body: String(data.message),
-			},
-			android: {
-				priority: "high",
-			},
-			apns: {
-				headers: {
-					"apns-priority": "5",
-				},
-			},
-		};
-		await getMessaging()
-			.send(finalNotification)
-			.then((response: string) => {
-				logger.info("Message sent succesfully");
-			})
-			.catch((error: string) => {
-				console.log("Message failed to send", error);
-			});
-	}
-
-	logger.info("Everything worked.", { notificationId });
 	return { notificationId };
 }

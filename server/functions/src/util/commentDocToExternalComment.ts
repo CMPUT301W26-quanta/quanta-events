@@ -1,5 +1,3 @@
-import { CommentDocument, ExternalComment } from "../schema";
-
 export function commentDocToExternalComment(
 	doc: FirebaseFirestore.QueryDocumentSnapshot<
 		FirebaseFirestore.DocumentData,

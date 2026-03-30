@@ -17,8 +17,15 @@ export async function removeImage(imageId: string) {
 		throw new HttpsError("not-found", "Image not found");
 	}
 
-	const eventsSnapshot = await db.collection("events").where("imageId", "==", imageId).get();
-	await Promise.all(eventsSnapshot.docs.map((eventDoc) => eventDoc.ref.update({ imageId: null })));
+	const eventsSnapshot = await db
+		.collection("events")
+		.where("imageId", "==", imageId)
+		.get();
+	await Promise.all(
+		eventsSnapshot.docs.map((eventDoc) =>
+			eventDoc.ref.update({ imageId: null }),
+		),
+	);
 
 	await db.collection("images").doc(imageId).delete();
 

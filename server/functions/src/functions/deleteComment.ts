@@ -3,7 +3,6 @@ import { logger } from "firebase-functions";
 import { CallableRequest, HttpsError } from "firebase-functions/https";
 import * as z from "zod";
 import * as util from "../util";
-import { CommentDocument, EventDocument } from "../schema";
 
 const deleteCommentInterface = util.standardForm(
 	z.object({

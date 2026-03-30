@@ -32,17 +32,26 @@ initializeApp();
 
 export const health = onCall({ maxInstances: 1 }, functions.health);
 
-export const createComment = onCall({ maxInstances: 1 }, functions.createComment);
+export const createComment = onCall(
+	{ maxInstances: 1 },
+	functions.createComment,
+);
 
 export const createUser = onCall({ maxInstances: 1 }, functions.createUser);
 
 export const getUser = onCall({ maxInstances: 1 }, functions.getUser);
 
-export const getAllComments = onCall({ maxInstances: 1 }, functions.getAllComments);
+export const getAllComments = onCall(
+	{ maxInstances: 1 },
+	functions.getAllComments,
+);
 
 export const getAllImages = onCall({ maxInstances: 1 }, functions.getAllImages);
 
-export const getAllNotifications = onCall({ maxInstances: 1}, functions.getAllNotifications);
+export const getAllNotifications = onCall(
+	{ maxInstances: 1 },
+	functions.getAllNotifications,
+);
 
 export const getAllUsers = onCall({ maxInstances: 1 }, functions.getAllUsers);
 
@@ -54,37 +63,54 @@ export const createImage = onCall({ maxInstances: 1 }, functions.createImage);
 
 export const getImage = onCall({ maxInstances: 1 }, functions.getImage);
 
-export const deleteComment = onCall({ maxInstances: 1 }, functions.deleteComment);
+export const deleteComment = onCall(
+	{ maxInstances: 1 },
+	functions.deleteComment,
+);
 
 export const deleteImage = onCall({ maxInstances: 1 }, functions.deleteImage);
 
 export const deleteUser = onCall({ maxInstances: 1 }, functions.deleteUser);
 
+export const drawLottery = onCall({ maxInstances: 1 }, functions.drawLottery);
+
 export const updateUser = onCall({ maxInstances: 1 }, functions.updateUser);
 
-export const getOrganizerName = onCall({ maxInstances: 1 }, functions.getOrganizerName);
+export const getOrganizerName = onCall(
+	{ maxInstances: 1 },
+	functions.getOrganizerName,
+);
 
-export const getWaitlistCount = onCall({ maxInstances: 1 }, functions.getWaitlistCount);
+export const getWaitlistCount = onCall(
+	{ maxInstances: 1 },
+	functions.getWaitlistCount,
+);
 
 export const joinWaitlist = onCall({ maxInstances: 1 }, functions.joinWaitlist);
 
-export const leaveWaitlist = onCall({ maxInstances: 1 }, functions.leaveWaitlist);
+export const leaveWaitlist = onCall(
+	{ maxInstances: 1 },
+	functions.leaveWaitlist,
+);
 
-export const checkWaitlist = onCall({ maxInstances: 1 }, functions.checkWaitlist);
+export const checkWaitlist = onCall(
+	{ maxInstances: 1 },
+	functions.checkWaitlist,
+);
 
 export const updateEvent = onCall({ maxInstances: 1 }, functions.updateEvent);
 
-export const getWaitlist = onCall({ maxInstances: 1}, functions.getWaitlist)
+export const getWaitlist = onCall({ maxInstances: 1 }, functions.getWaitlist);
 
 export const createNotification = onCall(
-  { maxInstances: 1 },
-  functions.createNotification
+	{ maxInstances: 1 },
+	functions.createNotification,
 );
 
-// export const getNotification = onCall(
-//   { maxInstances: 1 },
-//   functions.getNotification
-// );
+export const getNotification = onCall(
+	{ maxInstances: 1 },
+	functions.getNotification,
+);
 
 export const getEvents = onCall({ maxInstances: 1 }, functions.getEvents);
 

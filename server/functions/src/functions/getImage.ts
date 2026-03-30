@@ -2,7 +2,6 @@ import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
 import { CallableRequest, HttpsError } from "firebase-functions/https";
 import * as z from "zod";
-import { ImageDocument } from "../schema";
 import * as util from "../util";
 
 const getImageInterface = util.standardForm(

@@ -201,6 +201,9 @@
         <argument
             android:name="eventId"
             app:argType="java.util.UUID" />
+        <argument
+            android:name="isDrawn"
+            app:argType="boolean" />
     </fragment>
 
     <fragment

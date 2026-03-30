@@ -35,24 +35,26 @@ export async function createUser(request: CallableRequest) {
 		await db
 			.collection("users")
 			.doc(userId)
-			.create({
-				deviceId,
-				name: name,
-				email: email,
-				phone: phone,
-				entrant: isEntrant
-					? {
-							enteredEvents: [],
-							history: [],
-							receiveNotifications: receiveNotifications ?? false,
-						}
-					: null,
-				organizer: isOrganizer
-					? { createdEvents: [], sentNotifications: [] }
-					: null,
-				admin: isAdmin ? {} : null,
-				notifToken: null,
-			});
+			.create(
+				util.enforceFull<UserDocument>({
+					deviceId,
+					name: name,
+					email: email,
+					phone: phone,
+					entrant: isEntrant
+						? {
+								enteredEvents: [],
+								history: [],
+								receiveNotifications: receiveNotifications ?? false,
+							}
+						: null,
+					organizer: isOrganizer
+						? { createdEvents: [], sentNotifications: [] }
+						: null,
+					admin: isAdmin ? {} : null,
+					notifToken: null,
+				}),
+			);
 	} catch (_) {
 		throw new HttpsError("already-exists", "User already exists");
 	}
