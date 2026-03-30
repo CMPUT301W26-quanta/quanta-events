@@ -16,7 +16,7 @@ declare global {
 		notifToken: string | null;
 	}
 
-interface EntrantMap {
+    interface EntrantMap {
 		enteredEvents: string[];
 		history: string[];
 		receiveNotifications: boolean;
@@ -66,13 +66,14 @@ interface EntrantMap {
 		isEntrant: boolean;
 	}
 
-declare interface NotificationDocument {
-  eventId: string;
+    interface NotificationDocument {
+        eventId: string;
 
-  title: string;
-  message: string;
+        title: string;
+        message: string;
 
-  waited: boolean;
-  selected: boolean;
-  cancelled: boolean;
+        waited: boolean;
+        selected: boolean;
+        cancelled: boolean;
+    }
 }
