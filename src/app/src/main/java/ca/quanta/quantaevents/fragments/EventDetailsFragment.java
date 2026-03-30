@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+import android.Manifest;
+import android.content.pm.PackageManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +21,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -37,6 +42,10 @@ import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
+
 public class EventDetailsFragment extends Fragment {
     private FragmentEventDetailsBinding binding;
     private SessionStore sessionStore;
@@ -48,6 +57,7 @@ public class EventDetailsFragment extends Fragment {
     private boolean isAdmin = false;
     private boolean fromAdmin = false;
     private boolean inWaitlist = false;
+    private boolean geolocationRequired = false;
     private int waitlistCount = 0;
 
     private boolean isDrawn = false;
@@ -56,10 +66,13 @@ public class EventDetailsFragment extends Fragment {
 
     private UserViewModel model;
     private boolean isOrganizer = false;
+    private FusedLocationProviderClient fusedLocationClient;
+    private ActivityResultLauncher<String[]> locationPermissionLauncher;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
         // set up the header
 
@@ -107,6 +120,32 @@ public class EventDetailsFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        locationPermissionLauncher =
+                registerForActivityResult(
+                        new ActivityResultContracts.RequestMultiplePermissions(),
+                        result -> {
+                            boolean fineGranted = Boolean.TRUE.equals(
+                                    result.get(Manifest.permission.ACCESS_FINE_LOCATION));
+                            boolean coarseGranted = Boolean.TRUE.equals(
+                                    result.get(Manifest.permission.ACCESS_COARSE_LOCATION));
+
+                            if (fineGranted || coarseGranted) {
+                                fetchLocationAndJoinWaitlist();
+                            } else {
+                                ToastManager.show(
+                                        requireContext(),
+                                        "Location permission is required for this event",
+                                        Toast.LENGTH_LONG
+                                );
+                            }
+                        }
+                );
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentEventDetailsBinding.inflate(inflater, container, false);
@@ -149,6 +188,7 @@ public class EventDetailsFragment extends Fragment {
             return;
         }
 
+        geolocationRequired = event.isGeolocationEnabled();
         isDrawn = event.isDrawn();
 
         binding.getRoot().setVisibility(VISIBLE);
@@ -328,21 +368,103 @@ public class EventDetailsFragment extends Fragment {
                     );
         } else {
             Log.d("EventDetails", "joinWaitlist: eventId=" + eventId);
-            eventModel.joinWaitlist(userId, deviceId, eventId)
-                    .addOnSuccessListener(_done -> {
-                        inWaitlist = true;
-                        Log.d("EventDetails", "joinWaitlist: success");
-                        updateEnrollButtonLabel();
-                        refreshWaitlistCount();
-                        ToastManager.show(requireContext(), "Joined waitlist", Toast.LENGTH_LONG);
-                    })
-                    .addOnFailureListener(ex ->
-                            {
-                                Log.e("EventDetails", "joinWaitlist: failed", ex);
-                                ToastManager.show(requireContext(), "Failed to join waitlist", Toast.LENGTH_LONG);
-                            }
-                    );
+
+            if (geolocationRequired) {
+                requestLocationThenJoin();
+            } else {
+                submitJoinWaitlist(null, null, null);
+            }
         }
+    }
+
+    private void requestLocationThenJoin() {
+        boolean fineGranted = ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED;
+
+        boolean coarseGranted = ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED;
+
+        if (fineGranted || coarseGranted) {
+            fetchLocationAndJoinWaitlist();
+            return;
+        }
+
+        locationPermissionLauncher.launch(new String[] {
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        });
+    }
+
+    private void fetchLocationAndJoinWaitlist() {
+        boolean fineGranted = ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED;
+
+        boolean coarseGranted = ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED;
+
+        if (!fineGranted && !coarseGranted) {
+            ToastManager.show(
+                    requireContext(),
+                    "Location permission is required for this event",
+                    Toast.LENGTH_LONG
+            );
+            return;
+        }
+
+        fusedLocationClient
+
+                .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener(location -> {
+                    if (location == null) {
+                        ToastManager.show(
+                                requireContext(),
+                                "Failed to get current location",
+                                Toast.LENGTH_LONG
+                        );
+                        return;
+                    }
+
+                    submitJoinWaitlist(
+                            location.getLatitude(),
+                            location.getLongitude(),
+                            (double) location.getAccuracy()
+                    );
+                })
+                .addOnFailureListener(ex -> {
+                    Log.e("EventDetails", "getCurrentLocation failed", ex);
+                    ToastManager.show(
+                            requireContext(),
+                            "Failed to get current location",
+                            Toast.LENGTH_LONG
+                    );
+                });
+    }
+
+    private void submitJoinWaitlist(
+            @Nullable Double latitude,
+            @Nullable Double longitude,
+            @Nullable Double accuracyM
+    ) {
+        eventModel.joinWaitlist(userId, deviceId, eventId, latitude, longitude, accuracyM)
+                .addOnSuccessListener(_done -> {
+                    inWaitlist = true;
+                    Log.d("EventDetails", "joinWaitlist: success");
+                    updateEnrollButtonLabel();
+                    refreshWaitlistCount();
+                    ToastManager.show(requireContext(), "Joined waitlist", Toast.LENGTH_LONG);
+                })
+                .addOnFailureListener(ex -> {
+                    Log.e("EventDetails", "joinWaitlist: failed", ex);
+                    ToastManager.show(requireContext(), "Failed to join waitlist", Toast.LENGTH_LONG);
+                });
     }
 
     /** formats the time returned from server to show in a user readble format

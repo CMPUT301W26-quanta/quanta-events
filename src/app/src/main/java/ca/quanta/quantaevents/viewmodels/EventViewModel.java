@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.models.Event;
+import androidx.annotation.Nullable;
 
 /**
  * View-model for managing event-related data and cloud functions.
@@ -323,13 +324,25 @@ public class EventViewModel extends ViewModel {
      * @param eventId  UUID to identify event.
      * @return null if successful, an error if unsuccessful.
      */
-    public Task<Void> joinWaitlist(UUID userId, UUID deviceId, UUID eventId) {
+    public Task<Void> joinWaitlist(UUID userId, UUID deviceId, UUID eventId,
+                                   @Nullable Double latitude, @Nullable Double longitude, @Nullable Double accuracyM) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("eventId", eventId.toString());
+
+        if (latitude != null && longitude != null) {
+            Map<String, Object> joinLocation = new HashMap<>();
+            joinLocation.put("latitude", latitude);
+            joinLocation.put("longitude", longitude);
+            joinLocation.put("accuracyM", accuracyM);
+            payload.put("joinLocation", joinLocation);
+        } else  {
+            payload.put("joinLocation", null);
+        }
+
         data.put("data", payload);
 
         Log.d("EventViewModel", "joinWaitlist payload type=" + data.getClass().getName());
