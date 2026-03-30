@@ -3,7 +3,6 @@ import * as util from "../util";
 import * as z from "zod";
 import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
-import { EventDocument } from "../schema";
 
 const updateEventInterface = util.standardForm(
   z.object({
@@ -60,7 +59,10 @@ export async function updateEvent(request: CallableRequest) {
   const event = eventDoc.data() as EventDocument;
 
   if (event.organizer !== userId) {
-    throw new HttpsError("permission-denied", "User is not the organizer of this event");
+    throw new HttpsError(
+      "permission-denied",
+      "User is not the organizer of this event"
+    );
   }
 
   const updates: Record<string, any> = {

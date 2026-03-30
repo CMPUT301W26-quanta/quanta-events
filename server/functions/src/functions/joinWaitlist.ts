@@ -3,7 +3,6 @@ import * as util from "../util";
 import * as z from "zod";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
-import { EventDocument } from "../schema";
 
 const joinWaitlistInterface = util.standardForm(
   z.object({
@@ -45,7 +44,10 @@ export async function joinWaitlist(request: CallableRequest) {
   const registrationEnd = event.registrationEndTime.toDate();
 
   if (now < registrationStart) {
-    throw new HttpsError("failed-precondition", "Registration has not started yet");
+    throw new HttpsError(
+      "failed-precondition",
+      "Registration has not started yet"
+    );
   }
 
   if (now > registrationEnd) {
@@ -56,7 +58,10 @@ export async function joinWaitlist(request: CallableRequest) {
   const alreadyInFinalList = event.finalList?.includes(userId);
 
   if (alreadyInWaitlist || alreadyInFinalList) {
-    throw new HttpsError("already-exists", "User is already registered for this event");
+    throw new HttpsError(
+      "already-exists",
+      "User is already registered for this event"
+    );
   }
 
   if (
@@ -76,13 +81,19 @@ export async function joinWaitlist(request: CallableRequest) {
       );
   }
 
-  await db.collection("events").doc(eventId).update({
-    waitList: FieldValue.arrayUnion(userId),
-  });
+  await db
+    .collection("events")
+    .doc(eventId)
+    .update({
+      waitList: FieldValue.arrayUnion(userId),
+    });
 
-  await db.collection("users").doc(userId).update({
-    "entrant.enteredEvents": FieldValue.arrayUnion(eventId),
-  });
+  await db
+    .collection("users")
+    .doc(userId)
+    .update({
+      "entrant.enteredEvents": FieldValue.arrayUnion(eventId),
+    });
 
   if (joinLocation) {
       await db

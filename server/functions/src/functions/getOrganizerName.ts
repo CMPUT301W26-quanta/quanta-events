@@ -3,7 +3,6 @@ import * as util from "../util";
 import * as z from "zod";
 import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
-import { EventDocument, UserDocument } from "../schema";
 
 const getOrganizerNameInterface = util.standardForm(
   z.object({
