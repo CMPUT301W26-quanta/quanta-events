@@ -16,11 +16,18 @@ import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentEventManagerBinding;
+import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
+import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
+import ca.quanta.quantaevents.viewmodels.EventViewModel;
 
 public class EventManagerFragment extends Fragment {
     private FragmentEventManagerBinding binding;
+    private UUID userId;
+    private UUID deviceId;
     private UUID eventId;
+    private Boolean isDrawn;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -34,7 +41,15 @@ public class EventManagerFragment extends Fragment {
         infoStore.setIconRes(R.drawable.material_symbols_edit_outline);
 
         // reads event id passed as an argument in the bundle
-        readEventId();
+        SessionStore sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+
+        sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
+            userId = uid;
+            deviceId = did;
+        });
+
+        readArgs();
 
         // sets on click listener to navigate to editor fragment
         binding.editDetailsButton.setOnClickListener(
@@ -64,6 +79,27 @@ public class EventManagerFragment extends Fragment {
                     Navigation.findNavController(v).navigate(action);
                 }
         );
+
+        if(isDrawn) {
+            binding.drawLotteryButton.setEnabled(false);
+            binding.drawLotteryButton.setAlpha(0.5f);
+        } else {
+            binding.drawLotteryButton.setOnClickListener(v -> {
+                binding.drawLotteryButton.setEnabled(false);
+                binding.drawLotteryButton.setAlpha(0.5f);
+                EventViewModel events = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
+                loader.loadTask(events.drawLottery(userId, deviceId, eventId)
+                                .addOnSuccessListener(_void -> ToastManager.show(requireContext(), "Drew lottery"))
+                        .addOnFailureListener(exc -> {
+                            exc.printStackTrace();
+                            binding.drawLotteryButton.setEnabled(true);
+                            binding.drawLotteryButton.setAlpha(1.0f);
+                            ToastManager.show(requireContext(), "Failed to draw lottery");
+                        })
+                );
+            });
+        }
+
         // send on click listener to navigate back to previous fragment
         binding.backButton.setOnClickListener(
                 v -> {
@@ -80,8 +116,9 @@ public class EventManagerFragment extends Fragment {
         return binding.getRoot();
     }
 
-    private void readEventId() {
+    private void readArgs() {
         EventManagerFragmentArgs args = EventManagerFragmentArgs.fromBundle(getArguments());
         eventId = args.getEventId();
+        isDrawn = args.getIsDrawn();
     }
 }

@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -43,6 +44,8 @@ public class Event {
     @Nullable
     private UUID imageId;
 
+    private final boolean drawn;
+
     /**
      * Constructor for an Event object when all optional fields are filled.
      * @param imageId ID of an image object to be shown with the event.
@@ -72,6 +75,7 @@ public class Event {
         this.eventCapacity = 0;
         this.registrationLimit = registrationLimit;
         this.imageId = imageId;
+        this.drawn = false;
     }
 
     /**
@@ -102,6 +106,7 @@ public class Event {
         this.eventCapacity = 0;
         this.registrationLimit = registrationLimit;
         this.imageId = null;
+        this.drawn = false;
     }
 
     /**
@@ -132,6 +137,7 @@ public class Event {
         this.eventCapacity = 0;
         this.registrationLimit = null;
         this.imageId = imageId;
+        this.drawn = false;
     }
 
     /**
@@ -162,6 +168,7 @@ public class Event {
         this.eventCapacity = 0;
         this.registrationLimit = null;
         this.imageId = null;
+        this.drawn = false;
     }
 
     /**
@@ -204,6 +211,7 @@ public class Event {
         this.eventCapacity = eventCapacity == null ? 0 : eventCapacity;
         this.registrationLimit = registrationLimit;
         this.imageId = imageId;
+        this.drawn = false;
     }
 
     public Event(UUID eventId, Map<String, Object> data){
@@ -225,6 +233,9 @@ public class Event {
         this.eventCapacity = Integer.parseInt(data.getOrDefault("eventCapacity", "0").toString());
         this.registrationLimit = data.get("registrationLimit") == null ? null : Integer.parseInt(data.get("registrationLimit").toString());
         this.imageId = data.get("imageId") == null ? null : UUID.fromString(data.get("imageId").toString());
+        this.drawn = Optional.ofNullable(data.get("drawn"))
+                .flatMap(val -> val instanceof Boolean ? Optional.of((Boolean)val) : Optional.empty())
+                .orElse(false);
     }
 
     public Event(Map<String, Object> data) {
@@ -246,6 +257,9 @@ public class Event {
         this.eventCapacity = Integer.parseInt(data.getOrDefault("eventCapacity", "0").toString());
         this.registrationLimit = data.get("registrationLimit") == null ? null : Integer.parseInt(data.get("registrationLimit").toString());
         this.imageId = data.get("imageId") == null ? null : UUID.fromString(data.get("imageId").toString());
+        this.drawn = Optional.ofNullable(data.get("drawn"))
+                .flatMap(val -> val instanceof Boolean ? Optional.of((Boolean)val) : Optional.empty())
+                .orElse(false);
     }
 
     public UUID getEventId() {
@@ -326,4 +340,7 @@ public class Event {
         return imageId;
     }
 
+    public boolean isDrawn() {
+        return drawn;
+    }
 }

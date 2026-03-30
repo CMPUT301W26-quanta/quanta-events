@@ -36,6 +36,7 @@ public class NotificationService extends FirebaseMessagingService {
 
     /**
      * Listener which activates on creation of a new messaging token.
+     *
      * @param token The token used for sending messages to this application instance.
      */
     @Override
@@ -48,21 +49,23 @@ public class NotificationService extends FirebaseMessagingService {
 
     /**
      * Listener which activates when a device receives a notification message.
+     *
      * @param message Task object containing message data.
      */
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
-        Map<String, String> data = message.getData();
-        String title = data.get("title");
-        String body = data.get("body");
-        showNotification(title, body);
+        RemoteMessage.Notification notification = message.getNotification();
+        if (notification != null) {
+            showNotification(notification.getTitle(), notification.getBody());
+        }
     }
 
     /**
      * Shows notifications in the device notification wall.
+     *
      * @param title Title of the notification.
-     * @param body Message text of the notification.
+     * @param body  Message text of the notification.
      */
     private void showNotification(String title, String body) {
         String channelId = "default_channel";
@@ -93,8 +96,8 @@ public class NotificationService extends FirebaseMessagingService {
 
     /**
      *
-     * @param token Device's cloud messaging token.
-     * @param userId UUID identifying the user.
+     * @param token    Device's cloud messaging token.
+     * @param userId   UUID identifying the user.
      * @param deviceId UUID identifying the user's device.
      * @return Boolean task object confirming successful execution.
      */

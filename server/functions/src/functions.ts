@@ -5,6 +5,7 @@ export * from "./functions/createNotification";
 export * from "./functions/createUser";
 export * from "./functions/deleteImage";
 export * from "./functions/deleteUser";
+export * from "./functions/drawLottery";
 export * from "./functions/getAllImages";
 export * from "./functions/getAllNotifications";
 export * from "./functions/getAllUsers";
