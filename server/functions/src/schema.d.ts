@@ -65,15 +65,45 @@ declare global {
 		isOrganizer: boolean;
 		isEntrant: boolean;
 	}
-}
 
-declare interface NotificationDocument {
-  eventId: string;
+	interface NotificationDocument {
+		eventId: string;
 
-  title: string;
-  message: string;
+		title: string;
+		message: string;
 
-  waited: boolean;
-  selected: boolean;
-  cancelled: boolean;
+		waited: boolean;
+		selected: boolean;
+		cancelled: boolean;
+	}
+
+	/** The form comments are stored as in the database. */
+	interface CommentDocument {
+		senderId: string;
+		message: string;
+	}
+
+	/** The form images are stored as in the database. */
+	interface ImageDocument {
+		imageData: string;
+	}
+
+	// *** External
+
+	/** The form sent as comments to the front end. */
+	interface ExternalComment {
+		commentId: string;
+
+		senderId: string;
+		message: string;
+	}
+
+	interface ExternalUser {
+		userId: string;
+
+		name: string | null;
+		isAdmin: boolean;
+		isOrganizer: boolean;
+		isEntrant: boolean;
+	}
 }

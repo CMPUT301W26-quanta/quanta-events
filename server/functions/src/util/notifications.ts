@@ -5,7 +5,7 @@ import { logger } from "firebase-functions";
 export async function sendNotification(
 	targetId: string,
 	title: string,
-	body: string
+	body: string,
 ) {
 	const db = getFirestore();
 	const targetDoc = (await db
@@ -15,7 +15,7 @@ export async function sendNotification(
 
 	if (!targetDoc.exists) {
 		logger.error(
-			`Failed to send notification, user ${targetId} does not exist.`
+			`Failed to send notification, user ${targetId} does not exist.`,
 		);
 		return;
 	}
@@ -24,7 +24,7 @@ export async function sendNotification(
 
 	if (target.notifToken === undefined || target.notifToken === null) {
 		logger.error(
-			`Failed to send notification, user ${targetId} does not have a notifToken assigned.`
+			`Failed to send notification, user ${targetId} does not have a notifToken assigned.`,
 		);
 		return;
 	}
@@ -58,7 +58,7 @@ export async function sendNotification(
 export async function sendBatchNotifications(
 	targetIds: string[],
 	title: string,
-	body: string
+	body: string,
 ) {
 	// Send notification to the recipients
 	for (const targetId of targetIds) {

@@ -1,32 +1,30 @@
-import * as z from "zod";
-import * as util from "../util";
-import { CallableRequest, HttpsError } from "firebase-functions/https";
 import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
+import { CallableRequest, HttpsError } from "firebase-functions/https";
+import * as z from "zod";
+import * as util from "../util";
 
 const getImageInterface = util.standardForm(
-  z.object({
-    imageId: z.uuid(),
-  })
+	z.object({
+		imageId: z.uuid(),
+	}),
 );
 
-export async function getImage(request: CallableRequest) {
-  const { userId, deviceId, data } = util.parseInterface(
-    getImageInterface,
-    request
-  );
-  const { imageId } = data;
+export async function getImage(
+	request: CallableRequest,
+): Promise<ImageDocument> {
+	const payload = util.parseInterface(getImageInterface, request);
+	await util.verifyUser(payload.userId, payload.deviceId);
 
-  await util.verifyUser(userId, deviceId);
+	logger.info(`Retrieving image ${payload.data.imageId}.`);
 
-  const db = getFirestore();
+	const db = getFirestore();
 
-  const imageDoc = await db.collection("images").doc(imageId).get();
+	const image = await db.collection("images").doc(payload.data.imageId).get();
 
-  if (!imageDoc.exists) {
-    throw new HttpsError("not-found", "Image not found");
-  }
+	if (!image.exists) {
+		throw new HttpsError("not-found", "Image not found");
+	}
 
-  logger.info("Found image", { imageId });
-  return imageDoc.data();
+	return image.data() as ImageDocument;
 }

@@ -18,7 +18,7 @@ const updateUserInterface = z.object({
 export async function updateUser(request: CallableRequest) {
 	const { userId, deviceId, data } = util.parseInterface(
 		updateUserInterface,
-		request
+		request,
 	);
 
 	const { name, email, phone, receiveNotifications } = data;

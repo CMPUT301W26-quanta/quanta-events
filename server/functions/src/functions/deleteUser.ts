@@ -7,13 +7,13 @@ import * as util from "../util";
 const deleteUserInterface = util.standardForm(
 	z.object({
 		target: z.uuid(),
-	})
+	}),
 );
 
 export async function deleteUser(request: CallableRequest) {
 	const { userId, deviceId, data } = util.parseInterface(
 		deleteUserInterface,
-		request
+		request,
 	);
 
 	const userData = await util.verifyUser(userId, deviceId);

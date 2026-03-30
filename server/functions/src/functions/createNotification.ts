@@ -13,13 +13,13 @@ const createNotificationInterface = util.standardForm(
 		waited: z.boolean(),
 		cancelled: z.boolean(),
 		selected: z.boolean(),
-	})
+	}),
 );
 
 export async function createNotification(request: CallableRequest) {
 	const { userId, deviceId, data } = util.parseInterface(
 		createNotificationInterface,
-		request
+		request,
 	);
 
 	const { message, title, eventId, waited, cancelled, selected } = data;

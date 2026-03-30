@@ -6,31 +6,31 @@ import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
 
 const createImageInterface = util.standardForm(
-  z.object({
-    imageData: z.base64(),
-  })
+	z.object({
+		imageData: z.base64(),
+	}),
 );
 
 export async function createImage(request: CallableRequest) {
-  const { userId, deviceId, data } = util.parseInterface(
-    createImageInterface,
-    request
-  );
+	const { userId, deviceId, data } = util.parseInterface(
+		createImageInterface,
+		request,
+	);
 
-  const { imageData } = data;
+	const { imageData } = data;
 
-  await util.verifyUser(userId, deviceId);
+	await util.verifyUser(userId, deviceId);
 
-  const imageId = uuidv4();
+	const imageId = uuidv4();
 
-  const db = getFirestore();
+	const db = getFirestore();
 
-  try {
-    await db.collection("images").doc(imageId).create({ imageData });
-  } catch (_) {
-    throw new HttpsError("already-exists", "Event already exists");
-  }
+	try {
+		await db.collection("images").doc(imageId).create({ imageData });
+	} catch (_) {
+		throw new HttpsError("already-exists", "Event already exists");
+	}
 
-  logger.info("Image Created", { imageId });
-  return { imageId };
+	logger.info("Image Created", { imageId });
+	return { imageId };
 }

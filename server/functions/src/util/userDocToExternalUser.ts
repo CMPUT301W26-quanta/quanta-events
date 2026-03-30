@@ -2,7 +2,7 @@ export function userDocToExternalUser(
 	doc: FirebaseFirestore.QueryDocumentSnapshot<
 		FirebaseFirestore.DocumentData,
 		FirebaseFirestore.DocumentData
-	>
+	>,
 ): ExternalUser {
 	const user = doc.data() as UserDocument;
 

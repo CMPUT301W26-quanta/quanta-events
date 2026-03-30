@@ -7,20 +7,22 @@ import * as util from "../util";
 const getAllImagesInterface = util.standardForm(z.object({}));
 
 export async function getAllImages(
-  request: CallableRequest,
+	request: CallableRequest,
 ): Promise<string[]> {
-  const { userId, deviceId } = util.parseInterface(
-	getAllImagesInterface,
-	request,
-  );
+	const { userId, deviceId } = util.parseInterface(
+		getAllImagesInterface,
+		request,
+	);
 
-  const userData = await util.verifyUser(userId, deviceId);
-  await util.requireRole(userData, "admin");
+	const userData = await util.verifyUser(userId, deviceId);
+	await util.requireRole(userData, "admin");
 
-  const db = getFirestore();
+	const db = getFirestore();
 
-  const imageIDs = (await db.collection("images").get()).docs.map((doc) => doc.id);
+	const imageIDs = (await db.collection("images").get()).docs.map(
+		(doc) => doc.id,
+	);
 
-  logger.info("Get all users.");
-  return imageIDs;
+	logger.info("Get all users.");
+	return imageIDs;
 }
