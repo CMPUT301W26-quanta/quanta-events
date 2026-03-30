@@ -19,13 +19,13 @@ const createEventInterface = util.standardForm(
 		location: z.string(),
 		registrationLimit: z.int().positive().nullable(),
 		imageId: z.uuid().nullable(),
-	})
+	}),
 );
 
 export async function createEvent(request: CallableRequest) {
 	const { userId, deviceId, data } = util.parseInterface(
 		createEventInterface,
-		request
+		request,
 	);
 
 	const {
@@ -76,7 +76,7 @@ export async function createEvent(request: CallableRequest) {
 					eventCapacity,
 					registrationLimit: registrationLimit,
 					imageId: imageId,
-				})
+				}),
 			);
 	} catch (_) {
 		throw new HttpsError("already-exists", "Event already exists");

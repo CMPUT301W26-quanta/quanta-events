@@ -1,3 +1,4 @@
+export * from "./util/commentDocToExternalComment";
 export * from "./util/enforce";
 export * from "./util/notifications";
 export * from "./util/parseInterface";

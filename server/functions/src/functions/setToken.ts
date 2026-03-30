@@ -6,13 +6,13 @@ import { getFirestore } from "firebase-admin/firestore";
 const setTokenInterface = util.standardForm(
 	z.object({
 		token: z.string(),
-	})
+	}),
 );
 
 export async function setToken(request: CallableRequest): Promise<void> {
 	const { userId, deviceId, data } = util.parseInterface(
 		setTokenInterface,
-		request
+		request,
 	);
 
 	util.verifyUser(userId, deviceId);
@@ -28,7 +28,7 @@ export async function setToken(request: CallableRequest): Promise<void> {
 			.update(
 				util.enforcePartial<UserDocument>({
 					notifToken: token,
-				})
+				}),
 			);
 	} catch (e) {
 		throw new HttpsError("not-found", "User not found");

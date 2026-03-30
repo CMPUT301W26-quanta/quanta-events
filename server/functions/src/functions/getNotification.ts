@@ -2,7 +2,6 @@ import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
 import { CallableRequest, HttpsError } from "firebase-functions/https";
 import * as z from "zod";
-import { NotificationDocument } from "../schema";
 import * as util from "../util";
 
 const getNotificationInterface = util.standardForm(

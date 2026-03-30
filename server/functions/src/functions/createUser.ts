@@ -1,9 +1,9 @@
+import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
 import { CallableRequest, HttpsError } from "firebase-functions/https";
+import { v4 as uuidv4 } from "uuid";
 import * as z from "zod";
 import * as util from "../util";
-import { v4 as uuidv4 } from "uuid";
-import { getFirestore } from "firebase-admin/firestore";
 
 const createUserInterface = z.object({
 	deviceId: z.uuid(),
@@ -46,14 +46,14 @@ export async function createUser(request: CallableRequest) {
 								enteredEvents: [],
 								history: [],
 								receiveNotifications: receiveNotifications ?? false,
-						  }
+							}
 						: null,
 					organizer: isOrganizer
 						? { createdEvents: [], sentNotifications: [] }
 						: null,
 					admin: isAdmin ? {} : null,
 					notifToken: null,
-				})
+				}),
 			);
 	} catch (_) {
 		throw new HttpsError("already-exists", "User already exists");

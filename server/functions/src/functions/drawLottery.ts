@@ -12,13 +12,13 @@ import {
 const drawLotteryInterface = util.standardForm(
 	z.object({
 		eventId: z.uuid(),
-	})
+	}),
 );
 
 export async function drawLottery(request: CallableRequest) {
 	const { userId, deviceId, data } = util.parseInterface(
 		drawLotteryInterface,
-		request
+		request,
 	);
 
 	const userData = await util.verifyUser(userId, deviceId);
@@ -49,7 +49,7 @@ export async function drawLottery(request: CallableRequest) {
 			if (event.organizer !== userId) {
 				throw new HttpsError(
 					"failed-precondition",
-					"Event is not owned by this user"
+					"Event is not owned by this user",
 				);
 			}
 
@@ -57,7 +57,7 @@ export async function drawLottery(request: CallableRequest) {
 			if (event.drawn || false) {
 				throw new HttpsError(
 					"failed-precondition",
-					"Event has already drawn lottery"
+					"Event has already drawn lottery",
 				);
 			}
 
@@ -66,14 +66,14 @@ export async function drawLottery(request: CallableRequest) {
 			if (event.registrationEndTime > now) {
 				throw new HttpsError(
 					"failed-precondition",
-					"Event is still open for registration"
+					"Event is still open for registration",
 				);
 			}
 
 			// POST: Lottery marked as being drawn
 			transaction.update(
 				eventRef,
-				util.enforcePartial<EventDocument>({ drawn: true })
+				util.enforcePartial<EventDocument>({ drawn: true }),
 			);
 
 			const waitlist = event.waitList;
@@ -94,7 +94,7 @@ export async function drawLottery(request: CallableRequest) {
 				util.enforcePartial<EventDocument>({
 					selectedList: selected,
 					rejectedList: rejected,
-				})
+				}),
 			);
 
 			return {
@@ -129,7 +129,7 @@ export async function drawLottery(request: CallableRequest) {
 
 			if (entrantVal === undefined || entrantVal === null) {
 				logger.error(
-					`Failed to update history for user ${user}, continuing loop`
+					`Failed to update history for user ${user}, continuing loop`,
 				);
 				continue;
 			}
