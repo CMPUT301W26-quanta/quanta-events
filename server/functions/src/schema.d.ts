@@ -65,15 +65,15 @@ declare global {
 		isOrganizer: boolean;
 		isEntrant: boolean;
 	}
+}
 
-    interface NotificationDocument {
-        eventId: string;
+declare interface NotificationDocument {
+  eventId: string;
 
-        title: string;
-        message: string;
+  title: string;
+  message: string;
 
-        waited: boolean;
-        selected: boolean;
-        cancelled: boolean;
-    }
+  waited: boolean;
+  selected: boolean;
+  cancelled: boolean;
 }
