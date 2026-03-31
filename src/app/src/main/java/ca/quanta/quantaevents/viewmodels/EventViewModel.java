@@ -298,6 +298,7 @@ public class EventViewModel extends ViewModel {
                 });
     }
 
+
     /**
      * Calls the joinWaitlist cloud function to add a user to an event waitlist.
      *
