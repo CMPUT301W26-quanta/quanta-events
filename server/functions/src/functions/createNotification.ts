@@ -13,6 +13,7 @@ const createNotificationInterface = util.standardForm(
 		waited: z.boolean(),
 		cancelled: z.boolean(),
 		selected: z.boolean(),
+		final: z.boolean(),
 	}),
 );
 
@@ -22,7 +23,7 @@ export async function createNotification(request: CallableRequest) {
 		request,
 	);
 
-	const { message, title, eventId, waited, cancelled, selected } = data;
+	const { message, title, eventId, waited, cancelled, selected, final } = data;
 
 	const userData = await util.verifyUser(userId, deviceId);
 	await util.requireRole(userData, "organizer");
@@ -39,6 +40,7 @@ export async function createNotification(request: CallableRequest) {
 			waited,
 			cancelled,
 			selected,
+			final,
 		});
 	} catch (_) {
 		throw new HttpsError("already-exists", "Notification already exists");
@@ -70,10 +72,19 @@ export async function createNotification(request: CallableRequest) {
 			}
 		}
 	}
-	if (selected) {
+	if (final) {
 		const finalList = eventDocument?.finalList as string[];
 		logger.info("This is the final list", { finalList });
 		for (const entrantId of finalList) {
+			if (!recipients.includes(entrantId)) {
+				recipients.push(entrantId);
+			}
+		}
+	}
+	if (selected) {
+		const selectedList = eventDocument?.selectedList as string[];
+		logger.info("This is the selected list", { selectedList });
+		for (const entrantId of selectedList) {
 			if (!recipients.includes(entrantId)) {
 				recipients.push(entrantId);
 			}
