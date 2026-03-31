@@ -93,5 +93,12 @@ export async function createNotification(request: CallableRequest) {
 
 	util.sendBatchNotifications(recipients, data.title || "", data.message || "");
 
+	// Store the notification in organizer's created notifications array
+	const userDocuments = db.collection("users") as CollectionReference<UserDocument, UserDocument>;
+	const organizerDocument = (await userDocuments.doc(userId).get()).data();
+	organizerDocument?.organizer?.sentNotifications.push(notificationId);
+	const sentNotificationsList = organizerDocument?.organizer?.sentNotifications;
+	await db.collection("users").doc(userId).update({"organizer.sentNotifications": sentNotificationsList});
+
 	return { notificationId };
 }
