@@ -259,13 +259,10 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getWaitlistCount")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Integer>() {
-                    @Override
-                    public Integer then(@NonNull Task<HttpsCallableResult> task) {
-                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
+                .onSuccessTask(callResult -> {
+                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
                         Object count = result == null ? null : result.get("count");
-                        return count instanceof Number ? ((Number) count).intValue() : 0;
-                    }
+                        return Tasks.forResult(count instanceof Number ? ((Number) count).intValue() : 0);
                 });
     }
 
@@ -292,14 +289,11 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("checkWaitlist")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Boolean>() {
-                    @Override
-                    public Boolean then(@NonNull Task<HttpsCallableResult> task) {
-                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
+                .onSuccessTask(callResult -> {
+                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
                         Log.d("EventViewModel", "checkWaitlist result=" + result);
                         Object inWaitlist = result == null ? null : result.get("inWaitlist");
-                        return inWaitlist instanceof Boolean ? (Boolean) inWaitlist : false;
-                    }
+                        return Tasks.forResult(inWaitlist instanceof Boolean ? (Boolean) inWaitlist : false);
                 });
     }
 
@@ -326,12 +320,9 @@ public class EventViewModel extends ViewModel {
         return FirebaseFunctions.getInstance()
                 .getHttpsCallable("joinWaitlist")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Void>() {
-                    @Override
-                    public Void then(@NonNull Task<HttpsCallableResult> task) {
+                .onSuccessTask(callResult -> {
                         Log.d("EventViewModel", "joinWaitlist success");
-                        return null;
-                    }
+                        return Tasks.forResult(null);
                 });
     }
 
@@ -358,12 +349,9 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("leaveWaitlist")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Void>() {
-                    @Override
-                    public Void then(@NonNull Task<HttpsCallableResult> task) {
+                .onSuccessTask(callResult -> {
                         Log.d("EventViewModel", "leaveWaitlist success");
-                        return null;
-                    }
+                        return Tasks.forResult(null);
                 });
     }
 
