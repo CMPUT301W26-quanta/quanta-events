@@ -107,12 +107,9 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("createEvent")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, UUID>() {
-                    @Override
-                    public UUID then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
-                        return UUID.fromString((String) result.get("eventId"));
-                    }
+                .onSuccessTask(callResult -> {
+                    Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                    return Tasks.forResult(UUID.fromString((String) result.get("eventId")));
                 });
     }
 
@@ -136,13 +133,10 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getEvent")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Event>() {
-                    @Override
-                    public Event then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        Map<String, Object> eventData = (Map<String, Object>) task.getResult().getData();
+                .onSuccessTask(callResult -> {
+                    Map<String, Object> eventData = (Map<String, Object>) callResult.getData();
 
-                        return new Event(eventId, eventData);
-                    }
+                    return Tasks.forResult(new Event(eventId, eventData));
                 });
     }
 
@@ -200,24 +194,21 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getEvents")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, List<Event>>() {
-                    @Override
-                    public List<Event> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        List<Map<String, Object>> result = (List<Map<String, Object>>) task.getResult().getData();
-                        Log.d("EventViewModel", "getEvents result=" + result);
-                        ArrayList<Event> events = new ArrayList<>();
-                        if (result == null) {
-                            return events;
-                        }
-                        for (Map<String, Object> item : result) {
-                            Event event = new Event(item);
-                            if (event != null) {
-                                events.add(event);
-                            }
-                        }
-                        System.out.println("EVENTS ARRAY" + events);
-                        return events;
+                .onSuccessTask(callResult -> {
+                    List<Map<String, Object>> result = (List<Map<String, Object>>) callResult.getData();
+                    Log.d("EventViewModel", "getEvents result=" + result);
+                    ArrayList<Event> events = new ArrayList<>();
+                    if (result == null) {
+                        return Tasks.forResult(events);
                     }
+                    for (Map<String, Object> item : result) {
+                        Event event = new Event(item);
+                        if (event != null) {
+                            events.add(event);
+                        }
+                    }
+                    System.out.println("EVENTS ARRAY" + events);
+                    return Tasks.forResult(events);
                 });
     }
 
@@ -241,13 +232,10 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getOrganizerName")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, String>() {
-                    @Override
-                    public String then(@NonNull Task<HttpsCallableResult> task) {
-                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
+                .onSuccessTask(callResult -> {
+                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
                         Object name = result == null ? null : result.get("name");
-                        return name == null ? null : name.toString();
-                    }
+                        return Tasks.forResult(name == null ? null : name.toString());
                 });
     }
 
