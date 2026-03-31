@@ -3,7 +3,7 @@ import { CallableRequest, HttpsError } from "firebase-functions/https";
 import * as z from "zod";
 import * as util from "../util";
 import { v4 as uuidv4 } from "uuid";
-import { CollectionReference, getFirestore } from "firebase-admin/firestore";
+import { CollectionReference, FieldValue, getFirestore } from "firebase-admin/firestore";
 
 const createNotificationInterface = util.standardForm(
 	z.object({
@@ -93,12 +93,13 @@ export async function createNotification(request: CallableRequest) {
 
 	util.sendBatchNotifications(recipients, data.title || "", data.message || "");
 
-	// Store the notification in organizer's created notifications array
-	const userDocuments = db.collection("users") as CollectionReference<UserDocument, UserDocument>;
-	const organizerDocument = (await userDocuments.doc(userId).get()).data();
-	organizerDocument?.organizer?.sentNotifications.push(notificationId);
-	const sentNotificationsList = organizerDocument?.organizer?.sentNotifications;
-	await db.collection("users").doc(userId).update({"organizer.sentNotifications": sentNotificationsList});
+	// Store the notification in organizer's sent notifications array
+	await db
+			.collection("users")
+			.doc(userId)
+			.update({
+				"organizer.sentNotifications": FieldValue.arrayUnion(notificationId),
+			});
 
 	return { notificationId };
 }
