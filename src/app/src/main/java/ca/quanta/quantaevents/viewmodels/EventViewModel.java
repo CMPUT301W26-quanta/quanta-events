@@ -7,10 +7,10 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.models.Event;
+import androidx.annotation.Nullable;
 
 /**
  * View-model for managing event-related data and cloud functions.
@@ -62,28 +63,29 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the createEvent cloud function and adds an event to the database.
-     * @param userId UUID to identify user.
-     * @param deviceId UUID to identify user's device.
+     *
+     * @param userId                UUID to identify user.
+     * @param deviceId              UUID to identify user's device.
      * @param registrationStartTime ISO-8601 datetime with offset (UTC preferred).
-     * @param registrationEndTime ISO-8601 datetime with offset (UTC preferred).
-     * @param eventTime ISO-8601 datetime with offset (UTC preferred).
-     * @param eventName Name of the event.
-     * @param eventDescription Description of the event.
-     * @param eventCategory Category (optional).
-     * @param eventGuidelines Guidelines (optional).
-     * @param geolocation Whether geolocation is enabled.
-     * @param eventCapacity Entrant capacity.
-     * @param location Location of the event.
-     * @param registrationLimit Waitlist capacity (optional).
-     * @param imageId UUID identifying the image for the event (optional).
+     * @param registrationEndTime   ISO-8601 datetime with offset (UTC preferred).
+     * @param eventTime             ISO-8601 datetime with offset (UTC preferred).
+     * @param eventName             Name of the event.
+     * @param eventDescription      Description of the event.
+     * @param eventCategory         Category (optional).
+     * @param eventGuidelines       Guidelines (optional).
+     * @param geolocation           Whether geolocation is enabled.
+     * @param eventCapacity         Entrant capacity.
+     * @param location              Location of the event.
+     * @param registrationLimit     Waitlist capacity (optional).
+     * @param imageId               UUID identifying the image for the event (optional).
      * @return UUID assigned to the newly created event.
      */
     public Task<UUID> createEvent(UUID userId, UUID deviceId, String registrationStartTime,
-                                    String registrationEndTime, String eventTime,
-                                    String eventName, String eventDescription,
-                                    String eventCategory, String eventGuidelines,
-                                    boolean geolocation, int eventCapacity,
-                                    String location, Integer registrationLimit, UUID imageId) {
+                                  String registrationEndTime, String eventTime,
+                                  String eventName, String eventDescription,
+                                  String eventCategory, String eventGuidelines,
+                                  boolean geolocation, int eventCapacity,
+                                  String location, Integer registrationLimit, UUID imageId) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -117,8 +119,9 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the getEvent cloud function, fetches an event from the database, and maps it to an Event model.
-     * @param eventId UUID identify the event.
-     * @param userId UUID to identify user.
+     *
+     * @param eventId  UUID identify the event.
+     * @param userId   UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @return Event object.
      */
@@ -146,15 +149,16 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the getEvents cloud function, filtering events for different fragments.
-     * @param userId UUID to identify user.
-     * @param deviceId UUID to identify user's device.
-     * @param max Max number of events to return. Set to -1 for no maximum.
+     *
+     * @param userId    UUID to identify user.
+     * @param deviceId  UUID to identify user's device.
+     * @param max       Max number of events to return. Set to -1 for no maximum.
      * @param startFrom Event ID to start after (optional).
-     * @param fetch Filter mode (optional).
+     * @param fetch     Filter mode (optional).
      * @param startDate ISO-8601 datetime with offset (optional).
-     * @param endDate ISO-8601 datetime with offset (optional).
-     * @param search Search string (optional).
-     * @param sortBy Sort mode.
+     * @param endDate   ISO-8601 datetime with offset (optional).
+     * @param search    Search string (optional).
+     * @param sortBy    Sort mode.
      * @return List of Event objects after processing the search/filter query.
      */
     public Task<List<Event>> getEvents(UUID userId, UUID deviceId, int max,
@@ -220,9 +224,10 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the getOrganizerName cloud function and fetches the organizer name for an event.
-     * @param userId UUID to identify user.
+     *
+     * @param userId   UUID to identify user.
      * @param deviceId UUID to identify user's device.
-     * @param eventId UUID to identify the event.
+     * @param eventId  UUID to identify the event.
      * @return String representing organizer name.
      */
     public Task<String> getOrganizerName(UUID userId, UUID deviceId, UUID eventId) {
@@ -249,9 +254,10 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the getWaitlistCount cloud function to get the number of users on the waitlist of an event.
-     * @param userId UUID to identify user.
+     *
+     * @param userId   UUID to identify user.
      * @param deviceId UUID to identify user's device.
-     * @param eventId UUID to identify event.
+     * @param eventId  UUID to identify event.
      * @return Integer count of people on waitlist.
      */
     public Task<Integer> getWaitlistCount(UUID userId, UUID deviceId, UUID eventId) {
@@ -278,9 +284,10 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the checkWaitlist cloud function to check if a user is in waitlist of an event.
-     * @param userId UUID to identify user.
+     *
+     * @param userId   UUID to identify user.
      * @param deviceId UUID to identify user's device.
-     * @param eventId UUID to identify event.
+     * @param eventId  UUID to identify event.
      * @return Boolean value of true if user is in waitlist, false otherwise.
      */
     public Task<Boolean> checkWaitlist(UUID userId, UUID deviceId, UUID eventId) {
@@ -311,18 +318,31 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the joinWaitlist cloud function to add a user to an event waitlist.
-     * @param userId UUID to identify user.
+     *
+     * @param userId   UUID to identify user.
      * @param deviceId UUID to identify user's device.
-     * @param eventId UUID to identify event.
+     * @param eventId  UUID to identify event.
      * @return null if successful, an error if unsuccessful.
      */
-    public Task<Void> joinWaitlist(UUID userId, UUID deviceId, UUID eventId) {
+    public Task<Void> joinWaitlist(UUID userId, UUID deviceId, UUID eventId,
+                                   @Nullable Double latitude, @Nullable Double longitude, @Nullable Double accuracyM) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("eventId", eventId.toString());
+
+        if (latitude != null && longitude != null) {
+            Map<String, Object> joinLocation = new HashMap<>();
+            joinLocation.put("latitude", latitude);
+            joinLocation.put("longitude", longitude);
+            joinLocation.put("accuracyM", accuracyM);
+            payload.put("joinLocation", joinLocation);
+        } else  {
+            payload.put("joinLocation", null);
+        }
+
         data.put("data", payload);
 
         Log.d("EventViewModel", "joinWaitlist payload type=" + data.getClass().getName());
@@ -342,9 +362,10 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the leaveWaitlist cloud function to remove a user from an event waitlist.
-     * @param userId UUID to identify user.
+     *
+     * @param userId   UUID to identify user.
      * @param deviceId UUID to identify user's device.
-     * @param eventId UUID to identify event.
+     * @param eventId  UUID to identify event.
      * @return null if successful, an error if unsuccessful.
      */
     public Task<Void> leaveWaitlist(UUID userId, UUID deviceId, UUID eventId) {
@@ -373,20 +394,21 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the updateEvent cloud function to update an event.
-     * @param userId UUID to identify user.
-     * @param deviceId UUID to identify user's device.
+     *
+     * @param userId                UUID to identify user.
+     * @param deviceId              UUID to identify user's device.
      * @param registrationStartTime ISO-8601 datetime with offset (UTC preferred).
-     * @param registrationEndTime ISO-8601 datetime with offset (UTC preferred).
-     * @param eventTime ISO-8601 datetime with offset (UTC preferred).
-     * @param eventName Name of the event.
-     * @param eventDescription Description of the event.
-     * @param eventCategory Category (optional).
-     * @param eventGuidelines Guidelines (optional).
-     * @param geolocation Whether geolocation is enabled.
-     * @param eventCapacity Entrant capacity.
-     * @param location Location of the event.
-     * @param registrationLimit Waitlist capacity (optional).
-     * @param imageId UUID identifying the image for the event (optional).
+     * @param registrationEndTime   ISO-8601 datetime with offset (UTC preferred).
+     * @param eventTime             ISO-8601 datetime with offset (UTC preferred).
+     * @param eventName             Name of the event.
+     * @param eventDescription      Description of the event.
+     * @param eventCategory         Category (optional).
+     * @param eventGuidelines       Guidelines (optional).
+     * @param geolocation           Whether geolocation is enabled.
+     * @param eventCapacity         Entrant capacity.
+     * @param location              Location of the event.
+     * @param registrationLimit     Waitlist capacity (optional).
+     * @param imageId               UUID identifying the image for the event (optional).
      * @return null if successful, an error if unsuccessful.
      */
     public Task<Void> updateEvent(UUID userId, UUID deviceId, UUID eventId,
@@ -418,11 +440,28 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("updateEvent")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Void>() {
-                    @Override
-                    public Void then(@NonNull Task<HttpsCallableResult> task) {
-                        return null;
-                    }
-                });
+                .onSuccessTask(task -> Tasks.forResult(null));
+    }
+
+    /**
+     * Calls the drawLottery cloud function to draw the lottery for an event.
+     *
+     * @param userId   UUID to identify user.
+     * @param deviceId UUID to identify user's device.
+     * @param eventId  UUID to identify event.
+     * @return null on success, error on failure
+     */
+    public Task<Void> drawLottery(UUID userId, UUID deviceId, UUID eventId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        data.put("data", payload);
+
+        return functions.getHttpsCallable("drawLottery")
+                .call(data)
+                .onSuccessTask(task -> Tasks.forResult(null));
     }
 }

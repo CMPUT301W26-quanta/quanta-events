@@ -201,6 +201,9 @@
         <argument
             android:name="eventId"
             app:argType="java.util.UUID" />
+        <argument
+            android:name="isDrawn"
+            app:argType="boolean" />
     </fragment>
 
     <fragment
@@ -390,7 +393,12 @@
         android:id="@+id/adminNotificationHistoryFragment"
         android:name="ca.quanta.quantaevents.fragments.AdminNotificationHistoryFragment"
         android:label="fragment_android_notifcation_history_panel"
-        tools:layout="@layout/fragment_admin_notification_history"/>
+        tools:layout="@layout/fragment_admin_notification_history">
+        <argument
+            android:name="profileId"
+            app:argType="java.util.UUID"
+            app:nullable="false" />
+    </fragment>
     <action
         android:id="@+id/action_global_registerFragment"
         app:destination="@id/registerFragment"

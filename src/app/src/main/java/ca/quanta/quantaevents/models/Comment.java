@@ -3,37 +3,35 @@ package ca.quanta.quantaevents.models;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-public class Comment{
+public class Comment {
 
     private final UUID commentId;
-    private final UUID commenterId;
-    private ZonedDateTime commentTime;
+    private final UUID senderId;
+    private final String message;
 
 
     /**
      * Constructor for a Notification object.
-     * @param commenterId ID of a User who made the comment.
      * @param commentId The ID of the comment.
-     * @param commentTime The time at which the comment was made.
+     * @param senderId ID of a User who made the comment.
+     * @param message The content of the comment.
      */
-    public Comment(UUID commentId, UUID commenterId, ZonedDateTime commentTime){
+    public Comment(UUID commentId, UUID senderId, String message){
 
-        this.commentId = UUID.randomUUID();
-        this.commenterId = commenterId;
-        this.commentTime = commentTime;
-    }
-
-    public UUID getCommenterId() {
-        return this.commenterId;
+        this.commentId = commentId;
+        this.senderId = senderId;
+        this.message = message;
     }
 
     public UUID getCommentId(){
         return this.commentId;
     }
 
-    public ZonedDateTime getCommentTime(){
-        return this.commentTime;
+    public UUID getSenderId() {
+        return this.senderId;
     }
 
-
+    public String getMessage(){
+        return this.message;
+    }
 }

@@ -1,5 +1,6 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
+import { HttpsError } from "firebase-functions/https";
 
 /**
  * Removes the image from the database.
@@ -10,11 +11,21 @@ import { logger } from "firebase-functions";
 export async function removeImage(imageId: string) {
 	const db = getFirestore();
 
-	const targetDoc = await db.collection("images").doc(imageId).get();
-	if (!targetDoc.exists) return;
+	const imageDoc = await db.collection("images").doc(imageId).get();
 
-	const eventsSnapshot = await db.collection("events").where("imageId", "==", imageId).get();
-	await Promise.all(eventsSnapshot.docs.map((eventDoc) => eventDoc.ref.update({ imageId: null })));
+	if (!imageDoc.exists) {
+		throw new HttpsError("not-found", "Image not found");
+	}
+
+	const eventsSnapshot = await db
+		.collection("events")
+		.where("imageId", "==", imageId)
+		.get();
+	await Promise.all(
+		eventsSnapshot.docs.map((eventDoc) =>
+			eventDoc.ref.update({ imageId: null }),
+		),
+	);
 
 	await db.collection("images").doc(imageId).delete();
 

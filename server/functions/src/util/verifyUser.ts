@@ -1,26 +1,25 @@
 import { DocumentSnapshot, getFirestore } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/https";
-import { UserDocument } from "../schema";
 
 export async function verifyUser(
-  userId: string,
-  deviceId: string
+	userId: string,
+	deviceId: string,
 ): Promise<UserDocument> {
-  const db = getFirestore();
+	const db = getFirestore();
 
-  const userDoc: DocumentSnapshot<UserDocument, UserDocument> = (await db
-    .collection("users")
-    .doc(userId)
-    .get()) as DocumentSnapshot<UserDocument, UserDocument>;
+	const userDoc: DocumentSnapshot<UserDocument, UserDocument> = (await db
+		.collection("users")
+		.doc(userId)
+		.get()) as DocumentSnapshot<UserDocument, UserDocument>;
 
-  if (!userDoc.exists) {
-    throw new HttpsError("not-found", "User does not exist");
-  }
+	if (!userDoc.exists) {
+		throw new HttpsError("not-found", "User does not exist");
+	}
 
-  const data = userDoc.data()!;
+	const data = userDoc.data()!;
 
-  if (data.deviceId !== deviceId) {
-    throw new HttpsError("unauthenticated", "Device ID does not match");
-  }
-  return data;
+	if (data.deviceId !== deviceId) {
+		throw new HttpsError("unauthenticated", "Device ID does not match");
+	}
+	return data;
 }

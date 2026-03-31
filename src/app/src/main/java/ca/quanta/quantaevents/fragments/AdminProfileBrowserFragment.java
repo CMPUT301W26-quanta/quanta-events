@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -42,33 +43,36 @@ public class AdminProfileBrowserFragment extends Fragment {
     private void listProfiles() {
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(
-            this.userModel.getAllUsers(this.userId, this.deviceId)
-                    .addOnSuccessListener(users -> {
-                        // filter out admins
+                this.userModel.getAllUsers(this.userId, this.deviceId)
+                        .addOnSuccessListener(users -> {
+                            // filter out admins
 
-                        ArrayList<ExternalUser> nonAdminProfiles = new ArrayList<ExternalUser>();
+                            ArrayList<ExternalUser> nonAdminProfiles = new ArrayList<ExternalUser>();
 
-                        for (ExternalUser user : users) {
-                            if (!user.isAdmin()) {
-                                nonAdminProfiles.add(user);
+                            for (ExternalUser user : users) {
+                                if (!user.isAdmin()) {
+                                    nonAdminProfiles.add(user);
+                                }
                             }
-                        }
 
-                        // use the adapter to display them
+                            // use the adapter to display them
 
-                        ProfileAdapter profilesAdapter = new ProfileAdapter(nonAdminProfiles, this);
+                            ProfileAdapter profilesAdapter = new ProfileAdapter(nonAdminProfiles, this, (profileID) -> {
+                                NavDirections action = AdminProfileBrowserFragmentDirections.actionAdminprofilebrowserFragmentToAdminNotificationHistoryFragment(profileID);
+                                Navigation.findNavController(this.requireView()).navigate(action);
+                            });
 
-                        binding.profilesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                        binding.profilesRecyclerView.setAdapter(profilesAdapter);
-                    })
-                    .addOnFailureListener(exception -> {
-                        Log.e("AdminProfileBrowserFragment", "Failed to fetch all users.", exception);
+                            binding.profilesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                            binding.profilesRecyclerView.setAdapter(profilesAdapter);
+                        })
+                        .addOnFailureListener(exception -> {
+                            Log.e("AdminProfileBrowserFragment", "Failed to fetch all users.", exception);
 
-                        ToastManager.show(requireContext(), "Failed to fetch users", Toast.LENGTH_LONG);
-                        if (exception instanceof FirebaseFunctionsException) {
-                            Log.e("AdminProfileBrowserFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
-                        }
-                    })
+                            ToastManager.show(requireContext(), "Failed to fetch users", Toast.LENGTH_LONG);
+                            if (exception instanceof FirebaseFunctionsException) {
+                                Log.e("AdminProfileBrowserFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
+                            }
+                        })
         );
     }
 

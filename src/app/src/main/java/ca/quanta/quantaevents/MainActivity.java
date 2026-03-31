@@ -20,6 +20,7 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.security.ProviderInstaller;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import ca.quanta.quantaevents.burger.SmartBurger;
@@ -30,8 +31,8 @@ import ca.quanta.quantaevents.fragments.AdminPanelFragment;
 import ca.quanta.quantaevents.fragments.EntrantEventListFragment;
 import ca.quanta.quantaevents.fragments.EventDashboardFragment;
 import ca.quanta.quantaevents.fragments.HomeFragment;
-import ca.quanta.quantaevents.models.User;
 import ca.quanta.quantaevents.loading.Loader;
+import ca.quanta.quantaevents.models.User;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
@@ -60,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
                  GooglePlayServicesNotAvailableException e) {
             throw new RuntimeException(e);
         }
-
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

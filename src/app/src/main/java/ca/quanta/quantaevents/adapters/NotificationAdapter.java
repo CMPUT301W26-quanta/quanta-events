@@ -8,21 +8,21 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.models.Notification;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
-    private final List<Notification> notifications;
+    private final ArrayList<Notification> notifications;
 
-    public NotificationAdapter(List<Notification> notifications) {
+    public NotificationAdapter(ArrayList<Notification> notifications) {
         this.notifications = notifications;
     }
 
     @Override
     public int getItemCount() {
-        return notifications.size();
+        return this.notifications.size();
     }
 
     @Override
@@ -39,10 +39,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         Notification notification = notifications.get(position);
 
         String title = notification.getTitle();
-        holder.title.setText(title != null ? title : "[NO NOTIFICATION.TITLE]");
+        holder.title.setText(title != null ? title : "[Title not set]");
 
         String message = notification.getMessage();
-        holder.message.setText(message != null ? message : "[NO NOTIFICATION.MESSAGE]");
+        holder.message.setText(message != null ? message : "[Message not set]");
     }
 
     public static class NotificationViewHolder extends RecyclerView.ViewHolder {
