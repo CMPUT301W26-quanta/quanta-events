@@ -16,7 +16,7 @@ declare global {
 		notifToken: string | null;
 	}
 
-	interface EntrantMap {
+    interface EntrantMap {
 		enteredEvents: string[];
 		history: string[];
 		receiveNotifications: boolean;
