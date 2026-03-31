@@ -210,7 +210,7 @@ public class EntrantEventBrowserFragment extends Fragment {
                             return;
                         }
                         if (isAdded()) {
-                            ToastManager.show(requireContext(), "Failed to load events", Toast.LENGTH_LONG);
+                            ToastManager.show(getContext(), "Failed to load events", Toast.LENGTH_LONG);
                         }
                     })
         );
@@ -229,7 +229,7 @@ public class EntrantEventBrowserFragment extends Fragment {
         ToastManager.cancel();
         Log.d("EntrantEventBrowser", "Loaded events count=" + events.size());
         if (events.isEmpty()) {
-            ToastManager.show(requireContext(), "No events to enroll in", Toast.LENGTH_LONG);
+            ToastManager.show(getContext(), "No events to enroll in", Toast.LENGTH_LONG);
             adapter.setItems(new ArrayList<>());
             return;
         }

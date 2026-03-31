@@ -71,7 +71,7 @@ public class EventNotificationEditorFragment extends Fragment {
                     waited, cancelled, selected)
                     .addOnSuccessListener(notificationId -> {
                         binding.saveButton.setEnabled(true);
-                        Toast.makeText(requireContext(), "Notification created", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Notification created", Toast.LENGTH_LONG).show();
                         if (isAdded()) {
                             Navigation.findNavController(requireView()).popBackStack();
                         }
@@ -79,7 +79,7 @@ public class EventNotificationEditorFragment extends Fragment {
                     .addOnFailureListener(ex -> {
                         binding.saveButton.setEnabled(true);
                         Log.e("TAG", "Failed to create notification", ex);
-                        Toast.makeText(requireContext(), "Failed to create notification", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Failed to create notification", Toast.LENGTH_LONG).show();
                     });
 
         });

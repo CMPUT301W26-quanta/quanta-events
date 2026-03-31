@@ -51,7 +51,7 @@ public class AdminImageBrowserFragment extends Fragment {
                     .addOnFailureListener(exception -> {
                         Log.e("AdminImageBrowserFragment", "Failed to fetch images.", exception);
 
-                        ToastManager.show(requireContext(), "Failed to fetch images", Toast.LENGTH_LONG);
+                        ToastManager.show(getContext(), "Failed to fetch images", Toast.LENGTH_LONG);
 
                         if (exception instanceof FirebaseFunctionsException) {
                             Log.e("AdminImageBrowserFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
