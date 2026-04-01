@@ -97,13 +97,13 @@ public class RegisterFragment extends Fragment {
                         .addOnSuccessListener(userId -> {
                             sessionStore.setSession(userId, deviceId);
                             binding.saveButton.setEnabled(true);
-                            ToastManager.show(requireContext(), "Account created", Toast.LENGTH_LONG);
+                            ToastManager.show(getContext(), "Account created", Toast.LENGTH_LONG);
                             tryRedirect();
                         })
                         .addOnFailureListener(ex -> {
                             binding.saveButton.setEnabled(true);
                             Log.e(TAG, "Failed to create account", ex);
-                            ToastManager.show(requireContext(), "Failed to create account", Toast.LENGTH_LONG);
+                            ToastManager.show(getContext(), "Failed to create account", Toast.LENGTH_LONG);
                         })
         );
 

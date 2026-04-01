@@ -81,7 +81,7 @@ public class AdminNotificationHistoryFragment extends Fragment {
                 .addOnFailureListener(exception -> {
                     Log.e("AdminNotificationHistoryFragment", "Failed to fetch notifications.", exception);
 
-                    ToastManager.show(requireContext(), "Failed to fetch notifications", Toast.LENGTH_LONG);
+                    ToastManager.show(getContext(), "Failed to fetch notifications", Toast.LENGTH_LONG);
 
                     if (exception instanceof FirebaseFunctionsException) {
                         Log.e("AdminNotificationHistoryFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
@@ -102,7 +102,7 @@ public class AdminNotificationHistoryFragment extends Fragment {
         // **** display toast in case there are none
 
         if (notifications.isEmpty()) {
-            ToastManager.show(requireContext(), "No notifications to display.", Toast.LENGTH_LONG);
+            ToastManager.show(getContext(), "No notifications to display.", Toast.LENGTH_LONG);
         }
     }
 

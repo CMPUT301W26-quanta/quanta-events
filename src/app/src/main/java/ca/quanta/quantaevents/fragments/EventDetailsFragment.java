@@ -136,7 +136,7 @@ public class EventDetailsFragment extends Fragment {
                                 fetchLocationAndJoinWaitlist();
                             } else {
                                 ToastManager.show(
-                                        requireContext(),
+                                        getContext(),
                                         "Location permission is required for this event",
                                         Toast.LENGTH_LONG
                                 );
@@ -173,7 +173,7 @@ public class EventDetailsFragment extends Fragment {
                     .addOnSuccessListener(this::bindEvent)
                     .addOnFailureListener(ex -> {
                                 if (isAdded()) {
-                                    ToastManager.show(requireContext(), "Failed to load event", Toast.LENGTH_LONG);
+                                    ToastManager.show(getContext(), "Failed to load event", Toast.LENGTH_LONG);
                                     Navigation.findNavController(requireView()).popBackStack();
                                 }
                             }
@@ -274,7 +274,7 @@ public class EventDetailsFragment extends Fragment {
                     binding.textOrganizer.setText(" Organized by " + name.trim());
                 })
                 .addOnFailureListener(exception -> {
-                    ToastManager.show(requireContext(), "Failed to fetch organizer name", Toast.LENGTH_LONG);
+                    ToastManager.show(getContext(), "Failed to fetch organizer name", Toast.LENGTH_LONG);
                     Log.e("EventDetailsFragment", "Failed to fetch organizer name.", exception);
 
                     // set the organizer id as the name instead,
@@ -358,12 +358,12 @@ public class EventDetailsFragment extends Fragment {
                         Log.d("EventDetails", "leaveWaitlist: success");
                         updateEnrollButtonLabel();
                         refreshWaitlistCount();
-                        ToastManager.show(requireContext(), "Left waitlist", Toast.LENGTH_LONG);
+                        ToastManager.show(getContext(), "Left waitlist", Toast.LENGTH_LONG);
                     })
                     .addOnFailureListener(ex ->
                             {
                                 Log.e("EventDetails", "leaveWaitlist: failed", ex);
-                                ToastManager.show(requireContext(), "Failed to leave waitlist", Toast.LENGTH_LONG);
+                                ToastManager.show(getContext(), "Failed to leave waitlist", Toast.LENGTH_LONG);
                             }
                     );
         } else {
@@ -412,7 +412,7 @@ public class EventDetailsFragment extends Fragment {
 
         if (!fineGranted && !coarseGranted) {
             ToastManager.show(
-                    requireContext(),
+                    getContext(),
                     "Location permission is required for this event",
                     Toast.LENGTH_LONG
             );
@@ -425,7 +425,7 @@ public class EventDetailsFragment extends Fragment {
                 .addOnSuccessListener(location -> {
                     if (location == null) {
                         ToastManager.show(
-                                requireContext(),
+                                getContext(),
                                 "Failed to get current location",
                                 Toast.LENGTH_LONG
                         );
@@ -441,7 +441,7 @@ public class EventDetailsFragment extends Fragment {
                 .addOnFailureListener(ex -> {
                     Log.e("EventDetails", "getCurrentLocation failed", ex);
                     ToastManager.show(
-                            requireContext(),
+                            getContext(),
                             "Failed to get current location",
                             Toast.LENGTH_LONG
                     );
@@ -459,11 +459,11 @@ public class EventDetailsFragment extends Fragment {
                     Log.d("EventDetails", "joinWaitlist: success");
                     updateEnrollButtonLabel();
                     refreshWaitlistCount();
-                    ToastManager.show(requireContext(), "Joined waitlist", Toast.LENGTH_LONG);
+                    ToastManager.show(getContext(), "Joined waitlist", Toast.LENGTH_LONG);
                 })
                 .addOnFailureListener(ex -> {
                     Log.e("EventDetails", "joinWaitlist: failed", ex);
-                    ToastManager.show(requireContext(), "Failed to join waitlist", Toast.LENGTH_LONG);
+                    ToastManager.show(getContext(), ex.getMessage(), Toast.LENGTH_LONG);
                 });
     }
 
