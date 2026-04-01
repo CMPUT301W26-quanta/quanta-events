@@ -54,11 +54,11 @@ public class Comment {
     }
 
     public String getPostTime() {
-        return timestamp;
+        return this.postTime;
     }
 
     public void setPostTime(String postTime) {
-        this.timestamp = postTime;
+        this.postTime = postTime;
     }
 
     public String getSenderName() {
