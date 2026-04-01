@@ -45,6 +45,7 @@ import ca.quanta.quantaevents.viewmodels.UserViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.firebase.functions.FirebaseFunctionsException;
 
 public class EventDetailsFragment extends Fragment {
     private FragmentEventDetailsBinding binding;
@@ -233,8 +234,26 @@ public class EventDetailsFragment extends Fragment {
             binding.enrollButton.setText("Delete");
             binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
             isOrganizer = false;
+
+            binding.enrollButton.setOnClickListener(v -> {
+                this.eventModel.deleteEvent(this.eventId, this.userId, this.deviceId)
+                        .addOnSuccessListener(success -> {
+                            Navigation.findNavController(v).popBackStack();
+                        })
+                        .addOnFailureListener(exception -> {
+                            Log.e("EventDetailsFragment", "Failed to delete event.", exception);
+
+                            ToastManager.show(requireContext(), "Failed to delete event.", Toast.LENGTH_LONG);
+
+                            if (exception instanceof FirebaseFunctionsException) {
+                                Log.e("EventDetailsFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
+                            }
+                        });
+            });
+
             return;
         }
+
         if (userId != null && organizerId != null && organizerId.equals(userId.toString())) {
             isOrganizer = true;
             binding.enrollButton.setText("Manage");
@@ -243,8 +262,10 @@ public class EventDetailsFragment extends Fragment {
                 NavDirections action = EventDetailsFragmentDirections.actionEventdetailsfragmentToEventmanagerfragment(eventId, isDrawn);
                 Navigation.findNavController(v).navigate(action);
             });
+
             return;
         }
+
         isOrganizer = false;
         binding.enrollButton.setOnClickListener(v -> toggleWaitlist());
     }
