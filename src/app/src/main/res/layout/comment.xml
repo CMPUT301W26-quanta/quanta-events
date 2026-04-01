@@ -51,6 +51,15 @@
             android:layout_toRightOf="@id/load_comment"
             android:text="00/00/0000" />
 
+        <ImageButton
+            android:id = "@+id/delete_comment"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:background="@color/color_light_red"
+            android:padding = "15dp"
+            android:src = "@drawable/material_symbols_delete_rounded"/>
+
 
     </RelativeLayout>
 

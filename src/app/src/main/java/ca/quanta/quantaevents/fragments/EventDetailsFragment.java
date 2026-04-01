@@ -15,6 +15,7 @@ import android.widget.Toast;
 import android.Manifest;
 import android.content.pm.PackageManager;
 
+import android.app.ProgressDialog;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -24,10 +25,12 @@ import androidx.navigation.Navigation;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
@@ -225,6 +228,21 @@ public class EventDetailsFragment extends Fragment {
                         }
                     });
         }
+    }
+
+
+    private void loadComments(){
+
+
+    }
+
+    private void postComment(){
+
+
+    }
+
+    private void deleteComment(){
+
     }
 
     // change text on the button to display according to role
