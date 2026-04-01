@@ -8,6 +8,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,9 +30,10 @@ public class CommentViewModel extends ViewModel {
      * @param deviceId This user's device id (for permissions checking).
      * @param eventId The event to post the comment to.
      * @param message The content of the comment.
+     * @param postTime The time at which the comment was posted.
      * @return The ID of the created comment.
      */
-    public Task<UUID> createComment(UUID userId, UUID deviceId, UUID eventId, String message) {
+    public Task<UUID> createComment(UUID userId, UUID deviceId, UUID eventId, String message, String postTime) {
         Map<String, Object> data = new HashMap<>();
 
         data.put("userId", userId.toString());
@@ -40,6 +42,7 @@ public class CommentViewModel extends ViewModel {
         Map<String, Object> payload = new HashMap<>();
         payload.put("eventId", eventId.toString());
         payload.put("message", message);
+        payload.put("postTime", postTime);
 
         data.put("data", payload);
 
@@ -86,13 +89,11 @@ public class CommentViewModel extends ViewModel {
                         for (Map<String, Object> commentObject : commentObjects) {
                             UUID commentId = UUID.fromString((String) commentObject.get("commentId"));
                             UUID senderId = UUID.fromString((String) commentObject.get("senderId"));
-                            UUID deviceId = UUID.fromString((String) commentObject.get("deviceId"));
                             String message = (String) commentObject.get("message");
                             String postTime = (String) commentObject.get("postTime");
-                            String userName = (String) commentObject.get("userName");
+                            String senderName = (String) commentObject.get("senderName");
 
-
-                            comments.add(new Comment(commentId, message, postTime, userName, senderId, deviceId));
+                            comments.add(new Comment(commentId, senderId, message, postTime, senderName));
                         }
 
                         return comments;

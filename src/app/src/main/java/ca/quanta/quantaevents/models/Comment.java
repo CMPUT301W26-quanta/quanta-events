@@ -3,76 +3,68 @@ package ca.quanta.quantaevents.models;
 import java.util.UUID;
 
 public class Comment {
-    UUID commentId;
-
-    String comment;
+    private UUID commentId;
+    private UUID senderId; // *
+    private String message;
 
     String postTime;
 
-    UUID userId;
+    String senderName;
 
-    String userName;
+    public Comment() {}
 
-    UUID deviceId;
+    /**
+     * Constructor for a Comment object.
+     * @param commentId The ID of the comment.
+     * @param senderId ID of a user who made the comment.
+     * @param message The content of the comment.
+     * @param postTime The time at which the comment was made.
+     * @param senderName The name of the user who made the comment.
+     */
+    public Comment(UUID commentId, UUID senderId, String message, String postTime, String senderName) {
+        this.commentId = commentId;
+        this.senderId = senderId;
+        this.message = message;
+        this.postTime = postTime;
+        this.senderName = senderName;
+    }
 
     public UUID getCommentId() {
-        return commentId;
+        return this.commentId;
     }
 
-    public void setCommentId(UUID commentId){
+    public void setCommentId(UUID commentId) {
         this.commentId = commentId;
     }
 
-    public String getComment(){
-        return comment;
+    public UUID getSenderId() {
+        return senderId;
     }
 
-    public void setComment(String comment){
-        this.comment = comment;
+    public void setSenderId(UUID senderId) {
+        this.senderId = senderId;
     }
 
-    public String getPostTime(){
-        return postTime;
+    public String getMessage() {
+        return message;
     }
 
-    public void setPostTime(String postTime){
-        this.postTime = postTime;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-
-    public UUID getUserId(){
-        return userId;
+    public String getPostTime() {
+        return timestamp;
     }
 
-    public void setUserId(UUID userId){
-        this.userId = userId;
+    public void setPostTime(String postTime) {
+        this.timestamp = postTime;
     }
 
-    public String getUserName(){
-        return userName;
+    public String getSenderName() {
+        return this.senderName;
     }
-    public void setUserName(String userName){
-        this.userName = userName;
-    }
-
-    public UUID getDeviceId(){
-        return deviceId;
-    }
-    public void setDeviceId(UUID deviceId){
-        this.deviceId = deviceId;
-    }
-
-    public Comment(){
-    }
-
-    public Comment(UUID commentId, String comment, String postTime, String userName, UUID userId, UUID deviceId) {
-        this.commentId = commentId;
-        this.comment = comment;
-        this.postTime = postTime;
-        this.userName = userName;
-        this.userId = userId;
-        this.deviceId = deviceId;
-
-
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
     }
 }

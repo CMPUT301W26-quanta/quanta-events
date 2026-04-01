@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.format.DateFormat;
+
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -28,10 +29,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
     UUID eventId;
 
     public CommentAdapter(Context context, List<Comment> list, UUID userId, UUID eventId) {
-    this.context = context;
-    this.list = list;
-    this.userId = userId;
-    this.eventId = eventId;
+        this.context = context;
+        this.list = list;
+        this.userId = userId;
+        this.eventId = eventId;
     }
 
     @NonNull
@@ -42,19 +43,21 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
     }
     @Override
     public void onBindViewHolder(@NonNull MyHolder holder, int position) {
-        final UUID userId = list.get(position).getUserId();
-        String userName  = list.get(position).getUserName();
-        final UUID commentId = list.get(position).getCommentId();
-        String comment = list.get(position).getComment();
-        String timestamp = list.get(position).getPostTime();
+        final Comment thisComment = list.get(position);
+
+        final UUID commentId = thisComment.getCommentId();
+        final UUID senderId = thisComment.getSenderId();
+        final String senderName  = thisComment.getSenderName();
+        final String message = thisComment.getMessage();
+        final String timestamp = thisComment.getPostTime();
+
         Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
         calendar.setTimeInMillis(Long.parseLong(timestamp));
         String timedate = DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
 
-        holder.name.setText(userName);
+        holder.name.setText(senderName);
         holder.time.setText(timedate);
-        holder.comment.setText(comment);
-
+        holder.comment.setText(message);
     }
 
     @Override
