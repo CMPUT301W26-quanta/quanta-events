@@ -4,21 +4,24 @@ import * as z from "zod";
 import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
 
+type ListType = "waitList" | "cancelledList" | "finalList" | "rejectedList" | "selectedList";
+
 const getWaitlistInterface = util.standardForm(
 	z.object({
 		eventId: z.uuid(),
+    listType: z.enum(["waitList", "cancelledList", "finalList", "rejectedList", "selectedList"]),
 	}),
 );
 
 export async function getWaitlist(
 	request: CallableRequest,
-): Promise<{ waitList: string[] }> {
+): Promise<{ listRequested: string[]; listType: ListType }> {
 	const { userId, deviceId, data } = util.parseInterface(
 		getWaitlistInterface,
 		request,
 	);
 
-	const { eventId } = data;
+	const { eventId, listType } = data;
 
 	const userData = await util.verifyUser(userId, deviceId);
 	util.requireRole(userData, "organizer");
@@ -30,7 +33,7 @@ export async function getWaitlist(
 		throw new HttpsError("not-found", "Event not found");
 	}
 
-	const { organizer, waitList = [] } = eventDoc.data() as EventDocument;
+	const { organizer, [listType]: listRequested = [] } = eventDoc.data() as EventDocument;
 
 	if (organizer !== userId) {
 		throw new HttpsError(
@@ -39,7 +42,7 @@ export async function getWaitlist(
 		);
 	}
 
-	logger.info("Got waitlist", { eventId, count: waitList.length });
+	logger.info("Got requested list", { eventId, listType, count: listRequested.length });
 
-	return { waitList };
+	return { listRequested, listType };
 }
