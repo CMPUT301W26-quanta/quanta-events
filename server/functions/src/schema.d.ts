@@ -58,14 +58,6 @@ declare global {
 		drawn?: boolean;
 	}
 
-	interface ExternalUser {
-		userId: string;
-		name: string | null;
-		isAdmin: boolean;
-		isOrganizer: boolean;
-		isEntrant: boolean;
-	}
-
 	interface NotificationDocument {
 		eventId: string;
 
@@ -80,6 +72,7 @@ declare global {
 	/** The form comments are stored as in the database. */
 	interface CommentDocument {
 		senderId: string;
+		postTime: string;
 		message: string;
 	}
 
@@ -95,6 +88,7 @@ declare global {
 		commentId: string;
 
 		senderId: string;
+		postTime: string;
 		message: string;
 	}
 

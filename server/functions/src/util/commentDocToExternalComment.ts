@@ -10,6 +10,7 @@ export function commentDocToExternalComment(
 		commentId: doc.id,
 
 		senderId: comment.senderId,
+		postTime: comment.postTime,
 		message: comment.message,
 	};
 }
