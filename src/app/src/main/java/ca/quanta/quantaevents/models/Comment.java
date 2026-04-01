@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class Comment {
     private UUID commentId;
-    private UUID senderId; // *
+    private UUID senderId;
     private String message;
 
     String postTime;
