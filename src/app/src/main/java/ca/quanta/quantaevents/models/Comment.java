@@ -1,11 +1,8 @@
 package ca.quanta.quantaevents.models;
 
-import android.graphics.ColorSpace;
-
 import java.util.UUID;
 
-public class ModelComment {
-
+public class Comment {
     UUID commentId;
 
     String comment;
@@ -65,10 +62,10 @@ public class ModelComment {
         this.deviceId = deviceId;
     }
 
-    public ModelComment(){
+    public Comment(){
     }
 
-    public ModelComment(UUID commentId, String comment, String postTime, String userName, UUID userId, UUID deviceId) {
+    public Comment(UUID commentId, String comment, String postTime, String userName, UUID userId, UUID deviceId) {
         this.commentId = commentId;
         this.comment = comment;
         this.postTime = postTime;

@@ -16,18 +16,18 @@ import java.util.Locale;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
-import ca.quanta.quantaevents.models.ModelComment;
+import ca.quanta.quantaevents.models.Comment;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder> {
 
     Context context;
-    List<ModelComment> list;
+    List<Comment> list;
 
     UUID userId;
 
     UUID eventId;
 
-    public CommentAdapter(Context context, List<ModelComment> list, UUID userId, UUID eventId) {
+    public CommentAdapter(Context context, List<Comment> list, UUID userId, UUID eventId) {
     this.context = context;
     this.list = list;
     this.userId = userId;

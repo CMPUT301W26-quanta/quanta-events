@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import ca.quanta.quantaevents.models.ModelComment;
+import ca.quanta.quantaevents.models.Comment;
 
 /**
  * View-model for managing comment-related data and cloud functions.
@@ -63,7 +63,7 @@ public class CommentViewModel extends ViewModel {
      * @param eventId The ID of the event under which to retrieve all the comments for.
      * @return List of Comment Objects.
      */
-    public Task<ArrayList<ModelComment>> getAllComments(UUID userId, UUID deviceId, UUID eventId) {
+    public Task<ArrayList<Comment>> getAllComments(UUID userId, UUID deviceId, UUID eventId) {
         Map<String, Object> data = new HashMap<>();
 
         data.put("userId", userId.toString());
@@ -77,11 +77,11 @@ public class CommentViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getAllComments")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, ArrayList<ModelComment>>() {
+                .continueWith(new Continuation<HttpsCallableResult, ArrayList<Comment>>() {
                     @Override
-                    public ArrayList<ModelComment> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                    public ArrayList<Comment> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
                         List<Map<String, Object>> commentObjects = (List<Map<String, Object>>) task.getResult().getData();
-                        ArrayList<ModelComment> comments = new ArrayList<>();
+                        ArrayList<Comment> comments = new ArrayList<>();
 
                         for (Map<String, Object> commentObject : commentObjects) {
                             UUID commentId = UUID.fromString((String) commentObject.get("commentId"));
@@ -92,7 +92,7 @@ public class CommentViewModel extends ViewModel {
                             String userName = (String) commentObject.get("userName");
 
 
-                            comments.add(new ModelComment(commentId, message, postTime, userName, senderId, deviceId));
+                            comments.add(new Comment(commentId, message, postTime, userName, senderId, deviceId));
                         }
 
                         return comments;
