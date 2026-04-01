@@ -9,6 +9,8 @@ export function userDocToExternalUser(
 	return {
 		userId: doc.id,
 		name: user.name,
+		phone: user.phone,
+		email: user.email,
 		isAdmin: !!user.admin,
 		isOrganizer: !!user.organizer,
 		isEntrant: !!user.entrant,

@@ -141,6 +141,8 @@ declare global {
 	interface ExternalUser {
 		userId: string;
 		name: string | null;
+		phone: string | null;
+		email: string | null;
 		isAdmin: boolean;
 		isOrganizer: boolean;
 		isEntrant: boolean;

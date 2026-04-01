@@ -37,6 +37,11 @@ export const createComment = onCall(
 	functions.createComment,
 );
 
+export const createInvitation = onCall(
+	{ maxInstances: 1 },
+	functions.createInvitation,
+);
+
 export const createUser = onCall({ maxInstances: 1 }, functions.createUser);
 
 export const getUser = onCall({ maxInstances: 1 }, functions.getUser);

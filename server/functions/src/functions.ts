@@ -2,6 +2,7 @@ export * from "./functions/checkWaitlist";
 export * from "./functions/createComment";
 export * from "./functions/createEvent";
 export * from "./functions/createImage";
+export * from "./functions/createInvitation";
 export * from "./functions/createNotification";
 export * from "./functions/createUser";
 export * from "./functions/deleteComment";
