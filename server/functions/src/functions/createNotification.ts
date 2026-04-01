@@ -7,8 +7,8 @@ import { CollectionReference, getFirestore } from "firebase-admin/firestore";
 
 const createNotificationInterface = util.standardForm(
 	z.object({
-		message: z.string().optional(),
-		title: z.string().optional(),
+		message: z.string(),
+		title: z.string(),
 		eventId: z.uuid(),
 		waited: z.boolean(),
 		cancelled: z.boolean(),
@@ -30,19 +30,6 @@ export async function createNotification(request: CallableRequest) {
 	const notificationId = uuidv4();
 
 	const db = getFirestore();
-
-	try {
-		await db.collection("notifications").doc(notificationId).create({
-			message,
-			title,
-			eventId,
-			waited,
-			cancelled,
-			selected,
-		});
-	} catch (_) {
-		throw new HttpsError("already-exists", "Notification already exists");
-	}
 
 	const eventDocuments = db.collection("events") as CollectionReference<
 		EventDocument,
@@ -78,6 +65,28 @@ export async function createNotification(request: CallableRequest) {
 				recipients.push(entrantId);
 			}
 		}
+	}
+
+	try {
+		await db
+			.collection("notifications")
+			.doc(notificationId)
+			.create(
+				util.enforceFull<NotificationDocument>({
+					message,
+					title,
+					eventId,
+					kind: {
+						kind: "MESSAGE",
+						waited,
+						cancelled,
+						selected,
+					},
+					targetUsers: recipients,
+				}),
+			);
+	} catch (_) {
+		throw new HttpsError("already-exists", "Notification already exists");
 	}
 
 	util.sendBatchNotifications(recipients, data.title || "", data.message || "");

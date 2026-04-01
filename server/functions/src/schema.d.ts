@@ -89,14 +89,39 @@ declare global {
 	}
 
 	interface NotificationDocument {
+		/** The UUID of the source event */
 		eventId: string;
+
+		/** The UUIDs of the target users */
+		targetUsers: string[];
 
 		title: string;
 		message: string;
 
+		kind: NotificationAnyKind;
+	}
+
+	type NotificationAnyKind =
+		| NotificationMessageKind
+		| NotificationLotteryKind
+		| NotificationInviteKind;
+
+	interface NotificationMessageKind {
+		kind: "MESSAGE";
+
 		waited: boolean;
 		selected: boolean;
 		cancelled: boolean;
+	}
+
+	interface NotificationLotteryKind {
+		kind: "LOTTERY";
+
+		selected: boolean;
+	}
+
+	interface NotificationInviteKind {
+		kind: "INVITE";
 	}
 
 	/** The form comments are stored as in the database. */
