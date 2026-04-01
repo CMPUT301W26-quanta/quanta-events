@@ -28,7 +28,6 @@ import androidx.core.content.ContextCompat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Timer;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
