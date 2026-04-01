@@ -86,9 +86,13 @@ public class CommentViewModel extends ViewModel {
                         for (Map<String, Object> commentObject : commentObjects) {
                             UUID commentId = UUID.fromString((String) commentObject.get("commentId"));
                             UUID senderId = UUID.fromString((String) commentObject.get("senderId"));
+                            UUID deviceId = UUID.fromString((String) commentObject.get("deviceId"));
                             String message = (String) commentObject.get("message");
+                            String postTime = (String) commentObject.get("postTime");
+                            String userName = (String) commentObject.get("userName");
 
-                            comments.add(new ModelComment(commentId, senderId, message));
+
+                            comments.add(new ModelComment(commentId, message, postTime, userName, senderId, deviceId));
                         }
 
                         return comments;

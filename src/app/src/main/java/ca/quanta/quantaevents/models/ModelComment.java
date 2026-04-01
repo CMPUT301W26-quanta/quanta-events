@@ -6,21 +6,23 @@ import java.util.UUID;
 
 public class ModelComment {
 
-    String commentId;
+    UUID commentId;
 
     String comment;
 
     String postTime;
 
-    String userId;
+    UUID userId;
 
     String userName;
 
-    public String getCommentId() {
+    UUID deviceId;
+
+    public UUID getCommentId() {
         return commentId;
     }
 
-    public void setCommentId(String commentId){
+    public void setCommentId(UUID commentId){
         this.commentId = commentId;
     }
 
@@ -41,11 +43,11 @@ public class ModelComment {
     }
 
 
-    public String getUserId(){
+    public UUID getUserId(){
         return userId;
     }
 
-    public void setUserId(String userId){
+    public void setUserId(UUID userId){
         this.userId = userId;
     }
 
@@ -56,15 +58,23 @@ public class ModelComment {
         this.userName = userName;
     }
 
+    public UUID getDeviceId(){
+        return deviceId;
+    }
+    public void setDeviceId(UUID deviceId){
+        this.deviceId = deviceId;
+    }
+
     public ModelComment(){
     }
 
-    public ModelComment(String commentId, String comment, String postTime, String userName, String userId) {
+    public ModelComment(UUID commentId, String comment, String postTime, String userName, UUID userId, UUID deviceId) {
         this.commentId = commentId;
         this.comment = comment;
         this.postTime = postTime;
         this.userName = userName;
         this.userId = userId;
+        this.deviceId = deviceId;
 
 
     }
