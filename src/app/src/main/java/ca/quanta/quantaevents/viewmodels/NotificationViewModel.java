@@ -33,11 +33,12 @@ public class NotificationViewModel extends ViewModel {
      * @param waited Boolean that's true when the user wishes to send to people on the event's waitlist.
      * @param cancelled Boolean that's true when the user wishes to send to people on the event's canceled list.
      * @param selected Boolean that's true when the user wishes to send to people on the event's selected list.
+     * @param finale Boolean that's true when the user wishes to send to people on the event's final list
      * @return UUID identifying the newly created notification.
      */
     public Task<UUID> createNotification(UUID userId, UUID deviceId, String message,
                                          String title, String eventId, Boolean waited,
-                                         Boolean cancelled, Boolean selected) {
+                                         Boolean cancelled, Boolean selected, Boolean finale) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -49,6 +50,7 @@ public class NotificationViewModel extends ViewModel {
         payload.put("waited", waited);
         payload.put("cancelled", cancelled);
         payload.put("selected", selected);
+        payload.put("final", finale);
         data.put("data", payload);
 
         return functions

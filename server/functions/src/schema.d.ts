@@ -75,6 +75,7 @@ declare global {
 		waited: boolean;
 		selected: boolean;
 		cancelled: boolean;
+		final: boolean;
 	}
 
 	/** The form comments are stored as in the database. */
