@@ -68,6 +68,8 @@ export const deleteComment = onCall(
 	functions.deleteComment,
 );
 
+export const deleteEvent = onCall({ maxInstances: 1 }, functions.deleteEvent);
+
 export const deleteImage = onCall({ maxInstances: 1 }, functions.deleteImage);
 
 export const deleteUser = onCall({ maxInstances: 1 }, functions.deleteUser);
