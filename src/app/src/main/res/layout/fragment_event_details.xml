@@ -188,6 +188,7 @@
                 android:textSize="18sp"
                 android:textColor="@color/text_color" />
 
+            <!-- Comments Section -->
             <RelativeLayout
                 android:id = "@+id/comments_sa"
                 android:layout_width="match_parent"
