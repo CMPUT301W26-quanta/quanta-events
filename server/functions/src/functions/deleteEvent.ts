@@ -15,6 +15,10 @@ export async function deleteEvent(request: CallableRequest) {
 
 	const userData = await util.verifyUser(payload.userId, payload.deviceId);
 
+	// organizers can not delete their own events
+	// (per the user stories, only admins can remove/delete events)
+	util.requireRole(userData, "admin");
+
 	logger.info(`Deleting event ${payload.data.eventId}.`);
 
 	const db = getFirestore();
@@ -27,10 +31,6 @@ export async function deleteEvent(request: CallableRequest) {
 	}
 
 	const eventDoc = event.data() as EventDocument;
-
-	if (eventDoc.organizer !== payload.userId) {
-		util.requireRole(userData, "admin");
-	}
 
 	if (eventDoc.imageId !== null) {
 		await util.removeImage(eventDoc.imageId);

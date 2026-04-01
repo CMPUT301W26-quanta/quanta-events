@@ -118,6 +118,34 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
+     * Calls the deleteEvent cloud function and deletes the event (and its image)
+     * from the database.
+     * @param eventId UUID to identify the event to delete.
+     * @param userId UUID to identify this user.
+     * @param deviceId UUID to identify this user's device.
+     * @return True if successful, and error if unsuccessful.
+     */
+    public Task<Boolean> deleteEvent(UUID eventId, UUID userId, UUID deviceId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("deleteEvent")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, Boolean>() {
+                    @Override
+                    public Boolean then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                        return true;
+                    }
+                });
+    }
+
+    /**
      * Calls the getEvent cloud function, fetches an event from the database, and maps it to an Event model.
      *
      * @param eventId  UUID identify the event.
