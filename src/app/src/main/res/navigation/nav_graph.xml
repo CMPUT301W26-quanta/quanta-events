@@ -204,6 +204,16 @@
         <argument
             android:name="isDrawn"
             app:argType="boolean" />
+        <action
+            android:id="@+id/action_eventManagerFragment_to_eventInviteFragment"
+            app:destination="@id/eventInviteFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+        <argument
+            android:name="isPrivate"
+            app:argType="boolean" />
     </fragment>
 
     <fragment
@@ -413,5 +423,14 @@
         android:name="ca.quanta.quantaevents.fragments.AdminImageBrowserFragment"
         android:label="AdminImageBrowserFragment"
         tools:layout="@layout/fragment_admin_image_browser"/>
+    <fragment
+        android:id="@+id/eventInviteFragment"
+        android:name="ca.quanta.quantaevents.fragments.EventInviteFragment"
+        android:label="fragment_event_invite"
+        tools:layout="@layout/fragment_event_invite" >
+        <argument
+            android:name="eventId"
+            app:argType="java.util.UUID" />
+    </fragment>
 
 </navigation>

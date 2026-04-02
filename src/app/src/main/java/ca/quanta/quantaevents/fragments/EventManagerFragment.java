@@ -30,11 +30,19 @@ public class EventManagerFragment extends Fragment {
     private Boolean isDrawn;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventManagerFragmentArgs args = EventManagerFragmentArgs.fromBundle(getArguments());
+        eventId = args.getEventId();
+        isDrawn = args.getIsDrawn();
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
-        // set title of the page to Event Manaher and the subtitle.
+        // set title of the page to Event Manager and the subtitle.
         // also sets the icon for the page
         infoStore.setTitle("Event Manager");
         infoStore.setSubtitle("Manage your Events");
@@ -48,8 +56,6 @@ public class EventManagerFragment extends Fragment {
             userId = uid;
             deviceId = did;
         });
-
-        readArgs();
 
         // sets on click listener to navigate to editor fragment
         binding.editDetailsButton.setOnClickListener(
@@ -114,11 +120,5 @@ public class EventManagerFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentEventManagerBinding.inflate(inflater, container, false);
         return binding.getRoot();
-    }
-
-    private void readArgs() {
-        EventManagerFragmentArgs args = EventManagerFragmentArgs.fromBundle(getArguments());
-        eventId = args.getEventId();
-        isDrawn = args.getIsDrawn();
     }
 }
