@@ -104,8 +104,8 @@ public class EventFilterFragment extends Fragment {
 
     /**
      * Gets the value stored in the tag of the field, which is used to store the UTC value of the date time.
-     * @param field
-     * @return
+     * @param field The text input field.
+     * @return Value stored in the text input's tag.
      */
     @Nullable
     private String getTagValue(TextInputEditText field) {
@@ -115,8 +115,8 @@ public class EventFilterFragment extends Fragment {
 
     /**
      * Gets the text value of the field, which is used for the category filter.
-     * @param field
-     * @return
+     * @param field The text input field.
+     * @return Text entered in field if text is entered, null otherwise.
      */
     @Nullable
     private String getTextValue(TextInputEditText field) {
@@ -125,6 +125,11 @@ public class EventFilterFragment extends Fragment {
         return text.toString().trim();
     }
 
+    /**
+     * Gets the number entered in the field, used for capacity filter.
+     * @param field The number input field.
+     * @return Number entered in field if a valid number is entered, null otherwise.
+     */
     private Integer getIntegerValue(TextInputEditText field) {
         CharSequence text = field.getText();
         if (text == null || text.toString().trim().isEmpty()) {
