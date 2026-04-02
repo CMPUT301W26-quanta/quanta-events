@@ -6,6 +6,7 @@ import static android.view.View.VISIBLE;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,10 +28,14 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
@@ -54,6 +59,7 @@ import ca.quanta.quantaevents.viewmodels.UserViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.firebase.functions.FirebaseFunctionsException;
 
 public class EventDetailsFragment extends Fragment {
     private FragmentEventDetailsBinding binding;
@@ -62,6 +68,9 @@ public class EventDetailsFragment extends Fragment {
     private ImageViewModel imageModel;
 
     private CommentViewModel commentModel;
+
+    private CommentAdapter commentAdapter;
+
 
     private UUID userId;
     private UUID deviceId;
@@ -109,6 +118,7 @@ public class EventDetailsFragment extends Fragment {
         eventModel = new ViewModelProvider(this).get(EventViewModel.class);
         imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
         commentModel = new ViewModelProvider(this).get(CommentViewModel.class);
+
 
         // reads event id passed in form of arguments using bundles
         readEventId();
@@ -210,7 +220,8 @@ public class EventDetailsFragment extends Fragment {
                         .addOnSuccessListener(comments -> {
                             // use the adapter to display them
 
-                            CommentAdapter commentAdapter = new CommentAdapter(comments, this, this.eventId,isOrganizer,isAdmin);
+                            this.commentAdapter = new CommentAdapter(comments, this, this.eventId,isOrganizer,isAdmin);
+
 
                             binding.commentsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
                             binding.commentsRecyclerView.setAdapter(commentAdapter);
@@ -223,9 +234,43 @@ public class EventDetailsFragment extends Fragment {
                                 }
                         )
         );
+
+        binding.sendComment.setOnClickListener(v ->{
+
+            String message = binding.typeComment.getText().toString();
+            binding.typeComment.setText("");
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            String postTime = now.format(formatter);
+
+
+
+            model.getUser(this.userId, this.deviceId).addOnSuccessListener(user -> {
+                 String name = user.getName();
+
+                commentModel.createComment(this.userId, this.deviceId, this.eventId, message, postTime).addOnSuccessListener(commentId -> {
+
+                    Comment comment = new Comment(commentId, this.userId, message, postTime, name);
+                    this.commentAdapter.addComment(comment);
+                })
+
+                .addOnFailureListener(exception -> {
+                    Log.e("EventDetailsFragment", "Failed to delete an comment.", exception);
+
+                    Toast.makeText(this.requireContext(), "Failed to add comment: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+
+                    if (exception instanceof FirebaseFunctionsException) {
+                        Log.e("EventDetailsFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
+                    }
+                });
+            });
+
+
+
+
+        });
     }
 
-  
 
     // bind the event details to the
     // ui elemtents in the view

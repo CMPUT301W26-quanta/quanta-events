@@ -15,14 +15,11 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.format.DateFormat;
 import android.widget.Toast;
 
 import com.google.firebase.functions.FirebaseFunctionsException;
 
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
@@ -90,31 +87,17 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         final String message = thisComment.getMessage();
         final String timestamp = thisComment.getPostTime();
 
-        Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
-        calendar.setTimeInMillis(Long.parseLong(timestamp));
-        String timedate = DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
 
-        if (!isOrganizer) {
+        if (!isOrganizer && !isAdmin && userId != senderId) {
 
             // not an organizer, remove the notifications button
             holder.deleteComment.setVisibility(View.GONE);
         }
 
-        else if (!isAdmin) {
-
-            // not an admin, remove the notifications button
-            holder.deleteComment.setVisibility(View.GONE);
-        }
-
-        else if (userId != senderId) {
-
-            // not an user who wrote the comment
-            holder.deleteComment.setVisibility(View.GONE);
-        }
 
 
         holder.name.setText(senderName);
-        holder.time.setText(timedate);
+        holder.time.setText(timestamp);
         holder.comment.setText(message);
         holder.deleteComment.setOnClickListener(view -> {
             int commentPosition = holder.getBindingAdapterPosition();
@@ -125,12 +108,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
                         this.notifyItemRemoved(commentPosition);
                     })
                     .addOnFailureListener(exception -> {
-                        Log.e("ImageCardAdapter", "Failed to delete an image.", exception);
+                        Log.e("CommentAdapter", "Failed to delete an comment.", exception);
 
-                        Toast.makeText(this.parentFragment.requireContext(), "Failed to remove image: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(this.parentFragment.requireContext(), "Failed to remove comment: " + exception.getMessage(), Toast.LENGTH_LONG).show();
 
                         if (exception instanceof FirebaseFunctionsException) {
-                            Log.e("ImageCardAdapter", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
+                            Log.e("CommentCardAdapter", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
                         }
                     });
         });
@@ -141,6 +124,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
     @Override
     public int getItemCount(){
         return list.size();
+    }
+
+    public void addComment(Comment comment){
+        this.list.add(comment);
+        this.notifyItemInserted(this.list.size()-1);
+
     }
 
     class MyHolder extends RecyclerView.ViewHolder {
