@@ -190,7 +190,7 @@
 
             <!-- Comments Section -->
             <RelativeLayout
-                android:id = "@+id/comments_sa"
+                android:id = "@+id/enter_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="@id/textDescription"
@@ -235,7 +235,7 @@
                 android:textColor="@color/text_color"
                 android:textStyle = "bold" />
             <androidx.recyclerview.widget.RecyclerView
-                android:id = "@+id/recycle_comment"
+                android:id = "@+id/comments_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>

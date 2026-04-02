@@ -34,13 +34,19 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
+import ca.quanta.quantaevents.adapters.CommentAdapter;
+import ca.quanta.quantaevents.adapters.ImageCardAdapter;
+import ca.quanta.quantaevents.adapters.NotificationAdapter;
 import ca.quanta.quantaevents.burger.SmartBurger;
 import ca.quanta.quantaevents.databinding.FragmentEventDetailsBinding;
 import ca.quanta.quantaevents.loading.LoaderState;
+import ca.quanta.quantaevents.models.Comment;
 import ca.quanta.quantaevents.models.Event;
+import ca.quanta.quantaevents.models.Notification;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.utils.ToastManager;
+import ca.quanta.quantaevents.viewmodels.CommentViewModel;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
@@ -54,6 +60,9 @@ public class EventDetailsFragment extends Fragment {
     private SessionStore sessionStore;
     private EventViewModel eventModel;
     private ImageViewModel imageModel;
+
+    private CommentViewModel commentModel;
+
     private UUID userId;
     private UUID deviceId;
     private UUID eventId;
@@ -93,11 +102,13 @@ public class EventDetailsFragment extends Fragment {
 
         this.model = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
+
         //set up the session store and get this user
 
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
         eventModel = new ViewModelProvider(this).get(EventViewModel.class);
         imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
+        commentModel = new ViewModelProvider(this).get(CommentViewModel.class);
 
         // reads event id passed in form of arguments using bundles
         readEventId();
@@ -114,6 +125,7 @@ public class EventDetailsFragment extends Fragment {
             isAdmin = mask != null && (mask & SmartBurger.ADMIN_GROUP) != 0;
             updateManageButton(null);
         });
+
 
         // set up back button on click listener
 
@@ -173,7 +185,7 @@ public class EventDetailsFragment extends Fragment {
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(
             eventModel.getEvent(eventId, userId, deviceId)
-                    .addOnSuccessListener(this::bindEvent)
+                    .addOnSuccessListener(event -> {this.bindEvent(event);loadComments(); })
                     .addOnFailureListener(ex -> {
                                 if (isAdded()) {
                                     ToastManager.show(requireContext(), "Failed to load event", Toast.LENGTH_LONG);
@@ -183,6 +195,37 @@ public class EventDetailsFragment extends Fragment {
                     )
         );
     }
+
+    //load the comment details
+
+    private void loadComments(){
+        if (userId == null || deviceId == null) {
+            NavDirections action = EventDetailsFragmentDirections.actionGlobalRegisterFragment();
+            Navigation.findNavController(requireView()).navigate(action);
+            return;
+        }
+        LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+        loader.loadTask(
+                commentModel.getAllComments(userId, deviceId, eventId)
+                        .addOnSuccessListener(comments -> {
+                            // use the adapter to display them
+
+                            CommentAdapter commentAdapter = new CommentAdapter(comments, this, this.eventId,isOrganizer,isAdmin);
+
+                            binding.commentsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                            binding.commentsRecyclerView.setAdapter(commentAdapter);
+                        })
+                        .addOnFailureListener(ex -> {
+                                    if (isAdded()) {
+                                        ToastManager.show(requireContext(), "Failed to load comments", Toast.LENGTH_LONG);
+                                        Navigation.findNavController(requireView()).popBackStack();
+                                    }
+                                }
+                        )
+        );
+    }
+
+  
 
     // bind the event details to the
     // ui elemtents in the view
@@ -231,19 +274,6 @@ public class EventDetailsFragment extends Fragment {
     }
 
 
-    private void loadComments(){
-
-
-    }
-
-    private void postComment(){
-
-
-    }
-
-    private void deleteComment(){
-
-    }
 
     // change text on the button to display according to role
     private void updateManageButton(String organizerId) {
