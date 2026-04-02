@@ -119,6 +119,7 @@ public class AdminEventBrowserFragment extends Fragment {
                         null,
                         null,
                         null,
+                        null,
                         EventViewModel.SortBy.REGISTRATION_END)
                 .addOnSuccessListener(events -> {
                     if (!isAdded()) {

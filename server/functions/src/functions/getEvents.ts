@@ -16,10 +16,10 @@ const getEventsInterface = util.standardForm(
 		startFrom: z.uuid().nullable(),
 		filter: z.object({
 			fetch: z.enum(["all", "created", "available", "in", "history"]),
-			startDate: z.iso.datetime({ offset: true }).nullable(),  // event regristration
+			startDate: z.iso.datetime({ offset: true }).nullable(),
 			endDate: z.iso.datetime({ offset: true }).nullable(),
-			search: z.string().nullable(),  // keyword search
-			capacity: z.string().nullable(), 
+			search: z.string().nullable(),
+			capacity: z.int().nullable(),
 		}),
 		sortBy: z
 			.enum(["registrationEnd", "registrationStart", "name"])
@@ -108,26 +108,26 @@ export async function getEvents(
 
 	const docs: EventDocument[] = queryResult.docs.map((doc) => doc.data());
 
-	let docResults: EventDocument[];
+	let docResults: EventDocument[] = docs;
+
+	if (filter.capacity !== null) {
+		const filterCapacity = filter.capacity;
+		docResults = docResults.filter((doc) => doc.eventCapacity <= filterCapacity);
+	}
+
 	if (filter.search !== null && filter.search.trim().length > 0) {
-		docResults = new Fuse(docs, {
+		docResults = new Fuse(docResults, {
 			keys: [
 				{ name: "eventName", getFn: (data) => data.eventName },
 				{
 					name: "eventDescription",
 					getFn: (data) => data.eventDescription,
 				},
-				{	
-					// Compare strings
-					name: "eventCapacity",
-					getFn: (data) => String(data.eventCapacity)
-				},
 			],
 		})
 			.search(filter.search)
 			.map((result) => result.item);
 	} else {
-		docResults = docs;
 		switch (sortBy) {
 			case "registrationEnd":
 				docResults.sort((a, b) =>

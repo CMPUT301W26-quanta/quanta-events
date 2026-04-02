@@ -186,7 +186,7 @@ public class EventViewModel extends ViewModel {
     public Task<List<Event>> getEvents(UUID userId, UUID deviceId, int max,
                                        UUID startFrom, Fetch fetch,
                                        String startDate, String endDate,
-                                       String search, SortBy sortBy) {
+                                       String search, Integer capacity, SortBy sortBy) {
         Map<String, Object> data = new HashMap<>();
 
         data.put("userId", userId.toString());
@@ -210,6 +210,7 @@ public class EventViewModel extends ViewModel {
         filter.put("startDate", startDate);
         filter.put("endDate", endDate);
         filter.put("search", search);
+        filter.put("capacity", capacity);
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("max", max);

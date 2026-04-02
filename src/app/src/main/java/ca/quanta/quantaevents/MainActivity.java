@@ -20,6 +20,7 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.security.ProviderInstaller;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -54,6 +55,12 @@ public class MainActivity extends AppCompatActivity {
         // So force light mode
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(binding.getRoot());
+
+        // EMULATOR STUFF
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        firestore.useEmulator("10.0.2.2", 8080);
+        FirebaseFunctions functions = FirebaseFunctions.getInstance();
+        functions.useEmulator("10.0.2.2", 5001);
 
         try {
             ProviderInstaller.installIfNeeded(this);
