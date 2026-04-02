@@ -126,7 +126,7 @@ public class EntrantEventHistoryFragment extends Fragment {
                             handleMissingUser();
                             return;
                         }
-                        ToastManager.show(requireContext(), "Failed to load events", Toast.LENGTH_LONG);
+                        ToastManager.show(getContext(), "Failed to load events", Toast.LENGTH_LONG);
                     })
         );
     }
@@ -148,7 +148,7 @@ public class EntrantEventHistoryFragment extends Fragment {
         }
         Log.d("EntrantEventHistory", "Loaded events count=" + events.size());
         if (events.isEmpty()) {
-            ToastManager.show(requireContext(), "No event history", Toast.LENGTH_LONG);
+            ToastManager.show(getContext(), "No event history", Toast.LENGTH_LONG);
             adapter.setItems(new ArrayList<>());
             return;
         }

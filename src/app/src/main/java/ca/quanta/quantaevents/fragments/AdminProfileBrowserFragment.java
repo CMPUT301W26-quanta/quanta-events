@@ -68,7 +68,7 @@ public class AdminProfileBrowserFragment extends Fragment {
                         .addOnFailureListener(exception -> {
                             Log.e("AdminProfileBrowserFragment", "Failed to fetch all users.", exception);
 
-                            ToastManager.show(requireContext(), "Failed to fetch users", Toast.LENGTH_LONG);
+                            ToastManager.show(getContext(), "Failed to fetch users", Toast.LENGTH_LONG);
                             if (exception instanceof FirebaseFunctionsException) {
                                 Log.e("AdminProfileBrowserFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
                             }

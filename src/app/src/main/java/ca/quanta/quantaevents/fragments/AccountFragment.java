@@ -134,7 +134,7 @@ public class AccountFragment extends Fragment implements Tagged {
                         .addOnSuccessListener(_done -> {
                             sessionStore.clearSession();
                             binding.deleteButton.setEnabled(true);
-                            ToastManager.show(requireContext(), "Account deleted", Toast.LENGTH_LONG);
+                            ToastManager.show(getContext(), "Account deleted", Toast.LENGTH_LONG);
                             if (isAdded()) {
                                 NavDirections action = AccountFragmentDirections.actionAccountfragmentToRegisterfragment();
                                 Navigation.findNavController(requireView()).navigate(action);
@@ -142,7 +142,7 @@ public class AccountFragment extends Fragment implements Tagged {
                         })
                         .addOnFailureListener(ex -> {
                             binding.deleteButton.setEnabled(true);
-                            ToastManager.show(requireContext(), "Failed to delete account", Toast.LENGTH_LONG);
+                            ToastManager.show(getContext(), "Failed to delete account", Toast.LENGTH_LONG);
                         })
         );
     }
@@ -169,13 +169,13 @@ public class AccountFragment extends Fragment implements Tagged {
                 userModel.updateUser(userId, deviceId, name, email, phone, receiveNotifications)
                         .addOnSuccessListener(_userId -> {
                             binding.saveButton.setEnabled(true);
-                            ToastManager.show(requireContext(), "Account updated", Toast.LENGTH_LONG);
+                            ToastManager.show(getContext(), "Account updated", Toast.LENGTH_LONG);
                             NavDirections action = AccountFragmentDirections.actionAccountfragmentToHomefragment();
                             Navigation.findNavController(requireView()).navigate(action);
                         })
                         .addOnFailureListener(ex -> {
                             binding.saveButton.setEnabled(true);
-                            ToastManager.show(requireContext(), "Failed to update account", Toast.LENGTH_LONG);
+                            ToastManager.show(getContext(), "Failed to update account", Toast.LENGTH_LONG);
                         })
         );
     }

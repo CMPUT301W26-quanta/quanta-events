@@ -142,7 +142,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
                             return;
                         }
                         if (isAdded()) {
-                            ToastManager.show(requireContext(), "Failed to load events", Toast.LENGTH_LONG);
+                            ToastManager.show(getContext(), "Failed to load events", Toast.LENGTH_LONG);
                         }
                     })
         );
@@ -156,7 +156,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
             return;
         }
         if (events.isEmpty()) {
-            ToastManager.show(requireContext(), "No events found", Toast.LENGTH_LONG);
+            ToastManager.show(getContext(), "No events found", Toast.LENGTH_LONG);
             adapter.setItems(new java.util.ArrayList<>());
             return;
         }

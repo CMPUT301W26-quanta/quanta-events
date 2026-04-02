@@ -80,7 +80,7 @@ public class ShowQRFragment extends Fragment {
                 startActivity(Intent.createChooser(shareIntent, "Share QR Code"));
 
             } catch (Exception e) {
-                ToastManager.show(requireContext(), "Failed to share QR code", Toast.LENGTH_LONG);
+                ToastManager.show(getContext(), "Failed to share QR code", Toast.LENGTH_LONG);
             }
         });
     }
