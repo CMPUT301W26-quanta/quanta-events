@@ -49,19 +49,23 @@ export async function leaveWaitlist(request: CallableRequest) {
 		);
 	}
 
-	await db
-		.collection("events")
-		.doc(eventId)
-		.update({
-			waitList: FieldValue.arrayRemove(userId),
-		});
+	const eventRef = db.collection("events").doc(eventId);
+    const userRef = db.collection("users").doc(userId);
+    const waitlistEntryRef = eventRef.collection("waitlistEntries").doc(userId);
 
-	await db
-		.collection("users")
-		.doc(userId)
-		.update({
-			"entrant.enteredEvents": FieldValue.arrayRemove(eventId),
-		});
+    const batch = db.batch();
+
+    batch.update(eventRef, {
+      waitList: FieldValue.arrayRemove(userId),
+    });
+
+    batch.update(userRef, {
+      "entrant.enteredEvents": FieldValue.arrayRemove(eventId),
+    });
+
+    batch.delete(waitlistEntryRef);
+
+    await batch.commit();
 
 	logger.info("User left waitlist", { userId, eventId });
 	return {};
