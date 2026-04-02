@@ -106,9 +106,7 @@ export async function getEvents(
 		return [];
 	}
 
-	const docs: EventDocument[] = queryResult.docs.map((doc) => doc.data());
-
-	let docResults: EventDocument[] = docs;
+	let docResults: EventDocument[] = queryResult.docs.map((doc) => doc.data());
 
 	if (filter.capacity !== null) {
 		const filterCapacity = filter.capacity;
