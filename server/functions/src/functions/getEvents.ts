@@ -16,9 +16,10 @@ const getEventsInterface = util.standardForm(
 		startFrom: z.uuid().nullable(),
 		filter: z.object({
 			fetch: z.enum(["all", "created", "available", "in", "history"]),
-			startDate: z.iso.datetime({ offset: true }).nullable(),
+			startDate: z.iso.datetime({ offset: true }).nullable(),  // event regristration
 			endDate: z.iso.datetime({ offset: true }).nullable(),
-			search: z.string().nullable(),
+			search: z.string().nullable(),  // keyword search
+			capacity: z.string().nullable(), 
 		}),
 		sortBy: z
 			.enum(["registrationEnd", "registrationStart", "name"])
@@ -115,6 +116,11 @@ export async function getEvents(
 				{
 					name: "eventDescription",
 					getFn: (data) => data.eventDescription,
+				},
+				{	
+					// Compare strings
+					name: "eventCapacity",
+					getFn: (data) => String(data.eventCapacity)
 				},
 			],
 		})

@@ -48,10 +48,12 @@ public class EventFilterFragment extends Fragment {
             String from = getTagValue(binding.inputFrom);
             String to = getTagValue(binding.inputTo);
             String category = getTextValue(binding.inputCategory);
+            String capacity = getIntegerValue(binding.inputCapacity);
 
             if (from != null) result.putString("from", from);
             if (to != null) result.putString("to", to);
             if (category != null) result.putString("category", category);
+            if (capacity != null) result.putString("capacity", capacity);
 
             Navigation.findNavController(v)
                     .getPreviousBackStackEntry()
@@ -121,5 +123,21 @@ public class EventFilterFragment extends Fragment {
         CharSequence text = field.getText();
         if (text == null || text.toString().trim().isEmpty()) return null;
         return text.toString().trim();
+    }
+
+    private String getIntegerValue(TextInputEditText field) {
+        CharSequence text = field.getText();
+        if (text == null || text.toString().trim().isEmpty()) {
+            return null;
+        }
+        else {
+            String numberText = text.toString().trim();
+            try {
+                Integer.parseInt(numberText);
+            } catch (NumberFormatException e) {
+                numberText = null;
+            }
+            return numberText;
+        }
     }
 }
