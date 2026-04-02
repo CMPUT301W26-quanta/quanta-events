@@ -17,13 +17,18 @@ declare global {
 	}
 
 	interface EntrantMap {
+		/** List of UUIDs of the events this entrant is actively entered in */
 		enteredEvents: string[];
+		/** List of UUIDs of the events this entrant has previously entered in */
 		history: string[];
+		/** Whether the user should recieve notifications or not */
 		receiveNotifications: boolean;
 	}
 
 	interface OrganizerMap {
+		/** List of the UUIDS of the events created by this organizer */
 		createdEvents: string[];
+		/** List of the UUIDs of the MESSAGE type notifications sent by this organizer */
 		sentNotifications: string[];
 	}
 

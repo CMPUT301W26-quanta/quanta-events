@@ -7,7 +7,7 @@ import Fuse from "fuse.js";
 
 const getAllUsersInterface = util.standardForm(
 	z.object({
-		search: z.string().nullable(),
+		search: z.string().nullable(), // Search string for finding users
 	}),
 );
 
