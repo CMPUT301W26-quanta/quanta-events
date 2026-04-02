@@ -469,4 +469,27 @@ public class EventViewModel extends ViewModel {
                 .call(data)
                 .onSuccessTask(task -> Tasks.forResult(null));
     }
+
+    /**
+     *
+     * @param userId UUID to identify user.
+     * @param deviceId UUID to identify user's device.
+     * @param eventId UUID to identify event.
+     * @param invitee UUID to identify invitee.
+     * @return null on success, error on failure
+     */
+    public Task<Void> createInvitation(UUID userId, UUID deviceId, UUID eventId, UUID invitee) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        payload.put("invitee", eventId.toString());
+        data.put("data", payload);
+
+        return functions.getHttpsCallable("createInvitation")
+                .call(data)
+                .onSuccessTask(task -> Tasks.forResult(null));
+    }
 }

@@ -95,7 +95,7 @@ public class UserViewModel extends ViewModel {
                .call(data)
                .onSuccessTask(callResult -> {
                        List<Map<String, Object>> userObjects = (List<Map<String, Object>>) callResult.getData();
-                       ArrayList<ExternalUser> users = new ArrayList<ExternalUser>();
+                       ArrayList<ExternalUser> users = new ArrayList<>();
 
                        for (Map<String, Object> userObject : userObjects) {
                            String userIdStr = (String) userObject.get("userId");
