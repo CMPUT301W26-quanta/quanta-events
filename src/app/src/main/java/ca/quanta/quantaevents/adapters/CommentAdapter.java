@@ -1,15 +1,24 @@
 package ca.quanta.quantaevents.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.format.DateFormat;
+import android.widget.Toast;
+
+import com.google.firebase.functions.FirebaseFunctionsException;
 
 import java.util.Calendar;
 import java.util.List;
@@ -18,27 +27,57 @@ import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.models.Comment;
+import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.viewmodels.CommentViewModel;
+import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder> {
 
-    Context context;
     List<Comment> list;
+
+    private Fragment parentFragment;
+
+    private CommentViewModel commentModel;
+
+    private SessionStore sessionStore;
 
     UUID userId;
 
+    UUID deviceId;
+
     UUID eventId;
 
-    public CommentAdapter(Context context, List<Comment> list, UUID userId, UUID eventId) {
-        this.context = context;
+    UUID commentId;
+
+    boolean isOrganizer;
+
+    boolean isAdmin;
+
+    public CommentAdapter(List<Comment> list, Fragment parentFragment, UUID eventId, boolean isOrganizer, boolean isAdmin) {
+
         this.list = list;
-        this.userId = userId;
+        this.parentFragment = parentFragment;
         this.eventId = eventId;
+
+
+        this.commentModel = new ViewModelProvider(this.parentFragment.getActivity()).get(CommentViewModel.class);
+
+        this.sessionStore = new ViewModelProvider(this.parentFragment.requireActivity()).get(SessionStore.class);
+
+        this.userId = null;
+        this.deviceId = null;
+
+        sessionStore.observeSession(this.parentFragment.getViewLifecycleOwner(), (userId, deviceId) -> {
+            this.userId = userId;
+            this.deviceId = deviceId;
+        });
+
     }
 
     @NonNull
     @Override
     public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.comment, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment, parent, false);
         return new MyHolder(view);
     }
     @Override
@@ -55,9 +94,48 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         calendar.setTimeInMillis(Long.parseLong(timestamp));
         String timedate = DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
 
+        if (!isOrganizer) {
+
+            // not an organizer, remove the notifications button
+            holder.deleteComment.setVisibility(View.GONE);
+        }
+
+        else if (!isAdmin) {
+
+            // not an admin, remove the notifications button
+            holder.deleteComment.setVisibility(View.GONE);
+        }
+
+        else if (userId != senderId) {
+
+            // not an user who wrote the comment
+            holder.deleteComment.setVisibility(View.GONE);
+        }
+
+
         holder.name.setText(senderName);
         holder.time.setText(timedate);
         holder.comment.setText(message);
+        holder.deleteComment.setOnClickListener(view -> {
+            int commentPosition = holder.getBindingAdapterPosition();
+
+            this.commentModel.deleteComment(this.userId, deviceId, eventId, commentId)
+                    .addOnSuccessListener(success -> {
+                        this.list.remove(commentPosition);
+                        this.notifyItemRemoved(commentPosition);
+                    })
+                    .addOnFailureListener(exception -> {
+                        Log.e("ImageCardAdapter", "Failed to delete an image.", exception);
+
+                        Toast.makeText(this.parentFragment.requireContext(), "Failed to remove image: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+
+                        if (exception instanceof FirebaseFunctionsException) {
+                            Log.e("ImageCardAdapter", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
+                        }
+                    });
+        });
+
+
     }
 
     @Override
@@ -69,11 +147,14 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
 
         TextView name, comment, time;
 
+        ImageButton deleteComment;
+
         public MyHolder(@NonNull View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.comment_name);
             comment = itemView.findViewById(R.id.comment_text);
             time = itemView.findViewById(R.id.comment_time);
+            deleteComment = itemView.findViewById(R.id.delete_comment);
         }
     }
 }
