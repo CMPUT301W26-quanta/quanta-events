@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
@@ -42,12 +43,9 @@ public class ImageViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("createImage")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, UUID>() {
-                    @Override
-                    public UUID then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
-                        return UUID.fromString((String) result.get("imageId"));
-                    }
+                .onSuccessTask(callResult -> {
+                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                        return Tasks.forResult(UUID.fromString((String) result.get("imageId")));
                 });
     }
 
@@ -69,18 +67,15 @@ public class ImageViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getAllImages")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, ArrayList<UUID>>() {
-                    @Override
-                    public ArrayList<UUID> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        List<String> imageIDs = (List<String>) task.getResult().getData();
+                .onSuccessTask(callResult -> {
+                        List<String> imageIDs = (List<String>) callResult.getData();
                         ArrayList<UUID> imageUUIDs = new ArrayList<>();
 
                         for (String imageID : imageIDs) {
                             imageUUIDs.add(UUID.fromString(imageID));
                         }
 
-                        return imageUUIDs;
-                    }
+                        return Tasks.forResult(imageUUIDs);
                 });
     }
 
@@ -103,11 +98,11 @@ public class ImageViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getImage")
                 .call(data)
-                .continueWith(task -> {
-                    Map<String, Object> imageData = (Map<String, Object>) task.getResult().getData();
+                .onSuccessTask(callResult -> {
+                    Map<String, Object> imageData = (Map<String, Object>) callResult.getData();
                     Image result = new Image(imageId, imageData);
                     System.out.println("Got Image" + result);
-                    return result;
+                    return Tasks.forResult(result);
                 });
 
     }
@@ -132,11 +127,8 @@ public class ImageViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("deleteImage")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Boolean>() {
-                    @Override
-                    public Boolean then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        return true;
-                    }
+                .onSuccessTask(callResult -> {
+                        return Tasks.forResult(null);
                 });
     }
 }

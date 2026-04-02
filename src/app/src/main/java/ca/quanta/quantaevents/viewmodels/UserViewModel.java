@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
@@ -53,14 +54,11 @@ public class UserViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("createUser")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, UUID>() {
+                .onSuccessTask(callResult -> {
                     // Access return value of the function createUser
-                    @Override
-                    public UUID then(@NonNull Task<HttpsCallableResult> task) {
-                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
+                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
                         UUID userId = UUID.fromString((String) result.get("userId"));
-                        return userId;
-                    }
+                        return Tasks.forResult(userId);
                 });
     }
 
@@ -82,14 +80,12 @@ public class UserViewModel extends ViewModel {
         return functions
                .getHttpsCallable("getAllUsers")
                .call(data)
-               .continueWith(new Continuation<HttpsCallableResult, ArrayList<ExternalUser>>() {
-                   @Override
-                   public ArrayList<ExternalUser> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                       List<Map<String, Object>> userObjects = (List<Map<String, Object>>) task.getResult().getData();
+               .onSuccessTask(callResult -> {
+                       List<Map<String, Object>> userObjects = (List<Map<String, Object>>) callResult.getData();
                        ArrayList<ExternalUser> users = new ArrayList<ExternalUser>();
 
                        for (Map<String, Object> userObject : userObjects) {
-                           String userId = (String) userObject.get("userId");
+                           String userIdStr = (String) userObject.get("userId");
                            String name = (String) userObject.get("name");
                            Boolean isEntrant = (Boolean) userObject.get("isEntrant");
                            Boolean isOrganizer = (Boolean) userObject.get("isOrganizer");
@@ -97,17 +93,16 @@ public class UserViewModel extends ViewModel {
 
                            // verify that they have a userId, otherwise just skip them
 
-                           if (userId == null) {
+                           if (userIdStr == null) {
                                continue;
                            }
 
-                           UUID userUUID = UUID.fromString(userId);
+                           UUID userUUID = UUID.fromString(userIdStr);
 
                            users.add(new ExternalUser(userUUID, name, isEntrant, isOrganizer, isAdmin));
                        }
 
-                       return users;
-                   }
+                       return Tasks.forResult(users);
                });
     }
 
@@ -128,12 +123,12 @@ public class UserViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getUser")
                 .call(data)
-                .continueWith(task -> {
-                    Map<String, Object> userData = (Map<String, Object>) task.getResult().getData();
+                .onSuccessTask(callResult -> {
+                    Map<String, Object> userData = (Map<String, Object>) callResult.getData();
                     User result = new User(userData, userId, deviceId);
                     System.out.println("TASK COMPLETE");
                     System.out.println("GOT " + result);
-                    return result;
+                    return Tasks.forResult(result);
                 });
     }
 
@@ -155,11 +150,8 @@ public class UserViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("deleteUser")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Boolean>() {
-                    @Override
-                    public Boolean then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        return true;
-                    }
+                .onSuccessTask(callResult -> {
+                        return Tasks.forResult(null);
                 });
     }
 
@@ -200,12 +192,9 @@ public class UserViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("updateUser")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Void>() {
-                    @Override
-                    public Void then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
-                        return null;
-                    }
+                .onSuccessTask(callResult -> {
+                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                        return Tasks.forResult(null);
                 });
     }
 

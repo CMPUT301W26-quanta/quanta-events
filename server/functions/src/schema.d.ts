@@ -112,6 +112,7 @@ declare global {
 		waited: boolean;
 		selected: boolean;
 		cancelled: boolean;
+		final: boolean;
 	}
 
 	interface NotificationLotteryKind {

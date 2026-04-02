@@ -89,12 +89,12 @@ public class EventManagerFragment extends Fragment {
                 binding.drawLotteryButton.setAlpha(0.5f);
                 EventViewModel events = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
                 loader.loadTask(events.drawLottery(userId, deviceId, eventId)
-                                .addOnSuccessListener(_void -> ToastManager.show(requireContext(), "Drew lottery"))
+                                .addOnSuccessListener(_void -> ToastManager.show(getContext(), "Drew lottery"))
                         .addOnFailureListener(exc -> {
                             exc.printStackTrace();
                             binding.drawLotteryButton.setEnabled(true);
                             binding.drawLotteryButton.setAlpha(1.0f);
-                            ToastManager.show(requireContext(), "Failed to draw lottery");
+                            ToastManager.show(getContext(), "Failed to draw lottery");
                         })
                 );
             });

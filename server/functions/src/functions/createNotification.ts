@@ -3,7 +3,11 @@ import { CallableRequest, HttpsError } from "firebase-functions/https";
 import * as z from "zod";
 import * as util from "../util";
 import { v4 as uuidv4 } from "uuid";
-import { CollectionReference, getFirestore } from "firebase-admin/firestore";
+import {
+	CollectionReference,
+	FieldValue,
+	getFirestore,
+} from "firebase-admin/firestore";
 
 const createNotificationInterface = util.standardForm(
 	z.object({
@@ -13,6 +17,7 @@ const createNotificationInterface = util.standardForm(
 		waited: z.boolean(),
 		cancelled: z.boolean(),
 		selected: z.boolean(),
+		final: z.boolean(),
 	}),
 );
 
@@ -22,7 +27,7 @@ export async function createNotification(request: CallableRequest) {
 		request,
 	);
 
-	const { message, title, eventId, waited, cancelled, selected } = data;
+	const { message, title, eventId, waited, cancelled, selected, final } = data;
 
 	const userData = await util.verifyUser(userId, deviceId);
 	await util.requireRole(userData, "organizer");
@@ -57,10 +62,19 @@ export async function createNotification(request: CallableRequest) {
 			}
 		}
 	}
-	if (selected) {
+	if (final) {
 		const finalList = eventDocument?.finalList as string[];
 		logger.info("This is the final list", { finalList });
 		for (const entrantId of finalList) {
+			if (!recipients.includes(entrantId)) {
+				recipients.push(entrantId);
+			}
+		}
+	}
+	if (selected) {
+		const selectedList = eventDocument?.selectedList as string[];
+		logger.info("This is the selected list", { selectedList });
+		for (const entrantId of selectedList) {
 			if (!recipients.includes(entrantId)) {
 				recipients.push(entrantId);
 			}
@@ -81,6 +95,7 @@ export async function createNotification(request: CallableRequest) {
 						waited,
 						cancelled,
 						selected,
+						final,
 					},
 					targetUsers: recipients,
 				}),
@@ -90,6 +105,14 @@ export async function createNotification(request: CallableRequest) {
 	}
 
 	util.sendBatchNotifications(recipients, data.title || "", data.message || "");
+
+	// Store the notification in organizer's sent notifications array
+	await db
+		.collection("users")
+		.doc(userId)
+		.update({
+			"organizer.sentNotifications": FieldValue.arrayUnion(notificationId),
+		});
 
 	return { notificationId };
 }

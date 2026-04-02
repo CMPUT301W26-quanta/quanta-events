@@ -45,7 +45,9 @@ export async function sendNotification(
 		},
 	};
 
-	await getMessaging()
+	// Send only if receiveNotifications is enabled
+	if (target.entrant?.receiveNotifications) {
+		await getMessaging()
 		.send(message)
 		.then((_response: string) => {
 			logger.info("Message sent succesfully");
@@ -53,6 +55,7 @@ export async function sendNotification(
 		.catch((error: string) => {
 			logger.error("Message failed to send", error);
 		});
+	}
 }
 
 export async function sendBatchNotifications(
