@@ -157,6 +157,7 @@ public class EntrantEventBrowserFragment extends Fragment {
         hasLoaded = false;
         loadedInitialEvents = false;
         binding = null;
+        adapter = null;
     }
 
     // decides if events should be loaded based on if they
@@ -193,12 +194,11 @@ public class EntrantEventBrowserFragment extends Fragment {
                             filterCategory,
                             EventViewModel.SortBy.REGISTRATION_START)
                     .addOnSuccessListener(events -> {
-                        if (!isAdded()) {
-                            return;
-                        }
+                        if (!isAdded() || binding == null) return;
                         bindEventList(events);
                     })
                     .addOnFailureListener(ex -> {
+                        if (!isAdded() || binding == null) return;
                         Log.e("EntrantEventBrowser", "Failed to load events", ex);
                         if (ex instanceof FirebaseFunctionsException) {
                             FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
@@ -219,9 +219,7 @@ public class EntrantEventBrowserFragment extends Fragment {
     // The following function is from OpenAI, ChatGPT, "bindEventList implementation for EntrantEventBrowser", 2026-03-11
 
     private void bindEventList(List<Event> events) {
-        if (!isAdded()) {
-            return;
-        }
+        if (!isAdded() || binding == null || adapter == null) return;
         if (events == null) {
             Log.d("EntrantEventBrowser", "Event list is null");
             return;
@@ -256,9 +254,7 @@ public class EntrantEventBrowserFragment extends Fragment {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
-                    if (!isAdded()) {
-                        return;
-                    }
+                    if (!isAdded() || binding == null || adapter == null) return;
                     Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;

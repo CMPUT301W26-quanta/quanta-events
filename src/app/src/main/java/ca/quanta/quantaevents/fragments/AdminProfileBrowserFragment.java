@@ -47,6 +47,7 @@ public class AdminProfileBrowserFragment extends Fragment {
                         .addOnSuccessListener(users -> {
                             // filter out admins
 
+                            if (!isAdded() || binding == null) return;
                             ArrayList<ExternalUser> nonAdminProfiles = new ArrayList<ExternalUser>();
 
                             for (ExternalUser user : users) {
@@ -59,13 +60,16 @@ public class AdminProfileBrowserFragment extends Fragment {
 
                             ProfileAdapter profilesAdapter = new ProfileAdapter(nonAdminProfiles, this, (profileID) -> {
                                 NavDirections action = AdminProfileBrowserFragmentDirections.actionAdminprofilebrowserFragmentToAdminNotificationHistoryFragment(profileID);
-                                Navigation.findNavController(this.requireView()).navigate(action);
+                                if (isAdded()) {
+                                    Navigation.findNavController(requireView()).navigate(action);
+                                }
                             });
 
                             binding.profilesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
                             binding.profilesRecyclerView.setAdapter(profilesAdapter);
                         })
                         .addOnFailureListener(exception -> {
+                            if (!isAdded() || binding == null) return;
                             Log.e("AdminProfileBrowserFragment", "Failed to fetch all users.", exception);
 
                             ToastManager.show(getContext(), "Failed to fetch users", Toast.LENGTH_LONG);

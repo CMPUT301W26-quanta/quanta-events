@@ -40,4 +40,10 @@ public class EventWaitingListFragment extends Fragment {
         binding = FragmentEventWaitlistBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

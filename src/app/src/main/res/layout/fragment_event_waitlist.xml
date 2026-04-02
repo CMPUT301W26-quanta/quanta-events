@@ -16,40 +16,14 @@
         android:paddingTop="20dp"
         android:paddingBottom="8dp">
 
-        <CheckBox
-            android:id="@+id/check_waiting_list"
+        <Spinner
+            android:id="@+id/spinner_filter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="Show Waiting List Entrants"
-            android:textColor="@color/text_color"
-            app:buttonTint="@color/color_dark_gray"
-            app:strokeColor="@color/border"
-            app:strokeWidth="2dp" />
+            android:padding="12dp"
+            android:textColor="@color/text_color" />
 
-        <CheckBox
-            android:id="@+id/check_selected"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="Show Selected Entrants"
-            android:textColor="@color/text_color"
-            app:buttonTint="@color/color_light_green"
-            app:strokeColor="@color/border"
-            app:strokeWidth="2dp" />
-
-        <CheckBox
-            android:id="@+id/check_cancelled"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="Show Cancelled Entrants"
-            android:textColor="@color/text_color"
-            app:buttonTint="@color/color_light_red"
-            app:strokeColor="@color/border"
-            app:strokeWidth="2dp" />
     </LinearLayout>
-
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/profiles_recycler_view"
@@ -96,4 +70,5 @@
         app:strokeWidth="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

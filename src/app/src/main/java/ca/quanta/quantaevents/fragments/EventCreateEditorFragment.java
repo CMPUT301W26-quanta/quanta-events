@@ -174,6 +174,7 @@ public class EventCreateEditorFragment extends Fragment {
                             eventTime, name, description, eventCategory, eventGuidelines, geolocation,
                             eventCapacity, location, registrationLimit))
                     .addOnFailureListener(ex -> {
+                        if (!isAdded() || binding == null) return;
                         binding.saveButton.setEnabled(true);
                         Log.e(TAG, "Failed to upload image", ex);
                         ToastManager.show(getContext(), "Failed to upload image", Toast.LENGTH_LONG);
@@ -231,12 +232,14 @@ public class EventCreateEditorFragment extends Fragment {
         }
         eventModel.getEvent(eventId, userId, deviceId)
                 .addOnSuccessListener(this::bindEventForEdit)
-                .addOnFailureListener(ex ->
-                        ToastManager.show(getContext(), "Failed to load event", Toast.LENGTH_LONG)
-                );
+                .addOnFailureListener(ex -> {
+                    if (!isAdded() || binding == null) return;
+                    ToastManager.show(getContext(), "Failed to load event", Toast.LENGTH_LONG);
+                });
     }
 
     private void bindEventForEdit(Event event) {
+        if (!isAdded() || binding == null) return;
         if (event == null) {
             return;
         }
@@ -271,6 +274,7 @@ public class EventCreateEditorFragment extends Fragment {
         if (imageUuid != null) {
             imageModel.getImage(imageUuid, userId, deviceId)
                     .addOnSuccessListener(imageData -> {
+                        if (!isAdded() || binding == null) return;
                         Object imageBase64 = imageData.getImageData();
                         if (imageBase64 != null) {
                             selectedImageBase64 = imageBase64.toString();
@@ -298,6 +302,7 @@ public class EventCreateEditorFragment extends Fragment {
     }
 
     private void showPreviewFromBase64(String base64Data) {
+        if (!isAdded() || binding == null) return;
         byte[] bytes = Base64.decode(base64Data, Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         if (bitmap == null) {
@@ -327,6 +332,7 @@ public class EventCreateEditorFragment extends Fragment {
                         name, description, eventCategory, eventGuidelines, geolocation,
                         eventCapacity, location, registrationLimit, imageUuid)
                 .addOnSuccessListener(eventId -> {
+                    if (!isAdded() || binding == null) return;
                     binding.saveButton.setEnabled(true);
                     ToastManager.show(getContext(), "Event created", Toast.LENGTH_LONG);
                     if (isAdded()) {
@@ -334,6 +340,7 @@ public class EventCreateEditorFragment extends Fragment {
                     }
                 })
                 .addOnFailureListener(ex -> {
+                    if (!isAdded() || binding == null) return;
                     binding.saveButton.setEnabled(true);
                     Log.e(TAG, "Failed to create event", ex);
                     ToastManager.show(getContext(), "Failed to create event", Toast.LENGTH_LONG);
@@ -356,6 +363,7 @@ public class EventCreateEditorFragment extends Fragment {
                                 eventTime, name, description, eventCategory, eventGuidelines, geolocation,
                                 eventCapacity, location, registrationLimit))
                         .addOnFailureListener(ex -> {
+                            if (!isAdded() || binding == null) return;
                             binding.saveButton.setEnabled(true);
                             Log.e(TAG, "Failed to upload image", ex);
                             ToastManager.show(getContext(), "Failed to upload image", Toast.LENGTH_LONG);
@@ -391,6 +399,7 @@ public class EventCreateEditorFragment extends Fragment {
                         name, description, eventCategory, eventGuidelines,
                         geolocation, eventCapacity, location, registrationLimit, imageUuid)
                 .addOnSuccessListener(_done -> {
+                    if (!isAdded() || binding == null) return;
                     binding.saveButton.setEnabled(true);
                     ToastManager.show(getContext(), "Event updated", Toast.LENGTH_LONG);
                     if (isAdded()) {
@@ -398,6 +407,7 @@ public class EventCreateEditorFragment extends Fragment {
                     }
                 })
                 .addOnFailureListener(ex -> {
+                    if (!isAdded() || binding == null) return;
                     binding.saveButton.setEnabled(true);
                     Log.e(TAG, "Failed to update event", ex);
                     ToastManager.show(getContext(), "Failed to update event", Toast.LENGTH_LONG);
