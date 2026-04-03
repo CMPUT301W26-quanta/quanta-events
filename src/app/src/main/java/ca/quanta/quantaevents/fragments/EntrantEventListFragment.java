@@ -126,6 +126,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
                             null,
                             null,
                             null,
+                            null,
                             null)
                     .addOnSuccessListener(this::bindEventList)
                     .addOnFailureListener(ex -> {

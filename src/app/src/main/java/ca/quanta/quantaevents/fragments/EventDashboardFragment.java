@@ -128,6 +128,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
                             null,
                             null,
                             null,
+                            null,
                             EventViewModel.SortBy.REGISTRATION_END)
                     .addOnSuccessListener(events -> {
                         if (!isAdded()) {
