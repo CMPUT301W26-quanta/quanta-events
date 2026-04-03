@@ -32,14 +32,11 @@ public class UserViewModel extends ViewModel {
      * @param name             Name of the user.
      * @param email            Email address of the user.
      * @param phone            Phone number of the user.
-     * @param isEntrant        Boolean that's true when the user selects to be an Entrant. (Will be removed in final checkpoint)
-     * @param isOrganizer      Boolean that's true when the user selects to be an Organizer. (Will be removed in final checkpoint)
-     * @param isAdmin          Boolean that's true when the user selects to be an Admin. (Will be removed in final checkpoint)
      * @param getNotifications Boolean that's true when the user selects to receive notifications. (Will be removed in final checkpoint)
      * @param deviceId         UUID identifying the user's device.
      * @return UUID assigned to newly created user.
      */
-    public Task<UUID> createUser(String name, String email, String phone, Boolean isEntrant, Boolean isOrganizer, Boolean isAdmin, Boolean getNotifications, UUID deviceId) {
+    public Task<UUID> createUser(String name, String email, String phone, Boolean getNotifications, UUID deviceId) {
         // Arguments for createUser passed in data Map
         Map<String, Object> data = new HashMap<>();
 
@@ -48,9 +45,6 @@ public class UserViewModel extends ViewModel {
         data.put("email", email);
         data.put("phone", phone);
         data.put("receiveNotifications", getNotifications);
-        data.put("isEntrant", isEntrant);
-        data.put("isOrganizer", isOrganizer);
-        data.put("isAdmin", isAdmin);
 
         return functions
                 .getHttpsCallable("createUser")

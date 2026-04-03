@@ -11,9 +11,6 @@ const createUserInterface = z.object({
 	email: z.email().nullable(),
 	phone: z.string().nullable(),
 	receiveNotifications: z.boolean().nullable(),
-	isEntrant: z.boolean().nullable(),
-	isOrganizer: z.boolean().nullable(),
-	isAdmin: z.boolean().nullable(),
 });
 
 export async function createUser(request: CallableRequest) {
@@ -23,9 +20,6 @@ export async function createUser(request: CallableRequest) {
 		email,
 		phone,
 		receiveNotifications,
-		isEntrant,
-		isOrganizer,
-		isAdmin,
 	} = util.parseInterface(createUserInterface, request);
 
 	const userId = uuidv4();
@@ -41,17 +35,9 @@ export async function createUser(request: CallableRequest) {
 					name: name,
 					email: email,
 					phone: phone,
-					entrant: isEntrant
-						? {
-								enteredEvents: [],
-								history: [],
-								receiveNotifications: receiveNotifications ?? false,
-							}
-						: null,
-					organizer: isOrganizer
-						? { createdEvents: [], sentNotifications: [] }
-						: null,
-					admin: isAdmin ? {} : null,
+					entrant: {enteredEvents: [], history: [], receiveNotifications: receiveNotifications ?? false},
+					organizer: { createdEvents: [], sentNotifications: [] },
+					admin: null,
 					notifToken: null,
 				}),
 			);
