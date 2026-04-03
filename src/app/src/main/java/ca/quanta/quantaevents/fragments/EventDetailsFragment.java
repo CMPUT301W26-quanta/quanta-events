@@ -72,7 +72,7 @@ public class EventDetailsFragment extends Fragment {
     private CommentAdapter commentAdapter;
 
 
-    private UUID userId;
+    private String userId;
     private UUID deviceId;
     private UUID eventId;
     private boolean isAdmin = false;
@@ -125,7 +125,7 @@ public class EventDetailsFragment extends Fragment {
 
         // check session
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
-            userId = uid;
+            userId = uid.toString();
             deviceId = did;
             loadEvent();
         });
@@ -194,7 +194,7 @@ public class EventDetailsFragment extends Fragment {
         }
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(
-            eventModel.getEvent(eventId, userId, deviceId)
+            eventModel.getEvent(eventId, UUID.fromString(userId), deviceId)
                     .addOnSuccessListener(event -> {this.bindEvent(event);loadComments(); })
                     .addOnFailureListener(ex -> {
                                 if (isAdded()) {
@@ -216,7 +216,7 @@ public class EventDetailsFragment extends Fragment {
         }
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(
-                commentModel.getAllComments(userId, deviceId, eventId)
+                commentModel.getAllComments(UUID.fromString(userId), deviceId, eventId)
                         .addOnSuccessListener(comments -> {
                             // use the adapter to display them
 
@@ -245,12 +245,12 @@ public class EventDetailsFragment extends Fragment {
 
 
 
-            model.getUser(this.userId, this.deviceId).addOnSuccessListener(user -> {
+            model.getUser(UUID.fromString(this.userId), this.deviceId).addOnSuccessListener(user -> {
                  String name = user.getName();
 
-                commentModel.createComment(this.userId, this.deviceId, this.eventId, message, postTime).addOnSuccessListener(commentId -> {
+                commentModel.createComment(UUID.fromString(this.userId), this.deviceId, this.eventId, message, postTime).addOnSuccessListener(commentId -> {
 
-                    Comment comment = new Comment(commentId, this.userId, message, postTime, name);
+                    Comment comment = new Comment(commentId.toString(), this.userId, message, postTime, name);
                     this.commentAdapter.addComment(comment);
                 })
 
@@ -305,7 +305,7 @@ public class EventDetailsFragment extends Fragment {
 
         UUID imageUuid = event.getImageId();
         if (imageUuid != null) {
-            imageModel.getImage(imageUuid, userId, deviceId)
+            imageModel.getImage(imageUuid, UUID.fromString(userId), deviceId)
                     .addOnSuccessListener(imageData -> {
                         Object imageBase64 = imageData.getImageData();
                         if (imageBase64 != null) {
@@ -351,7 +351,7 @@ public class EventDetailsFragment extends Fragment {
 
         binding.textOrganizer.setText(" Loading organizer name...");
 
-        eventModel.getOrganizerName(userId, deviceId, eventId)
+        eventModel.getOrganizerName(UUID.fromString(userId), deviceId, eventId)
                 .addOnSuccessListener(name -> {
                     if (!isAdded()) {
                         binding.textOrganizer.setText(" [no associated organizer]");
@@ -385,7 +385,7 @@ public class EventDetailsFragment extends Fragment {
             return;
         }
         Log.d("EventDetails", "updateWaitlistState: checking waitlist for eventId=" + eventId);
-        eventModel.checkWaitlist(userId, deviceId, eventId)
+        eventModel.checkWaitlist(UUID.fromString(userId), deviceId, eventId)
                 .addOnSuccessListener(result -> {
                     inWaitlist = Boolean.TRUE.equals(result);
                     Log.d("EventDetails", "inWaitlist result=" + inWaitlist);
@@ -398,7 +398,7 @@ public class EventDetailsFragment extends Fragment {
             Log.d("EventDetails", "refreshWaitlistCount: missing session or eventId");
             return;
         }
-        eventModel.getWaitlistCount(userId, deviceId, eventId)
+        eventModel.getWaitlistCount(UUID.fromString(userId), deviceId, eventId)
                 .addOnSuccessListener(count -> {
                     waitlistCount = count == null ? 0 : count;
                     updateWaitlistText();
@@ -445,7 +445,7 @@ public class EventDetailsFragment extends Fragment {
         }
         if (inWaitlist) {
             Log.d("EventDetails", "leaveWaitlist: eventId=" + eventId);
-            eventModel.leaveWaitlist(userId, deviceId, eventId)
+            eventModel.leaveWaitlist(UUID.fromString(userId), deviceId, eventId)
                     .addOnSuccessListener(_done -> {
                         inWaitlist = false;
                         Log.d("EventDetails", "leaveWaitlist: success");
@@ -546,7 +546,7 @@ public class EventDetailsFragment extends Fragment {
             @Nullable Double longitude,
             @Nullable Double accuracyM
     ) {
-        eventModel.joinWaitlist(userId, deviceId, eventId, latitude, longitude, accuracyM)
+        eventModel.joinWaitlist(UUID.fromString(userId), deviceId, eventId, latitude, longitude, accuracyM)
                 .addOnSuccessListener(_done -> {
                     inWaitlist = true;
                     Log.d("EventDetails", "joinWaitlist: success");

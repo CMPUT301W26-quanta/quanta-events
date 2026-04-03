@@ -51,14 +51,24 @@
             android:layout_toRightOf="@id/load_comment"
             android:text="00/00/0000" />
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id = "@+id/delete_comment"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
-            android:background="@color/color_light_red"
-            android:padding = "15dp"
-            android:src = "@drawable/material_symbols_delete_rounded"/>
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:backgroundTint="@color/color_light_red"
+            android:padding = "8dp"
+            app:icon = "@drawable/material_symbols_delete_rounded"
+            app:iconGravity="textStart"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:gravity="center"
+            app:iconPadding="0dp"
+            app:cornerRadius="12dp"
+            style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton.Icon"
+            />
 
 
     </RelativeLayout>

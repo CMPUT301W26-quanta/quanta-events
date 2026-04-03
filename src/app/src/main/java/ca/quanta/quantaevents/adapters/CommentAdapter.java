@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.functions.FirebaseFunctionsException;
 
 import java.util.List;
@@ -38,13 +39,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
 
     private SessionStore sessionStore;
 
-    UUID userId;
+    String userId;
 
-    UUID deviceId;
+    String deviceId;
 
     UUID eventId;
 
-    UUID commentId;
+    String commentId;
 
     boolean isOrganizer;
 
@@ -65,8 +66,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         this.deviceId = null;
 
         sessionStore.observeSession(this.parentFragment.getViewLifecycleOwner(), (userId, deviceId) -> {
-            this.userId = userId;
-            this.deviceId = deviceId;
+            this.userId = userId != null ? userId.toString() :null;
+            this.deviceId = deviceId != null ? deviceId.toString() :null;
         });
 
     }
@@ -81,16 +82,19 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
     public void onBindViewHolder(@NonNull MyHolder holder, int position) {
         final Comment thisComment = list.get(position);
 
-        final UUID commentId = thisComment.getCommentId();
-        final UUID senderId = thisComment.getSenderId();
+        final String commentId = thisComment.getCommentId();
+        final String senderId = thisComment.getSenderId();
         final String senderName  = thisComment.getSenderName();
         final String message = thisComment.getMessage();
         final String timestamp = thisComment.getPostTime();
 
 
-        if (!isOrganizer && !isAdmin && userId != senderId) {
+        holder.deleteComment.setVisibility(View.VISIBLE);
 
-            // not an organizer, remove the notifications button
+
+        if (userId != null && !isOrganizer && !isAdmin && !userId.equals(senderId)) {
+
+            // not an organizer, admin, or user who wrote the comment remove the delete button
             holder.deleteComment.setVisibility(View.GONE);
         }
 
@@ -102,7 +106,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         holder.deleteComment.setOnClickListener(view -> {
             int commentPosition = holder.getBindingAdapterPosition();
 
-            this.commentModel.deleteComment(this.userId, deviceId, eventId, commentId)
+            this.commentModel.deleteComment(UUID.fromString(this.userId), UUID.fromString(this.deviceId), eventId, commentId)
                     .addOnSuccessListener(success -> {
                         this.list.remove(commentPosition);
                         this.notifyItemRemoved(commentPosition);
@@ -136,7 +140,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
 
         TextView name, comment, time;
 
-        ImageButton deleteComment;
+        MaterialButton deleteComment;
 
         public MyHolder(@NonNull View itemView) {
             super(itemView);
