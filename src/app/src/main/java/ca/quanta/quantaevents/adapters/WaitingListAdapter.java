@@ -49,6 +49,9 @@ public class WaitingListAdapter extends RecyclerView.Adapter<WaitingListAdapter.
         return users.size();
     }
 
+    public List<ExternalUser> getUsers() {
+        return users;
+    }
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView name, email, phone;
 

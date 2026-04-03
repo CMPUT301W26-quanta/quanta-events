@@ -34,8 +34,8 @@ public class SessionStore extends AndroidViewModel {
     public SessionStore(@NonNull Application application) {
         super(application);
         prefs = application.getSharedPreferences(PREFS_NAME, Application.MODE_PRIVATE);
-        userId.setValue("3cb05c5a-ade6-4aaa-8124-a2ea03abaee7");//prefs.getString(KEY_USER_ID, null));
-        deviceId.setValue("5ed9bd52-6b15-40b7-b06f-14cb53401171");//prefs.getString(KEY_DEVICE_ID, null));
+        userId.setValue(prefs.getString(KEY_USER_ID, null));
+        deviceId.setValue(prefs.getString(KEY_DEVICE_ID, null));
     }
 
     public LiveData<String> getUserId() {

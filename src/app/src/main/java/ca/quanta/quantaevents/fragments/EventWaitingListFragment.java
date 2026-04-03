@@ -16,13 +16,16 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import java.util.List;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.WaitingListAdapter;
 import ca.quanta.quantaevents.databinding.FragmentEventWaitlistBinding;
+import ca.quanta.quantaevents.models.ExternalUser;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.CsvExporter;
 import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 
@@ -34,6 +37,8 @@ public class EventWaitingListFragment extends Fragment {
     private UUID userId;
     private UUID deviceId;
     private UUID eventId;
+    private String eventName;
+    private String currentListType = LIST_VALUES[0];
 
     private static final String[] LIST_LABELS = {
             "Wait List", "Selected List", "Final List", "Cancelled List", "Rejected List"
@@ -57,6 +62,26 @@ public class EventWaitingListFragment extends Fragment {
         infoStore.setIconRes(R.drawable.material_symbols_group_outline);
 
         eventId = EventWaitingListFragmentArgs.fromBundle(getArguments()).getEventId();
+
+        sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
+            userId = uid;
+            deviceId = did;
+            System.out.print("Session observed: userId=" + userId + " deviceId=" + deviceId);
+            eventViewModel.getEvent(eventId, userId, deviceId)
+                    .addOnSuccessListener(event -> {
+                        System.out.println(event);
+                        if (event != null && event.getEventName() != null) {
+                            eventName = event.getEventName()
+                                    .trim()
+                                    .replaceAll("[^a-zA-Z0-9_\\-]", "_"); // sanitize for filename
+                        }
+                    })
+                    .addOnFailureListener(ex -> {
+                        Log.e("EventWaitingList", "getEvent FAILED", ex); // ← check Logcat for this
+                    });
+            fetchList(LIST_VALUES[binding.spinnerFilter.getSelectedItemPosition()]);
+        });
+
         adapter = new WaitingListAdapter();
         binding.profilesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.profilesRecyclerView.setAdapter(adapter);
@@ -71,15 +96,30 @@ public class EventWaitingListFragment extends Fragment {
         binding.spinnerFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                fetchList(LIST_VALUES[position]);
+                currentListType = LIST_VALUES[position];
+                fetchList(currentListType);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
-        sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
-            userId = uid;
-            deviceId = did;
-            fetchList(LIST_VALUES[binding.spinnerFilter.getSelectedItemPosition()]);
+
+        binding.exportCsvButton.setOnClickListener(v -> {
+            List<ExternalUser> users = adapter.getUsers();
+            if (users == null || users.isEmpty()) {
+                ToastManager.show(getContext(), "No data to export", Toast.LENGTH_SHORT);
+                return;
+            }
+
+            Log.d("WaitlistFragment", "Exporting CSV: count=" + users.size() + " listType=" + currentListType);
+            try {
+                System.out.println(eventName);
+                String fileName = currentListType + "_" + eventName;
+                CsvExporter.saveToDownloads(requireContext(), users, fileName);
+                ToastManager.show(getContext(), "Saved to Downloads", Toast.LENGTH_SHORT);
+            } catch (Exception ex) {
+                Log.e("WaitlistFragment", "Export failed", ex);
+                ToastManager.show(getContext(), "Export failed", Toast.LENGTH_SHORT);
+            }
         });
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
