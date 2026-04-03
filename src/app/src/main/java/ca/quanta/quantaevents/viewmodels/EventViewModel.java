@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.models.Event;
+import ca.quanta.quantaevents.models.ExternalUser;
+
 import androidx.annotation.Nullable;
 
 /**
@@ -468,5 +470,44 @@ public class EventViewModel extends ViewModel {
         return functions.getHttpsCallable("drawLottery")
                 .call(data)
                 .onSuccessTask(task -> Tasks.forResult(null));
+    }
+
+    /**
+     * Calls the getWaitlist cloud function and returns users on the requested list.
+     *
+     * @param userId    UUID to identify user.
+     * @param deviceId  UUID to identify user's device.
+     * @param eventId   UUID to identify the event.
+     * @param listType  The list to fetch (waitList, cancelledList, finalList, rejectedList, selectedList).
+     * @return List of ExternalUser objects on the requested list.
+     */
+    public Task<List<ExternalUser>> getWaitlist(UUID userId, UUID deviceId, UUID eventId, String listType) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        payload.put("listType", listType);
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("getWaitlist")
+                .call(data)
+                .onSuccessTask(callResult -> {
+                    Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                    List<Map<String, Object>> users = (List<Map<String, Object>>) result.get("users");
+                    ArrayList<ExternalUser> externalUsers = new ArrayList<>();
+                    if (users == null) return Tasks.forResult(externalUsers);
+                    for (Map<String, Object> user : users) {
+                        externalUsers.add(new ExternalUser(
+                                UUID.fromString((String) user.get("userId")),
+                                (String) user.get("name"),
+                                (String) user.get("email"),
+                                (String) user.get("phone")
+                        ));
+                    }
+                    return Tasks.forResult(externalUsers);
+                });
     }
 }

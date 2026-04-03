@@ -35,7 +35,7 @@
         android:scrollbars="vertical"
         android:overScrollMode="ifContentScrolls"
         app:layout_constraintTop_toBottomOf="@id/filter_layout"
-        app:layout_constraintBottom_toTopOf="@id/back_button"
+        app:layout_constraintBottom_toTopOf="@id/layout_bottom_buttons"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

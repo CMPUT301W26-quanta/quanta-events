@@ -90,8 +90,6 @@ export const getWaitlistCount = onCall(
 
 export const joinWaitlist = onCall({ maxInstances: 1 }, functions.joinWaitlist);
 
-export const getUsers = onCall({ maxInstances: 1}, functions.getUsers);
-
 export const leaveWaitlist = onCall(
 	{ maxInstances: 1 },
 	functions.leaveWaitlist,
