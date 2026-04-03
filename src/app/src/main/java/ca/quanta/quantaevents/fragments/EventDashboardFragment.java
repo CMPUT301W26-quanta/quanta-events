@@ -103,6 +103,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
         hasLoaded = false;
         binding = null;
         loadedInitialEvents = false;
+        adapter = null;
     }
 
     private void maybeLoadAllEvents() {
@@ -131,12 +132,11 @@ public class EventDashboardFragment extends Fragment implements Tagged {
                             null,
                             EventViewModel.SortBy.REGISTRATION_END)
                     .addOnSuccessListener(events -> {
-                        if (!isAdded()) {
-                            return;
-                        }
+                        if (!isAdded() || binding == null) return;
                         bindEventList(events);
                     })
                     .addOnFailureListener(ex -> {
+                        if (!isAdded() || binding == null) return;
                         Log.e("EventDashboard", "Failed to load events", ex);
                         if (isUserNotFound(ex)) {
                             handleMissingUser();
@@ -150,9 +150,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
     }
 
     private void bindEventList(java.util.List<Event> events) {
-        if (!isAdded()) {
-            return;
-        }
+        if (!isAdded() || binding == null || adapter == null) return;
         if (events == null) {
             return;
         }
@@ -184,9 +182,7 @@ public class EventDashboardFragment extends Fragment implements Tagged {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
-                    if (!isAdded()) {
-                        return;
-                    }
+                    if (!isAdded() || binding == null || adapter == null) return;
                     Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;

@@ -94,6 +94,7 @@ public class AccountFragment extends Fragment implements Tagged {
 
     // set input fields to the data fetched from server.
     private void populateFields(@NonNull User user) {
+        if (!isAdded() || binding == null) return;
         System.out.println(user);
 
         binding.inputName.setText(user.getName());
@@ -132,6 +133,7 @@ public class AccountFragment extends Fragment implements Tagged {
         loader.loadTask(
                 userModel.deleteUser(userId, deviceId, userId)
                         .addOnSuccessListener(_done -> {
+                            if (!isAdded() || binding == null) return;
                             sessionStore.clearSession();
                             binding.deleteButton.setEnabled(true);
                             ToastManager.show(getContext(), "Account deleted", Toast.LENGTH_LONG);
@@ -141,6 +143,7 @@ public class AccountFragment extends Fragment implements Tagged {
                             }
                         })
                         .addOnFailureListener(ex -> {
+                            if (!isAdded() || binding == null) return;
                             binding.deleteButton.setEnabled(true);
                             ToastManager.show(getContext(), "Failed to delete account", Toast.LENGTH_LONG);
                         })
@@ -168,12 +171,14 @@ public class AccountFragment extends Fragment implements Tagged {
         loader.loadTask(
                 userModel.updateUser(userId, deviceId, name, email, phone, receiveNotifications)
                         .addOnSuccessListener(_userId -> {
+                            if (!isAdded() || binding == null) return;
                             binding.saveButton.setEnabled(true);
                             ToastManager.show(getContext(), "Account updated", Toast.LENGTH_LONG);
                             NavDirections action = AccountFragmentDirections.actionAccountfragmentToHomefragment();
                             Navigation.findNavController(requireView()).navigate(action);
                         })
                         .addOnFailureListener(ex -> {
+                            if (!isAdded() || binding == null) return;
                             binding.saveButton.setEnabled(true);
                             ToastManager.show(getContext(), "Failed to update account", Toast.LENGTH_LONG);
                         })
@@ -195,5 +200,11 @@ public class AccountFragment extends Fragment implements Tagged {
     @Override
     public UUID getUniqueTag() {
         return TAG;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

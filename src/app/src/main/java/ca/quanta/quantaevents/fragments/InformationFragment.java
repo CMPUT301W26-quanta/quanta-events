@@ -19,7 +19,7 @@ import ca.quanta.quantaevents.databinding.FragmentInformationBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
 public class InformationFragment extends Fragment implements Tagged {
-    public FragmentInformationBinding binding;
+    private FragmentInformationBinding binding;
 
     public InformationFragment() {
         // Required empty public constructor
@@ -47,6 +47,12 @@ public class InformationFragment extends Fragment implements Tagged {
                              Bundle savedInstanceState) {
         binding = FragmentInformationBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 
     private final static UUID TAG = UUID.randomUUID();
