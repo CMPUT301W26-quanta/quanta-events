@@ -486,7 +486,7 @@ public class EventViewModel extends ViewModel {
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("eventId", eventId.toString());
-        payload.put("invitee", eventId.toString());
+        payload.put("invitee", invitee.toString());
         data.put("data", payload);
 
         return functions.getHttpsCallable("createInvitation")
