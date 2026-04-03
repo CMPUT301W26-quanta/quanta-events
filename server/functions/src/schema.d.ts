@@ -87,6 +87,7 @@ declare global {
 	interface ExternalComment {
 		commentId: string;
 
+		senderName: string;
 		senderId: string;
 		postTime: string;
 		message: string;

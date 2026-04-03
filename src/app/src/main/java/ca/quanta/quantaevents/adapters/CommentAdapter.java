@@ -57,6 +57,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         this.userId = null;
         this.deviceId = null;
 
+        this.isOrganizer = isOrganizer;
+        this.isAdmin = isAdmin;
+
         sessionStore.observeSession(this.parentFragment.getViewLifecycleOwner(), (userId, deviceId) -> {
             this.userId = userId;
             this.deviceId = deviceId;
@@ -81,7 +84,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         final String message = thisComment.getMessage();
         final String timestamp = thisComment.getPostTime();
 
-        if (this.userId != null && !isOrganizer && !isAdmin && !userId.equals(senderId)) {
+        if (this.userId != senderId && !this.isOrganizer && !this.isAdmin) {
             // not the organizer of the event, an admin, or the user who wrote the comment;
             // remove the delete button
             holder.deleteComment.setVisibility(View.GONE);
