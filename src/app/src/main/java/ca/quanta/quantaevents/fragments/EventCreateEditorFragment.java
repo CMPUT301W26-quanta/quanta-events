@@ -148,6 +148,7 @@ public class EventCreateEditorFragment extends Fragment {
         boolean geolocation = binding.checkGeolocation.isChecked();
         String eventCategory = normalizeEmpty(safeText(binding.inputCategory.getText()));
         String eventGuidelines = normalizeEmpty(safeText(binding.inputGuidelines.getText()));
+        boolean isPrivate = binding.checkPrivate.isChecked();
 
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(description)
                 || TextUtils.isEmpty(registrationStart) || TextUtils.isEmpty(registrationEnd)
@@ -172,7 +173,7 @@ public class EventCreateEditorFragment extends Fragment {
             imageModel.createImage(userId, deviceId, selectedImageBase64)
                     .addOnSuccessListener(imageId -> createEventWithImageId(imageId, registrationStart, registrationEnd,
                             eventTime, name, description, eventCategory, eventGuidelines, geolocation,
-                            eventCapacity, location, registrationLimit))
+                            eventCapacity, location, registrationLimit, isPrivate))
                     .addOnFailureListener(ex -> {
                         binding.saveButton.setEnabled(true);
                         Log.e(TAG, "Failed to upload image", ex);
@@ -180,7 +181,7 @@ public class EventCreateEditorFragment extends Fragment {
                     });
         } else {
             createEventWithImageId(null, registrationStart, registrationEnd, eventTime, name, description,
-                    eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit);
+                    eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit, isPrivate);
         }
     }
 
@@ -313,7 +314,7 @@ public class EventCreateEditorFragment extends Fragment {
                                         String name, String description,
                                         String eventCategory, String eventGuidelines,
                                         boolean geolocation, int eventCapacity,
-                                        String location, Integer registrationLimit) {
+                                        String location, Integer registrationLimit, boolean isPrivate) {
         UUID imageUuid = null;
         if (imageId != null) {
             try {
@@ -325,7 +326,7 @@ public class EventCreateEditorFragment extends Fragment {
 
         eventModel.createEvent(userId, deviceId, registrationStart, registrationEnd, eventTime,
                         name, description, eventCategory, eventGuidelines, geolocation,
-                        eventCapacity, location, registrationLimit, imageUuid)
+                        eventCapacity, location, registrationLimit, imageUuid, isPrivate)
                 .addOnSuccessListener(eventId -> {
                     binding.saveButton.setEnabled(true);
                     ToastManager.show(getContext(), "Event created", Toast.LENGTH_LONG);

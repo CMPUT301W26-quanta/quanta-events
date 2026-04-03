@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         FirebaseApp.initializeApp(this);
+        FirebaseFunctions.getInstance().useEmulator("192.168.50.69", 5001);
 
         FragmentInfoStore infoStore = new ViewModelProvider(this).get(FragmentInfoStore.class);
         SessionStore sessionStore = new ViewModelProvider(this).get(SessionStore.class);

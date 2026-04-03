@@ -27,7 +27,9 @@ public class EventManagerFragment extends Fragment {
     private UUID userId;
     private UUID deviceId;
     private UUID eventId;
-    private Boolean isDrawn;
+    private boolean isDrawn;
+
+    private boolean isPrivate;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,6 +37,7 @@ public class EventManagerFragment extends Fragment {
         EventManagerFragmentArgs args = EventManagerFragmentArgs.fromBundle(getArguments());
         eventId = args.getEventId();
         isDrawn = args.getIsDrawn();
+        isPrivate = args.getIsPrivate();
     }
 
     @Override
@@ -64,13 +67,25 @@ public class EventManagerFragment extends Fragment {
                     Navigation.findNavController(v).navigate(action);
                 }
         );
-        // sets onc lick listener to navigate to show qr fragment
-        binding.shareQrButton.setOnClickListener(
-                v -> {
-                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToShowqrfragment(eventId);
-                    Navigation.findNavController(v).navigate(action);
-                }
-        );
+        if (isPrivate) {
+            binding.shareQrButton.setText("Invite Entrants");
+            binding.shareQrButton.setOnClickListener(
+                    v -> {
+                        NavDirections action = EventManagerFragmentDirections.actionEventManagerFragmentToEventInviteFragment(eventId);
+                        Navigation.findNavController(v).navigate(action);
+                    }
+            );
+        } else {
+            binding.shareQrButton.setText("Share QR Code");
+            // sets onc lick listener to navigate to show qr fragment
+            binding.shareQrButton.setOnClickListener(
+                    v -> {
+                        NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToShowqrfragment(eventId);
+                        Navigation.findNavController(v).navigate(action);
+                    }
+            );
+        }
+
         //sets on click listener to navigate to waiting list fragment
         binding.viewWaitListButton.setOnClickListener(
                 v -> {

@@ -238,6 +238,18 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/checkPrivate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:checked="false"
+                android:text="Private Event"
+                android:textColor="@color/text_color"
+                android:textSize="16sp"
+                app:thumbTint="@color/color_light"
+                android:paddingVertical="12dp" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/checkGeolocation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
