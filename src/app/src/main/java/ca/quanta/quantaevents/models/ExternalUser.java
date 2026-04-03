@@ -43,6 +43,14 @@ public class ExternalUser {
         return this.name;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
     public Boolean isEntrant() {
         return this.isEntrant;
     }

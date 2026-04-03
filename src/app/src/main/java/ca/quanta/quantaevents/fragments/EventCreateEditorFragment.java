@@ -350,12 +350,12 @@ public class EventCreateEditorFragment extends Fragment {
             if (imageRemoved) {
                 updateEventWithImageId(null, registrationStart, registrationEnd, eventTime,
                         name, description, eventCategory, eventGuidelines, geolocation,
-                        eventCapacity, location, registrationLimit);
+                        eventCapacity, location, registrationLimit, isPrivate);
             } else if (selectedImageBase64 != null) {
                 imageModel.createImage(userId, deviceId, selectedImageBase64)
                         .addOnSuccessListener(imageId -> updateEventWithImageId(imageId, registrationStart, registrationEnd,
                                 eventTime, name, description, eventCategory, eventGuidelines, geolocation,
-                                eventCapacity, location, registrationLimit))
+                                eventCapacity, location, registrationLimit, isPrivate))
                         .addOnFailureListener(ex -> {
                             binding.saveButton.setEnabled(true);
                             Log.e(TAG, "Failed to upload image", ex);
