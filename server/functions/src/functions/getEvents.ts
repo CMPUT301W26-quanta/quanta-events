@@ -139,6 +139,10 @@ export async function getEvents(
 		}
 	}
 
+	if (filter.fetch === "available") {
+		docResults = docResults.filter((doc) => !(doc.isPrivate ?? false));
+	}
+
 	docResults = docResults
 		.slice(docResults.findIndex((data) => data.eventId === startFrom) + 1)
 		.slice(0, max);

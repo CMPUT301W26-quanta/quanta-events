@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.models.ExternalUser;
@@ -69,12 +70,24 @@ public class UserViewModel extends ViewModel {
      * @return List of User Objects.
      */
     public Task<ArrayList<ExternalUser>> getAllUsers(UUID userId, UUID deviceId) {
+        return getAllUsers(userId, deviceId, null);
+    }
+
+    /**
+     * Calls the getAllUsers cloud function, getting all users stored in the database.
+     * @param userId This user's id (for permissions checking).
+     * @param deviceId This user's device id (for permissions checking).
+     * @param search The keyword to search by
+     * @return List of User Objects.
+     */
+    public Task<ArrayList<ExternalUser>> getAllUsers(UUID userId, UUID deviceId, @Nullable String search) {
         Map<String, Object> data = new HashMap<>();
 
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
         Map<String, Object> payload = new HashMap<>();
+        payload.put("search", search);
         data.put("data", payload);
 
         return functions
@@ -82,11 +95,13 @@ public class UserViewModel extends ViewModel {
                .call(data)
                .onSuccessTask(callResult -> {
                        List<Map<String, Object>> userObjects = (List<Map<String, Object>>) callResult.getData();
-                       ArrayList<ExternalUser> users = new ArrayList<ExternalUser>();
+                       ArrayList<ExternalUser> users = new ArrayList<>();
 
                        for (Map<String, Object> userObject : userObjects) {
                            String userIdStr = (String) userObject.get("userId");
-                           String name = (String) userObject.get("name");
+                           String name = Optional.ofNullable(userObject.get("name")).map(val -> (String)val).orElse(null);
+                           String email = Optional.ofNullable(userObject.get("email")).map(val -> (String)val).orElse(null);
+                           String phone = Optional.ofNullable(userObject.get("phone")).map(val -> (String)val).orElse(null);
                            Boolean isEntrant = (Boolean) userObject.get("isEntrant");
                            Boolean isOrganizer = (Boolean) userObject.get("isOrganizer");
                            Boolean isAdmin = (Boolean) userObject.get("isAdmin");
@@ -99,7 +114,7 @@ public class UserViewModel extends ViewModel {
 
                            UUID userUUID = UUID.fromString(userIdStr);
 
-                           users.add(new ExternalUser(userUUID, name, isEntrant, isOrganizer, isAdmin));
+                           users.add(new ExternalUser(userUUID, name, email, phone, isEntrant, isOrganizer, isAdmin));
                        }
 
                        return Tasks.forResult(users);

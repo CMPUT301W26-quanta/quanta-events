@@ -1,6 +1,4 @@
 <resources>
     <string name="app_name">Quanta Events</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name = "information_lottery" ><string name="information_lottery">To join an event, you first join the waiting list during the registration period.\n\nWhen registration closes, the organizer runs a lottery draw to select participants.\n\nIf you are selected, you will receive a notification and can accept or decline your invitation.\n\nIf you are not selected, you may still be selected later if someone declines or cancels.</string></string>
+    <string name="information_lottery">To join an event, you first join the waiting list during the registration period.\n\nWhen registration closes, the organizer runs a lottery draw to select participants.\n\nIf you are selected, you will receive a notification and can accept or decline your invitation.\n\nIf you are not selected, you may still be selected later if someone declines or cancels.</string>
 </resources>

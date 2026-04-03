@@ -62,6 +62,7 @@ public class EventDetailsFragment extends Fragment {
     private int waitlistCount = 0;
 
     private boolean isDrawn = false;
+    private boolean isPrivate = false;
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
@@ -190,6 +191,7 @@ public class EventDetailsFragment extends Fragment {
 
         geolocationRequired = event.isGeolocationEnabled();
         isDrawn = event.isDrawn();
+        isPrivate = event.isPrivate();
 
         binding.getRoot().setVisibility(VISIBLE);
 
@@ -261,7 +263,7 @@ public class EventDetailsFragment extends Fragment {
             binding.enrollButton.setText("Manage");
             binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
             binding.enrollButton.setOnClickListener(v -> {
-                NavDirections action = EventDetailsFragmentDirections.actionEventdetailsfragmentToEventmanagerfragment(eventId, isDrawn);
+                NavDirections action = EventDetailsFragmentDirections.actionEventdetailsfragmentToEventmanagerfragment(eventId, isDrawn, isPrivate);
                 Navigation.findNavController(v).navigate(action);
             });
 
@@ -275,17 +277,23 @@ public class EventDetailsFragment extends Fragment {
     // get the organizer name to display in the ui
     private void fetchOrganizerName(Event event) {
         if (userId == null || deviceId == null || eventId == null) {
-            binding.textOrganizer.setText(" [unable to fetch organizer name]");
+            if (isAdded()) binding.textOrganizer.setText(" [unable to fetch organizer name]");
             return;
         }
 
-        binding.textOrganizer.setText(" Loading organizer name...");
+        if (isAdded()) binding.textOrganizer.setText(" Loading organizer name...");
 
         eventModel.getOrganizerName(userId, deviceId, eventId)
                 .addOnSuccessListener(name -> {
                     if (!isAdded() || binding == null) return;
 
-                    binding.textOrganizer.setText(" Organized by " + name.trim());
+                    if (name == null) {
+                        name = "[organizer's username is null]";
+                    } else if (name.trim().isEmpty()) {
+                        name = "[organizer has empty name]";
+                    }
+
+                    if (isAdded()) binding.textOrganizer.setText(" Organized by " + name.trim());
                 })
                 .addOnFailureListener(exception -> {
                     if (!isAdded() || binding == null) return;
@@ -294,7 +302,7 @@ public class EventDetailsFragment extends Fragment {
 
                     // set the organizer id as the name instead,
                     // to have something there at least, and to possibly help w/ debugging
-                    binding.textOrganizer.setText(" Organized by " + event.getOrganizerId());
+                    if (isAdded()) binding.textOrganizer.setText(" Organized by " + event.getOrganizerId());
                 });
     }
 

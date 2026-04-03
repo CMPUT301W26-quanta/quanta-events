@@ -27,14 +27,25 @@ public class EventManagerFragment extends Fragment {
     private UUID userId;
     private UUID deviceId;
     private UUID eventId;
-    private Boolean isDrawn;
+    private boolean isDrawn;
+
+    private boolean isPrivate;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventManagerFragmentArgs args = EventManagerFragmentArgs.fromBundle(getArguments());
+        eventId = args.getEventId();
+        isDrawn = args.getIsDrawn();
+        isPrivate = args.getIsPrivate();
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
-        // set title of the page to Event Manaher and the subtitle.
+        // set title of the page to Event Manager and the subtitle.
         // also sets the icon for the page
         infoStore.setTitle("Event Manager");
         infoStore.setSubtitle("Manage your Events");
@@ -58,13 +69,25 @@ public class EventManagerFragment extends Fragment {
                     Navigation.findNavController(v).navigate(action);
                 }
         );
-        // sets onc lick listener to navigate to show qr fragment
-        binding.shareQrButton.setOnClickListener(
-                v -> {
-                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToShowqrfragment(eventId);
-                    Navigation.findNavController(v).navigate(action);
-                }
-        );
+        if (isPrivate) {
+            binding.shareQrButton.setText("Invite Entrants");
+            binding.shareQrButton.setOnClickListener(
+                    v -> {
+                        NavDirections action = EventManagerFragmentDirections.actionEventManagerFragmentToEventInviteFragment(eventId);
+                        Navigation.findNavController(v).navigate(action);
+                    }
+            );
+        } else {
+            binding.shareQrButton.setText("Share QR Code");
+            // sets onc lick listener to navigate to show qr fragment
+            binding.shareQrButton.setOnClickListener(
+                    v -> {
+                        NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToShowqrfragment(eventId);
+                        Navigation.findNavController(v).navigate(action);
+                    }
+            );
+        }
+
         //sets on click listener to navigate to waiting list fragment
         binding.viewWaitListButton.setOnClickListener(
                 v -> {

@@ -87,7 +87,7 @@ public class EventViewModel extends ViewModel {
                                   String eventName, String eventDescription,
                                   String eventCategory, String eventGuidelines,
                                   boolean geolocation, int eventCapacity,
-                                  String location, Integer registrationLimit, UUID imageId) {
+                                  String location, Integer registrationLimit, UUID imageId, boolean isPrivate) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -105,6 +105,7 @@ public class EventViewModel extends ViewModel {
         payload.put("location", location);
         payload.put("registrationLimit", registrationLimit);
         payload.put("imageId", imageId == null ? null : imageId.toString());
+        payload.put("isPrivate", isPrivate);
         data.put("data", payload);
 
         return functions
@@ -423,7 +424,7 @@ public class EventViewModel extends ViewModel {
                                   String eventName, String eventDescription,
                                   String eventCategory, String eventGuidelines,
                                   boolean geolocation, int eventCapacity,
-                                  String location, Integer registrationLimit, UUID imageId) {
+                                  String location, Integer registrationLimit, UUID imageId, boolean isPrivate) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -442,6 +443,7 @@ public class EventViewModel extends ViewModel {
         payload.put("location", location);
         payload.put("registrationLimit", registrationLimit);
         payload.put("imageId", imageId == null ? null : imageId.toString());
+        payload.put("isPrivate", isPrivate);
         data.put("data", payload);
 
         return functions
@@ -473,6 +475,29 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
+     *
+     * @param userId UUID to identify user.
+     * @param deviceId UUID to identify user's device.
+     * @param eventId UUID to identify event.
+     * @param invitee UUID to identify invitee.
+     * @return null on success, error on failure
+     */
+    public Task<Void> createInvitation(UUID userId, UUID deviceId, UUID eventId, UUID invitee) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        payload.put("invitee", invitee.toString());
+        data.put("data", payload);
+
+        return functions.getHttpsCallable("createInvitation")
+                .call(data)
+                .onSuccessTask(task -> Tasks.forResult(null));
+    }
+
+    /**
      * Calls the getWaitlist cloud function and returns users on the requested list.
      *
      * @param userId    UUID to identify user.
@@ -499,6 +524,7 @@ public class EventViewModel extends ViewModel {
                     List<Map<String, Object>> users = (List<Map<String, Object>>) result.get("users");
                     ArrayList<ExternalUser> externalUsers = new ArrayList<>();
                     if (users == null) return Tasks.forResult(externalUsers);
+                    System.out.println("WAITLIST" + users);
                     for (Map<String, Object> user : users) {
                         externalUsers.add(new ExternalUser(
                                 UUID.fromString((String) user.get("userId")),

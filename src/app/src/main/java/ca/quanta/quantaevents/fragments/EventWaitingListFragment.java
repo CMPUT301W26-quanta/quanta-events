@@ -16,11 +16,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
-import ca.quanta.quantaevents.adapters.WaitingListAdapter;
+import ca.quanta.quantaevents.adapters.ProfileAdapter;
+import ca.quanta.quantaevents.adapters.WaitingListViewHolder;
 import ca.quanta.quantaevents.databinding.FragmentEventWaitlistBinding;
 import ca.quanta.quantaevents.models.ExternalUser;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
@@ -32,13 +34,13 @@ import ca.quanta.quantaevents.viewmodels.EventViewModel;
 public class EventWaitingListFragment extends Fragment {
     private FragmentEventWaitlistBinding binding;
     private EventViewModel eventViewModel;
-    private WaitingListAdapter adapter;
     private SessionStore sessionStore;
     private UUID userId;
     private UUID deviceId;
     private UUID eventId;
     private String eventName;
     private String currentListType = LIST_VALUES[0];
+    private ProfileAdapter<WaitingListViewHolder> adapter;
 
     private static final String[] LIST_LABELS = {
             "Wait List", "Selected List", "Final List", "Cancelled List", "Rejected List"
@@ -82,7 +84,7 @@ public class EventWaitingListFragment extends Fragment {
             fetchList(LIST_VALUES[binding.spinnerFilter.getSelectedItemPosition()]);
         });
 
-        adapter = new WaitingListAdapter();
+        adapter = new ProfileAdapter<>(new ArrayList<>(), WaitingListViewHolder.FACTORY);
         binding.profilesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.profilesRecyclerView.setAdapter(adapter);
 
@@ -104,7 +106,7 @@ public class EventWaitingListFragment extends Fragment {
         });
 
         binding.exportCsvButton.setOnClickListener(v -> {
-            List<ExternalUser> users = adapter.getUsers();
+            List<ExternalUser> users = adapter.getProfiles();
             if (users == null || users.isEmpty()) {
                 ToastManager.show(getContext(), "No data to export", Toast.LENGTH_SHORT);
                 return;
@@ -137,7 +139,7 @@ public class EventWaitingListFragment extends Fragment {
                 .addOnSuccessListener(users -> {
                     if (!isAdded() || binding == null) return;
                     Log.d("EventWaitingList", "fetchList success: count=" + users.size());
-                    adapter.setUsers(users);
+                    adapter.setProfiles(users);
                 })
                 .addOnFailureListener(ex -> {
                     if (!isAdded() || binding == null) return;

@@ -74,10 +74,13 @@ public class CsvExporter {
     }
 
     private static String escapeCsv(String value) {
-        if (value == null || value.equals("null")) return "";
-        if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
-            return "\"" + value.replace("\"", "\"\"") + "\"";
+        if (value == null || value.equalsIgnoreCase("null")) return "";
+        String escaped = value
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"");
+        if (escaped.contains(",") || escaped.contains("\"") || escaped.contains("\n")) {
+            return "\"" + escaped + "\"";
         }
-        return value;
+        return escaped;
     }
 }
