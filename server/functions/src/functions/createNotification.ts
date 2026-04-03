@@ -3,12 +3,16 @@ import { CallableRequest, HttpsError } from "firebase-functions/https";
 import * as z from "zod";
 import * as util from "../util";
 import { v4 as uuidv4 } from "uuid";
-import { CollectionReference, FieldValue, getFirestore } from "firebase-admin/firestore";
+import {
+	CollectionReference,
+	FieldValue,
+	getFirestore,
+} from "firebase-admin/firestore";
 
 const createNotificationInterface = util.standardForm(
 	z.object({
-		message: z.string().optional(),
-		title: z.string().optional(),
+		message: z.string(),
+		title: z.string(),
 		eventId: z.uuid(),
 		waited: z.boolean(),
 		cancelled: z.boolean(),
@@ -31,20 +35,6 @@ export async function createNotification(request: CallableRequest) {
 	const notificationId = uuidv4();
 
 	const db = getFirestore();
-
-	try {
-		await db.collection("notifications").doc(notificationId).create({
-			message,
-			title,
-			eventId,
-			waited,
-			cancelled,
-			selected,
-			final,
-		});
-	} catch (_) {
-		throw new HttpsError("already-exists", "Notification already exists");
-	}
 
 	const eventDocuments = db.collection("events") as CollectionReference<
 		EventDocument,
@@ -91,15 +81,38 @@ export async function createNotification(request: CallableRequest) {
 		}
 	}
 
+	try {
+		await db
+			.collection("notifications")
+			.doc(notificationId)
+			.create(
+				util.enforceFull<NotificationDocument>({
+					message,
+					title,
+					eventId,
+					kind: {
+						kind: "MESSAGE",
+						waited,
+						cancelled,
+						selected,
+						final,
+					},
+					targetUsers: recipients,
+				}),
+			);
+	} catch (_) {
+		throw new HttpsError("already-exists", "Notification already exists");
+	}
+
 	util.sendBatchNotifications(recipients, data.title || "", data.message || "");
 
 	// Store the notification in organizer's sent notifications array
 	await db
-			.collection("users")
-			.doc(userId)
-			.update({
-				"organizer.sentNotifications": FieldValue.arrayUnion(notificationId),
-			});
+		.collection("users")
+		.doc(userId)
+		.update({
+			"organizer.sentNotifications": FieldValue.arrayUnion(notificationId),
+		});
 
 	return { notificationId };
 }

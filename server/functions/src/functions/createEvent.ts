@@ -19,6 +19,7 @@ const createEventInterface = util.standardForm(
 		location: z.string(),
 		registrationLimit: z.int().positive().nullable(),
 		imageId: z.uuid().nullable(),
+		isPrivate: z.boolean(),
 	}),
 );
 
@@ -41,6 +42,7 @@ export async function createEvent(request: CallableRequest) {
 		location,
 		registrationLimit,
 		imageId,
+		isPrivate,
 	} = data;
 
 	const userData = await util.verifyUser(userId, deviceId);
@@ -74,8 +76,9 @@ export async function createEvent(request: CallableRequest) {
 					eventCategory,
 					geolocation,
 					eventCapacity,
-					registrationLimit: registrationLimit,
-					imageId: imageId,
+					registrationLimit,
+					imageId,
+					isPrivate,
 				}),
 			);
 	} catch (_) {

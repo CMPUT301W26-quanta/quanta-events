@@ -62,6 +62,7 @@ public class EventDetailsFragment extends Fragment {
     private int waitlistCount = 0;
 
     private boolean isDrawn = false;
+    private boolean isPrivate = false;
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
@@ -191,6 +192,7 @@ public class EventDetailsFragment extends Fragment {
 
         geolocationRequired = event.isGeolocationEnabled();
         isDrawn = event.isDrawn();
+        isPrivate = event.isPrivate();
 
         binding.getRoot().setVisibility(VISIBLE);
 
@@ -259,7 +261,7 @@ public class EventDetailsFragment extends Fragment {
             binding.enrollButton.setText("Manage");
             binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
             binding.enrollButton.setOnClickListener(v -> {
-                NavDirections action = EventDetailsFragmentDirections.actionEventdetailsfragmentToEventmanagerfragment(eventId, isDrawn);
+                NavDirections action = EventDetailsFragmentDirections.actionEventdetailsfragmentToEventmanagerfragment(eventId, isDrawn, isPrivate);
                 Navigation.findNavController(v).navigate(action);
             });
 
@@ -273,16 +275,15 @@ public class EventDetailsFragment extends Fragment {
     // get the organizer name to display in the ui
     private void fetchOrganizerName(Event event) {
         if (userId == null || deviceId == null || eventId == null) {
-            binding.textOrganizer.setText(" [unable to fetch organizer name]");
+            if (isAdded()) binding.textOrganizer.setText(" [unable to fetch organizer name]");
             return;
         }
 
-        binding.textOrganizer.setText(" Loading organizer name...");
+        if (isAdded()) binding.textOrganizer.setText(" Loading organizer name...");
 
         eventModel.getOrganizerName(userId, deviceId, eventId)
                 .addOnSuccessListener(name -> {
                     if (!isAdded()) {
-                        binding.textOrganizer.setText(" [no associated organizer]");
                         return;
                     }
 
@@ -292,7 +293,7 @@ public class EventDetailsFragment extends Fragment {
                         name = "[organizer has empty name]";
                     }
 
-                    binding.textOrganizer.setText(" Organized by " + name.trim());
+                    if (isAdded()) binding.textOrganizer.setText(" Organized by " + name.trim());
                 })
                 .addOnFailureListener(exception -> {
                     ToastManager.show(getContext(), "Failed to fetch organizer name", Toast.LENGTH_LONG);
@@ -300,7 +301,7 @@ public class EventDetailsFragment extends Fragment {
 
                     // set the organizer id as the name instead,
                     // to have something there at least, and to possibly help w/ debugging
-                    binding.textOrganizer.setText(" Organized by " + event.getOrganizerId());
+                    if (isAdded()) binding.textOrganizer.setText(" Organized by " + event.getOrganizerId());
                 });
     }
 
@@ -337,10 +338,7 @@ public class EventDetailsFragment extends Fragment {
     }
 
     private void updateWaitlistText() {
-        if (!isAdded()) {
-            return;
-        }
-        binding.textWaitingList.setText(" Wait list: " + waitlistCount);
+        if (isAdded()) binding.textWaitingList.setText(" Wait list: " + waitlistCount);
     }
 
     private void updateEnrollButtonLabel() {

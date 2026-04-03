@@ -46,130 +46,7 @@ public class Event {
 
     private final boolean drawn;
 
-    /**
-     * Constructor for an Event object when all optional fields are filled.
-     * @param imageId ID of an image object to be shown with the event.
-     * @param registrationStartTime Date and time when registration for the event opens.
-     * @param registrationEndTime Date and time when registration for the event closes.
-     * @param registrationLimit Maximum number of entrants allowed to join the event.
-     * @param eventName Name of the event.
-     * @param eventDescription Description of the event.
-     */
-    public Event(ZonedDateTime registrationStartTime, ZonedDateTime registrationEndTime,
-                 String eventName, String eventDescription, Float price, Integer registrationLimit,
-                 UUID imageId) {
-        this.eventId = UUID.randomUUID();
-        this.organizerId = null;
-        this.waitList = new ArrayList<>();
-        this.cancelledList = new ArrayList<>();
-        this.finalList = new ArrayList<>();
-        this.registrationStartTime = registrationStartTime;
-        this.registrationEndTime = registrationEndTime;
-        this.eventTime = null;
-        this.eventName = eventName;
-        this.eventDescription = eventDescription;
-        this.location = "";
-        this.eventCategory = null;
-        this.eventGuidelines = null;
-        this.geolocation = false;
-        this.eventCapacity = 0;
-        this.registrationLimit = registrationLimit;
-        this.imageId = imageId;
-        this.drawn = false;
-    }
-
-    /**
-     * Constructor for an Event object with no image.
-     * @param registrationStartTime Date and time when registration for the event opens.
-     * @param registrationEndTime Date and time when registration for the event closes.
-     * @param registrationLimit Maximum number of entrants allowed to join the event.
-     * @param eventName Name of the event.
-     * @param eventDescription Description of the event.
-     */
-    public Event(ZonedDateTime registrationStartTime, ZonedDateTime registrationEndTime,
-                 String eventName, String eventDescription, Float price, Integer registrationLimit) {
-        this.eventId = UUID.randomUUID();
-        this.organizerId = null;
-        this.waitList = new ArrayList<>();
-        this.cancelledList = new ArrayList<>();
-        this.finalList = new ArrayList<>();
-        this.commentsList = new ArrayList<>();
-        this.registrationStartTime = registrationStartTime;
-        this.registrationEndTime = registrationEndTime;
-        this.eventTime = null;
-        this.eventName = eventName;
-        this.eventDescription = eventDescription;
-        this.location = "";
-        this.eventCategory = null;
-        this.eventGuidelines = null;
-        this.geolocation = false;
-        this.eventCapacity = 0;
-        this.registrationLimit = registrationLimit;
-        this.imageId = null;
-        this.drawn = false;
-    }
-
-    /**
-     * Constructor for an Event object with no registration capacity.
-     * @param imageId ID of an image object to be shown with the event.
-     * @param registrationStartTime Date and time when registration for the event opens.
-     * @param registrationEndTime Date and time when registration for the event closes.
-     * @param eventName Name of the event.
-     * @param eventDescription Description of the event.
-     */
-    public Event(ZonedDateTime registrationStartTime, ZonedDateTime registrationEndTime,
-                 String eventName, String eventDescription, Float price, UUID imageId) {
-        this.eventId = UUID.randomUUID();
-        this.organizerId = null;
-        this.waitList = new ArrayList<>();
-        this.cancelledList = new ArrayList<>();
-        this.finalList = new ArrayList<>();
-        this.commentsList = new ArrayList<>();
-        this.registrationStartTime = registrationStartTime;
-        this.registrationEndTime = registrationEndTime;
-        this.eventTime = null;
-        this.eventName = eventName;
-        this.eventDescription = eventDescription;
-        this.location = "";
-        this.eventCategory = null;
-        this.eventGuidelines = null;
-        this.geolocation = false;
-        this.eventCapacity = 0;
-        this.registrationLimit = null;
-        this.imageId = imageId;
-        this.drawn = false;
-    }
-
-    /**
-     * Constructor for an Event when no optional fields are filled.
-     * @param registrationStartTime Date and time when registration for the event opens.
-     * @param registrationEndTime Date and time when registration for the event closes.
-     * @param eventName Name of the event.
-     * @param eventDescription Description of the event.
-     * @param price Cost to join the event.
-     */
-    public Event(ZonedDateTime registrationStartTime, ZonedDateTime registrationEndTime,
-                 String eventName, String eventDescription, Float price) {
-        this.eventId = UUID.randomUUID();
-        this.organizerId = null;
-        this.waitList = new ArrayList<>();
-        this.cancelledList = new ArrayList<>();
-        this.finalList = new ArrayList<>();
-        this.commentsList = new ArrayList<>();
-        this.registrationStartTime = registrationStartTime;
-        this.registrationEndTime = registrationEndTime;
-        this.eventTime = null;
-        this.eventName = eventName;
-        this.eventDescription = eventDescription;
-        this.location = "";
-        this.eventCategory = null;
-        this.eventGuidelines = null;
-        this.geolocation = false;
-        this.eventCapacity = 0;
-        this.registrationLimit = null;
-        this.imageId = null;
-        this.drawn = false;
-    }
+    private final boolean isPrivate;
 
     /**
      * Constructor for an Event object when loading from storage.
@@ -212,6 +89,7 @@ public class Event {
         this.registrationLimit = registrationLimit;
         this.imageId = imageId;
         this.drawn = false;
+        this.isPrivate = false;
     }
 
     public Event(UUID eventId, Map<String, Object> data){
@@ -236,6 +114,9 @@ public class Event {
         this.drawn = Optional.ofNullable(data.get("drawn"))
                 .flatMap(val -> val instanceof Boolean ? Optional.of((Boolean)val) : Optional.empty())
                 .orElse(false);
+        this.isPrivate = Optional.ofNullable(data.get("isPrivate"))
+                .flatMap(val -> val instanceof Boolean ? Optional.of((Boolean)val) : Optional.empty())
+                .orElse(false);
     }
 
     public Event(Map<String, Object> data) {
@@ -258,6 +139,9 @@ public class Event {
         this.registrationLimit = data.get("registrationLimit") == null ? null : Integer.parseInt(data.get("registrationLimit").toString());
         this.imageId = data.get("imageId") == null ? null : UUID.fromString(data.get("imageId").toString());
         this.drawn = Optional.ofNullable(data.get("drawn"))
+                .flatMap(val -> val instanceof Boolean ? Optional.of((Boolean)val) : Optional.empty())
+                .orElse(false);
+        this.isPrivate = Optional.ofNullable(data.get("isPrivate"))
                 .flatMap(val -> val instanceof Boolean ? Optional.of((Boolean)val) : Optional.empty())
                 .orElse(false);
     }
@@ -342,5 +226,9 @@ public class Event {
 
     public boolean isDrawn() {
         return drawn;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
     }
 }
