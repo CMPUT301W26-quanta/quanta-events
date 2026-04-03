@@ -165,7 +165,7 @@ public class EventCreateEditorFragment extends Fragment {
 
         if (eventId != null) {
             updateEventFlow(registrationStart, registrationEnd, eventTime, name, description,
-                    eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit);
+                    eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit, isPrivate);
             return;
         }
 
@@ -345,7 +345,7 @@ public class EventCreateEditorFragment extends Fragment {
                                  String name, String description,
                                  String eventCategory, String eventGuidelines,
                                  boolean geolocation, int eventCapacity,
-                                 String location, Integer registrationLimit) {
+                                 String location, Integer registrationLimit, boolean isPrivate) {
         if (imageDirty) {
             if (imageRemoved) {
                 updateEventWithImageId(null, registrationStart, registrationEnd, eventTime,
@@ -364,13 +364,13 @@ public class EventCreateEditorFragment extends Fragment {
             } else {
                 updateEventWithImageId(null, registrationStart, registrationEnd, eventTime,
                         name, description, eventCategory, eventGuidelines, geolocation,
-                        eventCapacity, location, registrationLimit);
+                        eventCapacity, location, registrationLimit, isPrivate);
             }
             return;
         }
         updateEventWithImageId(existingImageId == null ? null : existingImageId,
                 registrationStart, registrationEnd, eventTime, name, description,
-                eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit);
+                eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit, isPrivate);
     }
 
     private void updateEventWithImageId(@Nullable UUID imageId, String registrationStart,
@@ -378,7 +378,7 @@ public class EventCreateEditorFragment extends Fragment {
                                         String name, String description,
                                         String eventCategory, String eventGuidelines,
                                         boolean geolocation, int eventCapacity,
-                                        String location, Integer registrationLimit) {
+                                        String location, Integer registrationLimit, boolean isPrivate) {
         UUID imageUuid = null;
         if (imageId != null) {
             try {
@@ -390,7 +390,7 @@ public class EventCreateEditorFragment extends Fragment {
         eventModel.updateEvent(userId, deviceId, eventId,
                         registrationStart, registrationEnd, eventTime,
                         name, description, eventCategory, eventGuidelines,
-                        geolocation, eventCapacity, location, registrationLimit, imageUuid)
+                        geolocation, eventCapacity, location, registrationLimit, imageUuid, isPrivate)
                 .addOnSuccessListener(_done -> {
                     binding.saveButton.setEnabled(true);
                     ToastManager.show(getContext(), "Event updated", Toast.LENGTH_LONG);

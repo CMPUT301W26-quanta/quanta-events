@@ -422,7 +422,7 @@ public class EventViewModel extends ViewModel {
                                   String eventName, String eventDescription,
                                   String eventCategory, String eventGuidelines,
                                   boolean geolocation, int eventCapacity,
-                                  String location, Integer registrationLimit, UUID imageId) {
+                                  String location, Integer registrationLimit, UUID imageId, boolean isPrivate) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -441,6 +441,7 @@ public class EventViewModel extends ViewModel {
         payload.put("location", location);
         payload.put("registrationLimit", registrationLimit);
         payload.put("imageId", imageId == null ? null : imageId.toString());
+        payload.put("isPrivate", isPrivate);
         data.put("data", payload);
 
         return functions
