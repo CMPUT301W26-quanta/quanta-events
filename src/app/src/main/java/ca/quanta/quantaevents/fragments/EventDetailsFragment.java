@@ -72,7 +72,7 @@ public class EventDetailsFragment extends Fragment {
     private CommentAdapter commentAdapter;
 
 
-    private String userId;
+    private UUID userId;
     private UUID deviceId;
     private UUID eventId;
     private boolean isAdmin = false;
@@ -99,7 +99,7 @@ public class EventDetailsFragment extends Fragment {
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
 
-        binding.getRoot().setVisibility(INVISIBLE);
+        this.binding.getRoot().setVisibility(INVISIBLE);
 
         // set title of the page to Event and the subtitle.
         // also sets the icon for the page
@@ -114,24 +114,24 @@ public class EventDetailsFragment extends Fragment {
 
         //set up the session store and get this user
 
-        sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
-        eventModel = new ViewModelProvider(this).get(EventViewModel.class);
-        imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
-        commentModel = new ViewModelProvider(this).get(CommentViewModel.class);
+        this.sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
+        this.eventModel = new ViewModelProvider(this).get(EventViewModel.class);
+        this.imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
+        this.commentModel = new ViewModelProvider(this).get(CommentViewModel.class);
 
 
         // reads event id passed in form of arguments using bundles
         readEventId();
 
         // check session
-        sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
-            userId = uid.toString();
-            deviceId = did;
+        this.sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
+            this.userId = uid;
+            this.deviceId = did;
             loadEvent();
         });
 
         // gets role to determine which button to display
-        sessionStore.getRoleMask().observe(getViewLifecycleOwner(), mask -> {
+        this.sessionStore.getRoleMask().observe(getViewLifecycleOwner(), mask -> {
             isAdmin = mask != null && (mask & SmartBurger.ADMIN_GROUP) != 0;
             updateManageButton(null);
         });
@@ -139,7 +139,7 @@ public class EventDetailsFragment extends Fragment {
 
         // set up back button on click listener
 
-        binding.backButton.setOnClickListener(
+        this.binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
         );
     }
@@ -148,7 +148,7 @@ public class EventDetailsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        locationPermissionLauncher =
+        this.locationPermissionLauncher =
                 registerForActivityResult(
                         new ActivityResultContracts.RequestMultiplePermissions(),
                         result -> {
@@ -173,28 +173,28 @@ public class EventDetailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentEventDetailsBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+        this.binding = FragmentEventDetailsBinding.inflate(inflater, container, false);
+        return this.binding.getRoot();
     }
 
     // read event id passed in form of arguments
     // also read if the user was redirect to his fragment from the admin event browser
     private void readEventId() {
         EventDetailsFragmentArgs args = EventDetailsFragmentArgs.fromBundle(getArguments());
-        eventId = args.getEventId();
-        fromAdmin = args.getFromAdmin();
+        this.eventId = args.getEventId();
+        this.fromAdmin = args.getFromAdmin();
     }
 
     // load the event details
     private void loadEvent() {
-        if (userId == null || deviceId == null) {
+        if (this.userId == null || this.deviceId == null) {
             NavDirections action = EventDetailsFragmentDirections.actionGlobalRegisterFragment();
             Navigation.findNavController(requireView()).navigate(action);
             return;
         }
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(
-            eventModel.getEvent(eventId, UUID.fromString(userId), deviceId)
+            this.eventModel.getEvent(this.eventId, this.userId, this.deviceId)
                     .addOnSuccessListener(event -> {this.bindEvent(event);loadComments(); })
                     .addOnFailureListener(ex -> {
                                 if (isAdded()) {
@@ -209,18 +209,18 @@ public class EventDetailsFragment extends Fragment {
     //load the comment details
 
     private void loadComments(){
-        if (userId == null || deviceId == null) {
+        if (this.userId == null || this.deviceId == null) {
             NavDirections action = EventDetailsFragmentDirections.actionGlobalRegisterFragment();
             Navigation.findNavController(requireView()).navigate(action);
             return;
         }
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(
-                commentModel.getAllComments(UUID.fromString(userId), deviceId, eventId)
+                commentModel.getAllComments(this.userId, this.deviceId, this.eventId)
                         .addOnSuccessListener(comments -> {
                             // use the adapter to display them
 
-                            this.commentAdapter = new CommentAdapter(comments, this, this.eventId,isOrganizer,isAdmin);
+                            this.commentAdapter = new CommentAdapter(comments, this, this.eventId, isOrganizer, isAdmin);
 
 
                             binding.commentsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -245,12 +245,11 @@ public class EventDetailsFragment extends Fragment {
 
 
 
-            model.getUser(UUID.fromString(this.userId), this.deviceId).addOnSuccessListener(user -> {
+            model.getUser(this.userId, this.deviceId).addOnSuccessListener(user -> {
                  String name = user.getName();
 
-                commentModel.createComment(UUID.fromString(this.userId), this.deviceId, this.eventId, message, postTime).addOnSuccessListener(commentId -> {
-
-                    Comment comment = new Comment(commentId.toString(), this.userId, message, postTime, name);
+                commentModel.createComment(this.userId, this.deviceId, this.eventId, message, postTime).addOnSuccessListener(commentId -> {
+                    Comment comment = new Comment(commentId, this.userId, message, postTime, name);
                     this.commentAdapter.addComment(comment);
                 })
 
@@ -305,13 +304,13 @@ public class EventDetailsFragment extends Fragment {
 
         UUID imageUuid = event.getImageId();
         if (imageUuid != null) {
-            imageModel.getImage(imageUuid, UUID.fromString(userId), deviceId)
+            this.imageModel.getImage(imageUuid, this.userId, this.deviceId)
                     .addOnSuccessListener(imageData -> {
                         Object imageBase64 = imageData.getImageData();
                         if (imageBase64 != null) {
                             Bitmap bitmap = decodeBase64ToBitmap(imageBase64.toString());
                             if (bitmap != null) {
-                                binding.imagePreview.setImageBitmap(bitmap);
+                                this.binding.imagePreview.setImageBitmap(bitmap);
                             }
                         }
                     });
@@ -322,17 +321,18 @@ public class EventDetailsFragment extends Fragment {
 
     // change text on the button to display according to role
     private void updateManageButton(String organizerId) {
-        if (isAdmin && fromAdmin) {
-            binding.enrollButton.setText("Delete");
-            binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
-            isOrganizer = false;
+        if (this.isAdmin && this.fromAdmin) {
+            this.binding.enrollButton.setText("Delete");
+            this.binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
+            this.isOrganizer = false;
             return;
         }
-        if (userId != null && organizerId != null && organizerId.equals(userId.toString())) {
-            isOrganizer = true;
-            binding.enrollButton.setText("Manage");
-            binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
-            binding.enrollButton.setOnClickListener(v -> {
+
+        if (this.userId != null && organizerId != null && organizerId.equals(this.userId.toString())) {
+            this.isOrganizer = true;
+            this.binding.enrollButton.setText("Manage");
+            this.binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
+            this.binding.enrollButton.setOnClickListener(v -> {
                 NavDirections action = EventDetailsFragmentDirections.actionEventdetailsfragmentToEventmanagerfragment(eventId, isDrawn);
                 Navigation.findNavController(v).navigate(action);
             });
@@ -344,14 +344,14 @@ public class EventDetailsFragment extends Fragment {
 
     // get the organizer name to display in the ui
     private void fetchOrganizerName(Event event) {
-        if (userId == null || deviceId == null || eventId == null) {
+        if (this.userId == null || this.deviceId == null || this.eventId == null) {
             binding.textOrganizer.setText(" [unable to fetch organizer name]");
             return;
         }
 
         binding.textOrganizer.setText(" Loading organizer name...");
 
-        eventModel.getOrganizerName(UUID.fromString(userId), deviceId, eventId)
+        eventModel.getOrganizerName(this.userId, this.deviceId, this.eventId)
                 .addOnSuccessListener(name -> {
                     if (!isAdded()) {
                         binding.textOrganizer.setText(" [no associated organizer]");
@@ -364,7 +364,7 @@ public class EventDetailsFragment extends Fragment {
                         name = "[organizer has empty name]";
                     }
 
-                    binding.textOrganizer.setText(" Organized by " + name.trim());
+                    this.binding.textOrganizer.setText(" Organized by " + name.trim());
                 })
                 .addOnFailureListener(exception -> {
                     ToastManager.show(requireContext(), "Failed to fetch organizer name", Toast.LENGTH_LONG);
@@ -372,20 +372,20 @@ public class EventDetailsFragment extends Fragment {
 
                     // set the organizer id as the name instead,
                     // to have something there at least, and to possibly help w/ debugging
-                    binding.textOrganizer.setText(" Organized by " + event.getOrganizerId());
+                    this.binding.textOrganizer.setText(" Organized by " + event.getOrganizerId());
                 });
     }
 
     private void updateWaitlistState() {
-        if (isOrganizer || (isAdmin && fromAdmin)) {
+        if (this.isOrganizer || (this.isAdmin && this.fromAdmin)) {
             return;
         }
-        if (userId == null || deviceId == null || eventId == null) {
+        if (this.userId == null || this.deviceId == null || this.eventId == null) {
             Log.d("EventDetails", "updateWaitlistState: missing session or eventId");
             return;
         }
-        Log.d("EventDetails", "updateWaitlistState: checking waitlist for eventId=" + eventId);
-        eventModel.checkWaitlist(UUID.fromString(userId), deviceId, eventId)
+        Log.d("EventDetails", "updateWaitlistState: checking waitlist for eventId=" + this.eventId);
+        this.eventModel.checkWaitlist(this.userId, this.deviceId, this.eventId)
                 .addOnSuccessListener(result -> {
                     inWaitlist = Boolean.TRUE.equals(result);
                     Log.d("EventDetails", "inWaitlist result=" + inWaitlist);
@@ -394,11 +394,11 @@ public class EventDetailsFragment extends Fragment {
     }
 
     private void refreshWaitlistCount() {
-        if (userId == null || deviceId == null || eventId == null) {
+        if (this.userId == null || this.deviceId == null || this.eventId == null) {
             Log.d("EventDetails", "refreshWaitlistCount: missing session or eventId");
             return;
         }
-        eventModel.getWaitlistCount(UUID.fromString(userId), deviceId, eventId)
+        this.eventModel.getWaitlistCount(this.userId, this.deviceId, this.eventId)
                 .addOnSuccessListener(count -> {
                     waitlistCount = count == null ? 0 : count;
                     updateWaitlistText();
@@ -412,22 +412,25 @@ public class EventDetailsFragment extends Fragment {
         if (!isAdded()) {
             return;
         }
-        binding.textWaitingList.setText(" Wait list: " + waitlistCount);
+
+        this.binding.textWaitingList.setText(" Wait list: " + waitlistCount);
     }
 
     private void updateEnrollButtonLabel() {
         if (!isAdded()) {
             return;
         }
-        if (isOrganizer || (isAdmin && fromAdmin)) {
+
+        if (this.isOrganizer || (this.isAdmin && this.fromAdmin)) {
             return;
         }
+
         if (inWaitlist) {
-            binding.enrollButton.setText("Leave Waitlist");
-            binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
+            this.binding.enrollButton.setText("Leave Waitlist");
+            this.binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
         } else {
-            binding.enrollButton.setText("Join Waitlist");
-            binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_green));
+            this.binding.enrollButton.setText("Join Waitlist");
+            this.binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_green));
         }
     }
 
@@ -435,17 +438,17 @@ public class EventDetailsFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         ToastManager.cancel();
-        binding = null;
+        this.binding = null;
     }
 
     private void toggleWaitlist() {
-        if (userId == null || deviceId == null || eventId == null) {
+        if (this.userId == null || this.deviceId == null || this.eventId == null) {
             Log.d("EventDetails", "toggleWaitlist: missing session or eventId");
             return;
         }
         if (inWaitlist) {
-            Log.d("EventDetails", "leaveWaitlist: eventId=" + eventId);
-            eventModel.leaveWaitlist(UUID.fromString(userId), deviceId, eventId)
+            Log.d("EventDetails", "leaveWaitlist: eventId=" + this.eventId);
+            this.eventModel.leaveWaitlist(this.userId, this.deviceId, this.eventId)
                     .addOnSuccessListener(_done -> {
                         inWaitlist = false;
                         Log.d("EventDetails", "leaveWaitlist: success");
@@ -546,7 +549,7 @@ public class EventDetailsFragment extends Fragment {
             @Nullable Double longitude,
             @Nullable Double accuracyM
     ) {
-        eventModel.joinWaitlist(UUID.fromString(userId), deviceId, eventId, latitude, longitude, accuracyM)
+        eventModel.joinWaitlist(this.userId, this.deviceId, this.eventId, latitude, longitude, accuracyM)
                 .addOnSuccessListener(_done -> {
                     inWaitlist = true;
                     Log.d("EventDetails", "joinWaitlist: success");

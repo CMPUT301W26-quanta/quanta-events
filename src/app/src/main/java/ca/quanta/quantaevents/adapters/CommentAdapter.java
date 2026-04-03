@@ -39,35 +39,27 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
 
     private SessionStore sessionStore;
 
-    String userId;
-
-    String deviceId;
-
+    UUID userId;
+    UUID deviceId;
     UUID eventId;
 
-    String commentId;
-
     boolean isOrganizer;
-
     boolean isAdmin;
 
     public CommentAdapter(List<Comment> list, Fragment parentFragment, UUID eventId, boolean isOrganizer, boolean isAdmin) {
-
         this.list = list;
         this.parentFragment = parentFragment;
         this.eventId = eventId;
 
-
         this.commentModel = new ViewModelProvider(this.parentFragment.getActivity()).get(CommentViewModel.class);
-
         this.sessionStore = new ViewModelProvider(this.parentFragment.requireActivity()).get(SessionStore.class);
 
         this.userId = null;
         this.deviceId = null;
 
         sessionStore.observeSession(this.parentFragment.getViewLifecycleOwner(), (userId, deviceId) -> {
-            this.userId = userId != null ? userId.toString() :null;
-            this.deviceId = deviceId != null ? deviceId.toString() :null;
+            this.userId = userId;
+            this.deviceId = deviceId;
         });
 
     }
@@ -78,35 +70,31 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment, parent, false);
         return new MyHolder(view);
     }
+
     @Override
     public void onBindViewHolder(@NonNull MyHolder holder, int position) {
         final Comment thisComment = list.get(position);
 
-        final String commentId = thisComment.getCommentId();
-        final String senderId = thisComment.getSenderId();
+        final UUID commentId = thisComment.getCommentId();
+        final UUID senderId = thisComment.getSenderId();
         final String senderName  = thisComment.getSenderName();
         final String message = thisComment.getMessage();
         final String timestamp = thisComment.getPostTime();
 
-
-        holder.deleteComment.setVisibility(View.VISIBLE);
-
-
-        if (userId != null && !isOrganizer && !isAdmin && !userId.equals(senderId)) {
-
-            // not an organizer, admin, or user who wrote the comment remove the delete button
+        if (this.userId != null && !isOrganizer && !isAdmin && !userId.equals(senderId)) {
+            // not the organizer of the event, an admin, or the user who wrote the comment;
+            // remove the delete button
             holder.deleteComment.setVisibility(View.GONE);
         }
-
-
 
         holder.name.setText(senderName);
         holder.time.setText(timestamp);
         holder.comment.setText(message);
+
         holder.deleteComment.setOnClickListener(view -> {
             int commentPosition = holder.getBindingAdapterPosition();
 
-            this.commentModel.deleteComment(UUID.fromString(this.userId), UUID.fromString(this.deviceId), eventId, commentId)
+            this.commentModel.deleteComment(this.userId, this.deviceId, this.eventId, commentId)
                     .addOnSuccessListener(success -> {
                         this.list.remove(commentPosition);
                         this.notifyItemRemoved(commentPosition);
@@ -117,7 +105,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
                         Toast.makeText(this.parentFragment.requireContext(), "Failed to remove comment: " + exception.getMessage(), Toast.LENGTH_LONG).show();
 
                         if (exception instanceof FirebaseFunctionsException) {
-                            Log.e("CommentCardAdapter", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
+                            Log.e("CommentAdapter", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
                         }
                     });
         });

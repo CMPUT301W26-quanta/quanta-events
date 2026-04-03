@@ -3,8 +3,8 @@ package ca.quanta.quantaevents.models;
 import java.util.UUID;
 
 public class Comment {
-    private String commentId;
-    private String senderId;
+    private UUID commentId;
+    private UUID senderId;
     private String message;
 
     String postTime;
@@ -21,7 +21,7 @@ public class Comment {
      * @param postTime The time at which the comment was made.
      * @param senderName The name of the user who made the comment.
      */
-    public Comment(String commentId, String senderId, String message, String postTime, String senderName) {
+    public Comment(UUID commentId, UUID senderId, String message, String postTime, String senderName) {
         this.commentId = commentId;
         this.senderId = senderId;
         this.message = message;
@@ -29,19 +29,19 @@ public class Comment {
         this.senderName = senderName;
     }
 
-    public String getCommentId() {
+    public UUID getCommentId() {
         return this.commentId;
     }
 
-    public void setCommentId(String commentId) {
+    public void setCommentId(UUID commentId) {
         this.commentId = commentId;
     }
 
-    public String getSenderId() {
+    public UUID getSenderId() {
         return senderId;
     }
 
-    public void setSenderId(String senderId) {
+    public void setSenderId(UUID senderId) {
         this.senderId = senderId;
     }
 

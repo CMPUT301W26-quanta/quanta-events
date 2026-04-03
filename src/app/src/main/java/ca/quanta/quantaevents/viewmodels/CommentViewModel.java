@@ -93,7 +93,7 @@ public class CommentViewModel extends ViewModel {
                             String postTime = (String) commentObject.get("postTime");
                             String senderName = (String) commentObject.get("senderName");
 
-                            comments.add(new Comment(commentId, senderId, message, postTime, senderName));
+                            comments.add(new Comment(UUID.fromString(commentId), UUID.fromString(senderId), message, postTime, senderName));
                         }
 
                         return comments;
@@ -109,14 +109,14 @@ public class CommentViewModel extends ViewModel {
      * @param commentId The ID of the comment to delete.
      * @return Nothing.
      */
-    public Task<Void> deleteComment(UUID userId, UUID deviceId, UUID eventId, String commentId) {
+    public Task<Void> deleteComment(UUID userId, UUID deviceId, UUID eventId, UUID commentId) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("eventId", eventId.toString());
-        payload.put("commentId", commentId);
+        payload.put("commentId", commentId.toString());
 
         data.put("data", payload);
 
