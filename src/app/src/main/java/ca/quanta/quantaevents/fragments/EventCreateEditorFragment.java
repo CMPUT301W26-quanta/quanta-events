@@ -337,7 +337,7 @@ public class EventCreateEditorFragment extends Fragment {
                     .addOnSuccessListener(eventId -> {
                         if (!isAdded() || binding == null) return;
                         binding.saveButton.setEnabled(true);
-                        ToastManager.show(getContext(), "Event created", Toast.LENGTH_LONG);
+                        Toast.makeText(getContext(), "Event created", Toast.LENGTH_LONG).show();
                         if (isAdded()) {
                             Navigation.findNavController(requireView()).popBackStack();
                         }
@@ -346,7 +346,7 @@ public class EventCreateEditorFragment extends Fragment {
                         if (!isAdded() || binding == null) return;
                         binding.saveButton.setEnabled(true);
                         Log.e(TAG, "Failed to create event", ex);
-                        ToastManager.show(getContext(), "Failed to create event", Toast.LENGTH_LONG);
+                        Toast.makeText(getContext(), "Failed to create event", Toast.LENGTH_LONG).show();
                     })
         );
     }
@@ -407,7 +407,7 @@ public class EventCreateEditorFragment extends Fragment {
                     .addOnSuccessListener(_done -> {
                         if (!isAdded() || binding == null) return;
                         binding.saveButton.setEnabled(true);
-                        ToastManager.show(getContext(), "Event updated", Toast.LENGTH_LONG);
+                        Toast.makeText(getContext(), "Event updated", Toast.LENGTH_LONG).show();
                         if (isAdded()) {
                             Navigation.findNavController(requireView()).popBackStack();
                         }
@@ -416,7 +416,7 @@ public class EventCreateEditorFragment extends Fragment {
                         if (!isAdded() || binding == null) return;
                         binding.saveButton.setEnabled(true);
                         Log.e(TAG, "Failed to update event", ex);
-                        ToastManager.show(getContext(), "Failed to update event", Toast.LENGTH_LONG);
+                        Toast.makeText(getContext(), "Failed to update event", Toast.LENGTH_LONG).show();
                     })
         );
     }
