@@ -52,6 +52,7 @@ public class EntrantEventBrowserFragment extends Fragment {
     private String filterFrom = null;
     private String filterTo = null;
     private String filterCategory = null;
+    private Integer filterCapacity = null;
 
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
@@ -111,6 +112,7 @@ public class EntrantEventBrowserFragment extends Fragment {
                     filterFrom = filters.getString("from");
                     filterTo = filters.getString("to");
                     filterCategory = filters.getString("category");
+                    filterCapacity = filters.getInt("capacity");
 
                     Navigation.findNavController(requireView())
                             .getCurrentBackStackEntry()
@@ -131,6 +133,7 @@ public class EntrantEventBrowserFragment extends Fragment {
                     filterFrom = filters.getString("from");
                     filterTo = filters.getString("to");
                     filterCategory = filters.getString("category");
+                    filterCapacity = filters.getInt("capacity");
 
                     Navigation.findNavController(requireView())
                             .getCurrentBackStackEntry()
@@ -192,6 +195,7 @@ public class EntrantEventBrowserFragment extends Fragment {
                             filterFrom,
                             filterTo,
                             filterCategory,
+                            filterCapacity,
                             EventViewModel.SortBy.REGISTRATION_START)
                     .addOnSuccessListener(events -> {
                         if (!isAdded() || binding == null) return;

@@ -114,6 +114,7 @@ public class EntrantEventHistoryFragment extends Fragment {
                             null,
                             null,
                             null,
+                            null,
                             EventViewModel.SortBy.NAME)
                     .addOnSuccessListener(this::bindEventList)
                     .addOnFailureListener(ex -> {
