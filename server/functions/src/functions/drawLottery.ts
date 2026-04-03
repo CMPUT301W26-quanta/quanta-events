@@ -2,6 +2,7 @@ import { logger } from "firebase-functions";
 import { CallableRequest, HttpsError } from "firebase-functions/https";
 import * as z from "zod";
 import * as util from "../util";
+import { v4 as uuidv4 } from "uuid";
 import {
 	DocumentReference,
 	FieldValue,
@@ -33,7 +34,8 @@ export async function drawLottery(request: CallableRequest) {
 		EventDocument,
 		EventDocument
 	>;
-	let affectedUsers: { user: string; selected: boolean }[];
+	let selectedUsers: string[];
+	let rejectedUsers: string[];
 	let eventName: string;
 	try {
 		const result = await db.runTransaction(async (transaction) => {
@@ -98,14 +100,14 @@ export async function drawLottery(request: CallableRequest) {
 			);
 
 			return {
-				affectedUsers: selected
-					.map((val) => ({ user: val, selected: true }))
-					.concat(rejected.map((val) => ({ user: val, selected: false }))),
+				selectedUsers: selected,
+				rejectedUsers: rejected,
 				eventName: event.eventName,
 			};
 		});
 
-		affectedUsers = result.affectedUsers;
+		selectedUsers = result.selectedUsers;
+		rejectedUsers = result.rejectedUsers;
 		eventName = result.eventName;
 
 		logger.info("Successfully ran drawLottery transaction");
@@ -118,7 +120,7 @@ export async function drawLottery(request: CallableRequest) {
 		}
 	}
 
-	for (const { user, selected } of affectedUsers) {
+	for (const user of selectedUsers.concat(rejectedUsers)) {
 		try {
 			const userRef = db.collection("users").doc(user) as DocumentReference<
 				UserDocument,
@@ -138,15 +140,48 @@ export async function drawLottery(request: CallableRequest) {
 			userRef.update("entrant.history", FieldValue.arrayUnion(eventId));
 			// POST: All users on waitlist have this event removed from enteredEvents
 			userRef.update("entrant.enteredEvents", FieldValue.arrayRemove(eventId));
-
-			// POST: All users on waitlist receive a notification
-			const messageBody = selected
-				? "You were selected for an event!"
-				: "You were not selected for an event.";
-
-			util.sendNotification(user, eventName, messageBody);
 		} catch (e) {
 			logger.error(`Failed to update or notify user ${user}`, e);
 		}
+	}
+
+	const selectedNotif: NotificationDocument = {
+		message: "You were selected for an event!",
+		title: eventName,
+		eventId,
+		kind: {
+			kind: "LOTTERY",
+			selected: true,
+		},
+		targetUsers: selectedUsers,
+	};
+	const rejectedNotif: NotificationDocument = {
+		message: "You were not selected for an event.",
+		title: eventName,
+		eventId,
+		kind: {
+			kind: "LOTTERY",
+			selected: false,
+		},
+		targetUsers: rejectedUsers,
+	};
+
+	util.sendBatchNotifications(
+		selectedNotif.targetUsers,
+		selectedNotif.title,
+		selectedNotif.message,
+	);
+	util.sendBatchNotifications(
+		rejectedNotif.targetUsers,
+		rejectedNotif.title,
+		rejectedNotif.message,
+	);
+
+	try {
+		await db.collection("notifications").doc(uuidv4()).create(selectedNotif);
+		await db.collection("notifications").doc(uuidv4()).create(rejectedNotif);
+	} catch (e) {
+		logger.error("Notification cannot be created, as it already exists", e);
+		throw new HttpsError("already-exists", "Notification already exists");
 	}
 }

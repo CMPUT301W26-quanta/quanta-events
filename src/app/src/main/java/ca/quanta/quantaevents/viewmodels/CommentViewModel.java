@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
@@ -49,13 +50,10 @@ public class CommentViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("createComment")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, UUID>() {
+                .onSuccessTask(callResult -> {
                     // Access return value of the function createUser
-                    @Override
-                    public UUID then(@NonNull Task<HttpsCallableResult> task) {
-                        String result = (String) task.getResult().getData();
-                        return UUID.fromString(result);
-                    }
+                    String result = (String) callResult.getData();
+                    return Tasks.forResult(UUID.fromString(result));
                 });
     }
 
@@ -80,11 +78,9 @@ public class CommentViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getAllComments")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, ArrayList<Comment>>() {
-                    @Override
-                    public ArrayList<Comment> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        List<Map<String, Object>> commentObjects = (List<Map<String, Object>>) task.getResult().getData();
-                        ArrayList<Comment> comments = new ArrayList<>();
+                .onSuccessTask(callResult -> {
+                    List<Map<String, Object>> commentObjects = (List<Map<String, Object>>) callResult.getData();
+                    ArrayList<Comment> comments = new ArrayList<>();
 
                         for (Map<String, Object> commentObject : commentObjects) {
                             String commentId = (String)commentObject.get("commentId");
@@ -98,6 +94,7 @@ public class CommentViewModel extends ViewModel {
 
                         return comments;
                     }
+                    return Tasks.forResult(comments);
                 });
     }
 
@@ -123,11 +120,8 @@ public class CommentViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("deleteComment")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Void>() {
-                    @Override
-                    public Void then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        return null;
-                    }
+                .onSuccessTask(callResult -> {
+                    return Tasks.forResult(null);
                 });
     }
 }

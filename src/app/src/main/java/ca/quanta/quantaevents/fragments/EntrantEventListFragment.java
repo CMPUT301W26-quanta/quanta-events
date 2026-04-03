@@ -138,7 +138,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
                             handleMissingUser();
                             return;
                         }
-                        ToastManager.show(requireContext(), "Failed to load events", Toast.LENGTH_LONG);
+                        ToastManager.show(getContext(), "Failed to load events", Toast.LENGTH_LONG);
                     })
         );
     }
@@ -158,7 +158,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
         }
         Log.d("EntrantEventList", "Loaded events count=" + events.size());
         if (events.isEmpty()) {
-            ToastManager.show(requireContext(), "Not enrolled in any event", Toast.LENGTH_LONG);
+            ToastManager.show(getContext(), "Not enrolled in any event", Toast.LENGTH_LONG);
             adapter.setItems(new ArrayList<>());
             return;
         }

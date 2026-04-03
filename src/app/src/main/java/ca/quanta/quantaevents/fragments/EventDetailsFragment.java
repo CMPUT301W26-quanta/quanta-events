@@ -82,6 +82,7 @@ public class EventDetailsFragment extends Fragment {
     private int waitlistCount = 0;
 
     private boolean isDrawn = false;
+    private boolean isPrivate = false;
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
@@ -161,7 +162,7 @@ public class EventDetailsFragment extends Fragment {
                                 fetchLocationAndJoinWaitlist();
                             } else {
                                 ToastManager.show(
-                                        requireContext(),
+                                        getContext(),
                                         "Location permission is required for this event",
                                         Toast.LENGTH_LONG
                                 );
@@ -198,7 +199,7 @@ public class EventDetailsFragment extends Fragment {
                     .addOnSuccessListener(event -> {this.bindEvent(event);loadComments(); })
                     .addOnFailureListener(ex -> {
                                 if (isAdded()) {
-                                    ToastManager.show(requireContext(), "Failed to load event", Toast.LENGTH_LONG);
+                                    ToastManager.show(getContext(), "Failed to load event", Toast.LENGTH_LONG);
                                     Navigation.findNavController(requireView()).popBackStack();
                                 }
                             }
@@ -280,6 +281,7 @@ public class EventDetailsFragment extends Fragment {
 
         geolocationRequired = event.isGeolocationEnabled();
         isDrawn = event.isDrawn();
+        isPrivate = event.isPrivate();
 
         binding.getRoot().setVisibility(VISIBLE);
 
@@ -325,6 +327,23 @@ public class EventDetailsFragment extends Fragment {
             this.binding.enrollButton.setText("Delete");
             this.binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
             this.isOrganizer = false;
+
+            this.binding.enrollButton.setOnClickListener(v -> {
+                this.eventModel.deleteEvent(this.eventId, this.userId, this.deviceId)
+                        .addOnSuccessListener(success -> {
+                            Navigation.findNavController(v).popBackStack();
+                        })
+                        .addOnFailureListener(exception -> {
+                            Log.e("EventDetailsFragment", "Failed to delete event.", exception);
+
+                            ToastManager.show(requireContext(), "Failed to delete event.", Toast.LENGTH_LONG);
+
+                            if (exception instanceof FirebaseFunctionsException) {
+                                Log.e("EventDetailsFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
+                            }
+                        });
+            });
+
             return;
         }
 
@@ -333,11 +352,13 @@ public class EventDetailsFragment extends Fragment {
             this.binding.enrollButton.setText("Manage");
             this.binding.enrollButton.setBackgroundColor(getResources().getColor(R.color.color_light_red));
             this.binding.enrollButton.setOnClickListener(v -> {
-                NavDirections action = EventDetailsFragmentDirections.actionEventdetailsfragmentToEventmanagerfragment(eventId, isDrawn);
+                NavDirections action = EventDetailsFragmentDirections.actionEventdetailsfragmentToEventmanagerfragment(eventId, isDrawn, isPrivate);
                 Navigation.findNavController(v).navigate(action);
             });
+
             return;
         }
+
         isOrganizer = false;
         binding.enrollButton.setOnClickListener(v -> toggleWaitlist());
     }
@@ -345,16 +366,15 @@ public class EventDetailsFragment extends Fragment {
     // get the organizer name to display in the ui
     private void fetchOrganizerName(Event event) {
         if (this.userId == null || this.deviceId == null || this.eventId == null) {
-            binding.textOrganizer.setText(" [unable to fetch organizer name]");
+            if (isAdded()) binding.textOrganizer.setText(" [unable to fetch organizer name]");
             return;
         }
 
-        binding.textOrganizer.setText(" Loading organizer name...");
+        if (isAdded()) binding.textOrganizer.setText(" Loading organizer name...");
 
         eventModel.getOrganizerName(this.userId, this.deviceId, this.eventId)
                 .addOnSuccessListener(name -> {
                     if (!isAdded()) {
-                        binding.textOrganizer.setText(" [no associated organizer]");
                         return;
                     }
 
@@ -364,15 +384,15 @@ public class EventDetailsFragment extends Fragment {
                         name = "[organizer has empty name]";
                     }
 
-                    this.binding.textOrganizer.setText(" Organized by " + name.trim());
+                    if (isAdded()) this.binding.textOrganizer.setText(" Organized by " + name.trim());
                 })
                 .addOnFailureListener(exception -> {
-                    ToastManager.show(requireContext(), "Failed to fetch organizer name", Toast.LENGTH_LONG);
+                    ToastManager.show(getContext(), "Failed to fetch organizer name", Toast.LENGTH_LONG);
                     Log.e("EventDetailsFragment", "Failed to fetch organizer name.", exception);
 
                     // set the organizer id as the name instead,
                     // to have something there at least, and to possibly help w/ debugging
-                    this.binding.textOrganizer.setText(" Organized by " + event.getOrganizerId());
+                    if (isAdded()) this.binding.textOrganizer.setText(" Organized by " + event.getOrganizerId());
                 });
     }
 
@@ -409,11 +429,7 @@ public class EventDetailsFragment extends Fragment {
     }
 
     private void updateWaitlistText() {
-        if (!isAdded()) {
-            return;
-        }
-
-        this.binding.textWaitingList.setText(" Wait list: " + waitlistCount);
+        if (isAdded()) this.binding.textWaitingList.setText(" Wait list: " + waitlistCount);
     }
 
     private void updateEnrollButtonLabel() {
@@ -454,12 +470,12 @@ public class EventDetailsFragment extends Fragment {
                         Log.d("EventDetails", "leaveWaitlist: success");
                         updateEnrollButtonLabel();
                         refreshWaitlistCount();
-                        ToastManager.show(requireContext(), "Left waitlist", Toast.LENGTH_LONG);
+                        ToastManager.show(getContext(), "Left waitlist", Toast.LENGTH_LONG);
                     })
                     .addOnFailureListener(ex ->
                             {
                                 Log.e("EventDetails", "leaveWaitlist: failed", ex);
-                                ToastManager.show(requireContext(), "Failed to leave waitlist", Toast.LENGTH_LONG);
+                                ToastManager.show(getContext(), "Failed to leave waitlist", Toast.LENGTH_LONG);
                             }
                     );
         } else {
@@ -508,7 +524,7 @@ public class EventDetailsFragment extends Fragment {
 
         if (!fineGranted && !coarseGranted) {
             ToastManager.show(
-                    requireContext(),
+                    getContext(),
                     "Location permission is required for this event",
                     Toast.LENGTH_LONG
             );
@@ -521,7 +537,7 @@ public class EventDetailsFragment extends Fragment {
                 .addOnSuccessListener(location -> {
                     if (location == null) {
                         ToastManager.show(
-                                requireContext(),
+                                getContext(),
                                 "Failed to get current location",
                                 Toast.LENGTH_LONG
                         );
@@ -537,7 +553,7 @@ public class EventDetailsFragment extends Fragment {
                 .addOnFailureListener(ex -> {
                     Log.e("EventDetails", "getCurrentLocation failed", ex);
                     ToastManager.show(
-                            requireContext(),
+                            getContext(),
                             "Failed to get current location",
                             Toast.LENGTH_LONG
                     );
@@ -555,11 +571,11 @@ public class EventDetailsFragment extends Fragment {
                     Log.d("EventDetails", "joinWaitlist: success");
                     updateEnrollButtonLabel();
                     refreshWaitlistCount();
-                    ToastManager.show(requireContext(), "Joined waitlist", Toast.LENGTH_LONG);
+                    ToastManager.show(getContext(), "Joined waitlist", Toast.LENGTH_LONG);
                 })
                 .addOnFailureListener(ex -> {
                     Log.e("EventDetails", "joinWaitlist: failed", ex);
-                    ToastManager.show(requireContext(), "Failed to join waitlist", Toast.LENGTH_LONG);
+                    ToastManager.show(getContext(), ex.getMessage(), Toast.LENGTH_LONG);
                 });
     }
 

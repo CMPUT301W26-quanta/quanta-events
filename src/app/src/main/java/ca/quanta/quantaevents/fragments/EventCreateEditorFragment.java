@@ -131,7 +131,7 @@ public class EventCreateEditorFragment extends Fragment {
                         showPreviewFromBase64(selectedImageBase64);
                     } catch (IOException ex) {
                         selectedImageBase64 = null;
-                        ToastManager.show(requireContext(), "Failed to read image", Toast.LENGTH_LONG);
+                        ToastManager.show(getContext(), "Failed to read image", Toast.LENGTH_LONG);
                     }
                 });
     }
@@ -148,15 +148,16 @@ public class EventCreateEditorFragment extends Fragment {
         boolean geolocation = binding.checkGeolocation.isChecked();
         String eventCategory = normalizeEmpty(safeText(binding.inputCategory.getText()));
         String eventGuidelines = normalizeEmpty(safeText(binding.inputGuidelines.getText()));
+        boolean isPrivate = binding.checkPrivate.isChecked();
 
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(description)
                 || TextUtils.isEmpty(registrationStart) || TextUtils.isEmpty(registrationEnd)
                 || TextUtils.isEmpty(eventTime) || TextUtils.isEmpty(location) || eventCapacity == null) {
-            ToastManager.show(requireContext(), "Fill required fields", Toast.LENGTH_LONG);
+            ToastManager.show(getContext(), "Fill required fields", Toast.LENGTH_LONG);
             return;
         }
         if (userId == null || deviceId == null) {
-            ToastManager.show(requireContext(), "Missing user session", Toast.LENGTH_LONG);
+            ToastManager.show(getContext(), "Missing user session", Toast.LENGTH_LONG);
             return;
         }
 
@@ -164,7 +165,7 @@ public class EventCreateEditorFragment extends Fragment {
 
         if (eventId != null) {
             updateEventFlow(registrationStart, registrationEnd, eventTime, name, description,
-                    eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit);
+                    eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit, isPrivate);
             return;
         }
 
@@ -172,15 +173,15 @@ public class EventCreateEditorFragment extends Fragment {
             imageModel.createImage(userId, deviceId, selectedImageBase64)
                     .addOnSuccessListener(imageId -> createEventWithImageId(imageId, registrationStart, registrationEnd,
                             eventTime, name, description, eventCategory, eventGuidelines, geolocation,
-                            eventCapacity, location, registrationLimit))
+                            eventCapacity, location, registrationLimit, isPrivate))
                     .addOnFailureListener(ex -> {
                         binding.saveButton.setEnabled(true);
                         Log.e(TAG, "Failed to upload image", ex);
-                        ToastManager.show(requireContext(), "Failed to upload image", Toast.LENGTH_LONG);
+                        ToastManager.show(getContext(), "Failed to upload image", Toast.LENGTH_LONG);
                     });
         } else {
             createEventWithImageId(null, registrationStart, registrationEnd, eventTime, name, description,
-                    eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit);
+                    eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit, isPrivate);
         }
     }
 
@@ -232,7 +233,7 @@ public class EventCreateEditorFragment extends Fragment {
         eventModel.getEvent(eventId, userId, deviceId)
                 .addOnSuccessListener(this::bindEventForEdit)
                 .addOnFailureListener(ex ->
-                        ToastManager.show(requireContext(), "Failed to load event", Toast.LENGTH_LONG)
+                        ToastManager.show(getContext(), "Failed to load event", Toast.LENGTH_LONG)
                 );
     }
 
@@ -301,7 +302,7 @@ public class EventCreateEditorFragment extends Fragment {
         byte[] bytes = Base64.decode(base64Data, Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         if (bitmap == null) {
-            ToastManager.show(requireContext(), "Unable to preview image", Toast.LENGTH_LONG);
+            ToastManager.show(getContext(), "Unable to preview image", Toast.LENGTH_LONG);
             return;
         }
         binding.imagePreview.setImageBitmap(bitmap);
@@ -313,7 +314,7 @@ public class EventCreateEditorFragment extends Fragment {
                                         String name, String description,
                                         String eventCategory, String eventGuidelines,
                                         boolean geolocation, int eventCapacity,
-                                        String location, Integer registrationLimit) {
+                                        String location, Integer registrationLimit, boolean isPrivate) {
         UUID imageUuid = null;
         if (imageId != null) {
             try {
@@ -325,10 +326,10 @@ public class EventCreateEditorFragment extends Fragment {
 
         eventModel.createEvent(userId, deviceId, registrationStart, registrationEnd, eventTime,
                         name, description, eventCategory, eventGuidelines, geolocation,
-                        eventCapacity, location, registrationLimit, imageUuid)
+                        eventCapacity, location, registrationLimit, imageUuid, isPrivate)
                 .addOnSuccessListener(eventId -> {
                     binding.saveButton.setEnabled(true);
-                    ToastManager.show(requireContext(), "Event created", Toast.LENGTH_LONG);
+                    ToastManager.show(getContext(), "Event created", Toast.LENGTH_LONG);
                     if (isAdded()) {
                         Navigation.findNavController(requireView()).popBackStack();
                     }
@@ -336,7 +337,7 @@ public class EventCreateEditorFragment extends Fragment {
                 .addOnFailureListener(ex -> {
                     binding.saveButton.setEnabled(true);
                     Log.e(TAG, "Failed to create event", ex);
-                    ToastManager.show(requireContext(), "Failed to create event", Toast.LENGTH_LONG);
+                    ToastManager.show(getContext(), "Failed to create event", Toast.LENGTH_LONG);
                 });
     }
 
@@ -344,32 +345,32 @@ public class EventCreateEditorFragment extends Fragment {
                                  String name, String description,
                                  String eventCategory, String eventGuidelines,
                                  boolean geolocation, int eventCapacity,
-                                 String location, Integer registrationLimit) {
+                                 String location, Integer registrationLimit, boolean isPrivate) {
         if (imageDirty) {
             if (imageRemoved) {
                 updateEventWithImageId(null, registrationStart, registrationEnd, eventTime,
                         name, description, eventCategory, eventGuidelines, geolocation,
-                        eventCapacity, location, registrationLimit);
+                        eventCapacity, location, registrationLimit, isPrivate);
             } else if (selectedImageBase64 != null) {
                 imageModel.createImage(userId, deviceId, selectedImageBase64)
                         .addOnSuccessListener(imageId -> updateEventWithImageId(imageId, registrationStart, registrationEnd,
                                 eventTime, name, description, eventCategory, eventGuidelines, geolocation,
-                                eventCapacity, location, registrationLimit))
+                                eventCapacity, location, registrationLimit, isPrivate))
                         .addOnFailureListener(ex -> {
                             binding.saveButton.setEnabled(true);
                             Log.e(TAG, "Failed to upload image", ex);
-                            ToastManager.show(requireContext(), "Failed to upload image", Toast.LENGTH_LONG);
+                            ToastManager.show(getContext(), "Failed to upload image", Toast.LENGTH_LONG);
                         });
             } else {
                 updateEventWithImageId(null, registrationStart, registrationEnd, eventTime,
                         name, description, eventCategory, eventGuidelines, geolocation,
-                        eventCapacity, location, registrationLimit);
+                        eventCapacity, location, registrationLimit, isPrivate);
             }
             return;
         }
         updateEventWithImageId(existingImageId == null ? null : existingImageId,
                 registrationStart, registrationEnd, eventTime, name, description,
-                eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit);
+                eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit, isPrivate);
     }
 
     private void updateEventWithImageId(@Nullable UUID imageId, String registrationStart,
@@ -377,7 +378,7 @@ public class EventCreateEditorFragment extends Fragment {
                                         String name, String description,
                                         String eventCategory, String eventGuidelines,
                                         boolean geolocation, int eventCapacity,
-                                        String location, Integer registrationLimit) {
+                                        String location, Integer registrationLimit, boolean isPrivate) {
         UUID imageUuid = null;
         if (imageId != null) {
             try {
@@ -389,10 +390,10 @@ public class EventCreateEditorFragment extends Fragment {
         eventModel.updateEvent(userId, deviceId, eventId,
                         registrationStart, registrationEnd, eventTime,
                         name, description, eventCategory, eventGuidelines,
-                        geolocation, eventCapacity, location, registrationLimit, imageUuid)
+                        geolocation, eventCapacity, location, registrationLimit, imageUuid, isPrivate)
                 .addOnSuccessListener(_done -> {
                     binding.saveButton.setEnabled(true);
-                    ToastManager.show(requireContext(), "Event updated", Toast.LENGTH_LONG);
+                    ToastManager.show(getContext(), "Event updated", Toast.LENGTH_LONG);
                     if (isAdded()) {
                         Navigation.findNavController(requireView()).popBackStack();
                     }
@@ -400,7 +401,7 @@ public class EventCreateEditorFragment extends Fragment {
                 .addOnFailureListener(ex -> {
                     binding.saveButton.setEnabled(true);
                     Log.e(TAG, "Failed to update event", ex);
-                    ToastManager.show(requireContext(), "Failed to update event", Toast.LENGTH_LONG);
+                    ToastManager.show(getContext(), "Failed to update event", Toast.LENGTH_LONG);
                 });
     }
 

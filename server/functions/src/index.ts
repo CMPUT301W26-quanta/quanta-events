@@ -37,6 +37,11 @@ export const createComment = onCall(
 	functions.createComment,
 );
 
+export const createInvitation = onCall(
+	{ maxInstances: 1 },
+	functions.createInvitation,
+);
+
 export const createUser = onCall({ maxInstances: 1 }, functions.createUser);
 
 export const getUser = onCall({ maxInstances: 1 }, functions.getUser);
@@ -67,6 +72,8 @@ export const deleteComment = onCall(
 	{ maxInstances: 1 },
 	functions.deleteComment,
 );
+
+export const deleteEvent = onCall({ maxInstances: 1 }, functions.deleteEvent);
 
 export const deleteImage = onCall({ maxInstances: 1 }, functions.deleteImage);
 
