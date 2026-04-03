@@ -1,15 +1,11 @@
 package ca.quanta.quantaevents.viewmodels;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.HttpsCallableResult;
 
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,10 +88,8 @@ public class CommentViewModel extends ViewModel {
                             comments.add(new Comment(UUID.fromString(commentId), UUID.fromString(senderId), message, postTime, senderName));
                         }
 
-                        return comments;
-                    }
-                    return Tasks.forResult(comments);
-                });
+                        return Tasks.forResult(comments);
+                    });
     }
 
     /**
