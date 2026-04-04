@@ -7,10 +7,10 @@ import android.graphics.BitmapFactory;
 import android.icu.util.Calendar;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -23,6 +23,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.ByteArrayOutputStream;
@@ -63,11 +69,21 @@ public class EventCreateEditorFragment extends Fragment {
     private boolean imageDirty = false;
     private boolean imageRemoved = false;
 
-    public EventCreateEditorFragment() {
-        // Required empty public constructor
-    }
+    // Map picker fields
+    private GoogleMap pickerMap;
+    private LatLng selectedLatLng;
+    private Marker selectedMarker;
 
     private SessionStore sessionStore;
+
+    public EventCreateEditorFragment() {}
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        binding = FragmentEventCreateEditorBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -88,31 +104,45 @@ public class EventCreateEditorFragment extends Fragment {
         infoStore.setSubtitle("Create or edit an event.");
         infoStore.setIconRes(R.drawable.material_symbols_add);
 
-        binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).popBackStack()
-        );
-
+        binding.backButton.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
         binding.saveButton.setOnClickListener(_view -> saveEvent());
         binding.inputRegistrationEnd.setOnClickListener(v -> showDateTimePicker(binding.inputRegistrationEnd));
         binding.inputStartTime.setOnClickListener(v -> showDateTimePicker(binding.inputStartTime));
         binding.inputRegistrationStart.setOnClickListener(v -> showDateTimePicker(binding.inputRegistrationStart));
-
         binding.btnSelectImage.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
         binding.btnRemoveImage.setOnClickListener(v -> clearSelectedImage());
+
+        // Set up the map picker
+        SupportMapFragment mapPickerFragment = (SupportMapFragment)
+                getChildFragmentManager().findFragmentById(R.id.mapPicker);
+
+        if (mapPickerFragment != null) {
+            mapPickerFragment.getMapAsync(googleMap -> {
+                pickerMap = googleMap;
+                pickerMap.getUiSettings().setZoomControlsEnabled(true);
+
+                // Restore pin if editing or if user already picked before rotation
+                if (selectedLatLng != null) {
+                    placePin(selectedLatLng);
+                    pickerMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, 13f));
+                }
+
+                pickerMap.setOnMapClickListener(latLng -> {
+                    selectedLatLng = latLng;
+                    placePin(latLng);
+                    binding.textSelectedLocation.setText(
+                            String.format("%.5f, %.5f", latLng.latitude, latLng.longitude));
+                });
+            });
+        } else {
+            binding.mapErrorText.setVisibility(View.VISIBLE);
+        }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        binding = FragmentEventCreateEditorBinding.inflate(inflater, container, false);
-        return binding.getRoot();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ToastManager.cancel();
-        binding = null;
+    private void placePin(LatLng latLng) {
+        if (selectedMarker != null) selectedMarker.remove();
+        selectedMarker = pickerMap.addMarker(new MarkerOptions().position(latLng));
+        pickerMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
     }
 
     @Override
@@ -121,9 +151,7 @@ public class EventCreateEditorFragment extends Fragment {
         imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 uri -> {
-                    if (uri == null) {
-                        return;
-                    }
+                    if (uri == null) return;
                     selectedImageUri = uri;
                     imageDirty = true;
                     imageRemoved = false;
@@ -143,7 +171,6 @@ public class EventCreateEditorFragment extends Fragment {
         String registrationStart = getUtcValue(binding.inputRegistrationStart);
         String registrationEnd = getUtcValue(binding.inputRegistrationEnd);
         String eventTime = getUtcValue(binding.inputStartTime);
-        String location = safeText(binding.inputLocation.getText());
         Integer eventCapacity = parseInt(binding.inputEventLimit.getText());
         Integer registrationLimit = parseInt(binding.inputRegistrationCapacity.getText());
         boolean geolocation = binding.checkGeolocation.isChecked();
@@ -155,16 +182,18 @@ public class EventCreateEditorFragment extends Fragment {
             ToastManager.show(getContext(), "Missing user session", Toast.LENGTH_LONG);
             return;
         }
-
         if (name == null || name.isEmpty()) {
             binding.layoutEventName.setError("Name is required");
             binding.inputName.requestFocus();
             return;
         }
-        if (location == null || location.isEmpty()) {
-            binding.layoutEventLocation.setError("Location is required");
-            binding.inputLocation.requestFocus();
+        // Validate map pin
+        if (selectedLatLng == null) {
+            binding.mapErrorText.setVisibility(View.VISIBLE);
+            binding.mapErrorText.setText("Please tap the map to select a location");
             return;
+        } else {
+            binding.mapErrorText.setVisibility(View.GONE);
         }
         if (eventTime == null || eventTime.isEmpty()) {
             binding.layoutStartTime.setError("Event Start Time is required");
@@ -186,11 +215,12 @@ public class EventCreateEditorFragment extends Fragment {
             binding.inputDescription.requestFocus();
             return;
         }
-        if (eventCapacity <= 0) {
-            binding.layoutEntrantCapacity.setError("Capacity cant be 0");
+        if (eventCapacity == null || eventCapacity <= 0) {
+            binding.layoutEntrantCapacity.setError("Capacity can't be 0");
             binding.inputEventLimit.requestFocus();
             return;
         }
+
         ZonedDateTime regStartDt = parseUtcTag(binding.inputRegistrationStart);
         ZonedDateTime regEndDt   = parseUtcTag(binding.inputRegistrationEnd);
         ZonedDateTime eventDt    = parseUtcTag(binding.inputStartTime);
@@ -205,19 +235,24 @@ public class EventCreateEditorFragment extends Fragment {
             return;
         }
 
+        double locationLat = selectedLatLng.latitude;
+        double locationLng = selectedLatLng.longitude;
+
         binding.saveButton.setEnabled(false);
 
         if (eventId != null) {
             updateEventFlow(registrationStart, registrationEnd, eventTime, name, description,
-                    eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit, isPrivate);
+                    eventCategory, eventGuidelines, geolocation, eventCapacity,
+                    locationLat, locationLng, registrationLimit, isPrivate);
             return;
         }
 
         if (selectedImageBase64 != null) {
             imageModel.createImage(userId, deviceId, selectedImageBase64)
-                    .addOnSuccessListener(imageId -> createEventWithImageId(imageId, registrationStart, registrationEnd,
-                            eventTime, name, description, eventCategory, eventGuidelines, geolocation,
-                            eventCapacity, location, registrationLimit, isPrivate))
+                    .addOnSuccessListener(imageId -> createEventWithImageId(imageId, registrationStart,
+                            registrationEnd, eventTime, name, description, eventCategory,
+                            eventGuidelines, geolocation, eventCapacity, locationLat, locationLng,
+                            registrationLimit, isPrivate))
                     .addOnFailureListener(ex -> {
                         if (!isAdded() || binding == null) return;
                         binding.saveButton.setEnabled(true);
@@ -225,8 +260,9 @@ public class EventCreateEditorFragment extends Fragment {
                         ToastManager.show(getContext(), "Failed to upload image", Toast.LENGTH_LONG);
                     });
         } else {
-            createEventWithImageId(null, registrationStart, registrationEnd, eventTime, name, description,
-                    eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit, isPrivate);
+            createEventWithImageId(null, registrationStart, registrationEnd, eventTime, name,
+                    description, eventCategory, eventGuidelines, geolocation, eventCapacity,
+                    locationLat, locationLng, registrationLimit, isPrivate);
         }
     }
 
@@ -242,39 +278,32 @@ public class EventCreateEditorFragment extends Fragment {
     private void showDateTimePicker(TextInputEditText target) {
         Calendar cal = Calendar.getInstance();
         new DatePickerDialog(requireContext(), R.style.ThemeOverlay_QuantaEvents_DatePicker,
-                (dateView, year, month, dayOfMonth) -> {
-                    new TimePickerDialog(requireContext(), R.style.ThemeOverlay_QuantaEvents_TimePicker,
-                            (timeView, hourOfDay, minute) -> {
-                                LocalDateTime local = LocalDateTime.of(year, month + 1, dayOfMonth,
-                                        hourOfDay, minute);
-                                ZonedDateTime zonedLocal = local.atZone(ZoneId.systemDefault());
-                                ZonedDateTime utc = zonedLocal.withZoneSameInstant(ZoneId.of("UTC"));
-                                String display = zonedLocal.format(displayFormatter);
-                                String utcValue = utc.format(utcFormatter);
-                                target.setText(display);
-                                target.setTag(utcValue);
-                            }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false).show();
-                }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
+                (dateView, year, month, dayOfMonth) ->
+                        new TimePickerDialog(requireContext(), R.style.ThemeOverlay_QuantaEvents_TimePicker,
+                                (timeView, hourOfDay, minute) -> {
+                                    LocalDateTime local = LocalDateTime.of(year, month + 1, dayOfMonth, hourOfDay, minute);
+                                    ZonedDateTime zonedLocal = local.atZone(ZoneId.systemDefault());
+                                    ZonedDateTime utc = zonedLocal.withZoneSameInstant(ZoneId.of("UTC"));
+                                    target.setText(zonedLocal.format(displayFormatter));
+                                    target.setTag(utc.format(utcFormatter));
+                                }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false).show(),
+                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
     }
 
     private String getUtcValue(TextInputEditText input) {
         Object tag = input.getTag();
-        if (tag instanceof String) {
-            return (String) tag;
-        }
+        if (tag instanceof String) return (String) tag;
         return safeText(input.getText());
     }
 
     private void readEventId() {
-        ca.quanta.quantaevents.fragments.EventCreateEditorFragmentArgs args = ca.quanta.quantaevents.fragments.EventCreateEditorFragmentArgs.fromBundle(getArguments());
+        EventCreateEditorFragmentArgs args = EventCreateEditorFragmentArgs.fromBundle(getArguments());
         eventId = args.getEventId();
         maybeLoadEventForEdit();
     }
 
     private void maybeLoadEventForEdit() {
-        if (eventId == null || userId == null || deviceId == null) {
-            return;
-        }
+        if (eventId == null || userId == null || deviceId == null) return;
         eventModel.getEvent(eventId, userId, deviceId)
                 .addOnSuccessListener(this::bindEventForEdit)
                 .addOnFailureListener(ex -> {
@@ -284,35 +313,40 @@ public class EventCreateEditorFragment extends Fragment {
     }
 
     private void bindEventForEdit(Event event) {
-        if (!isAdded() || binding == null) return;
-        if (event == null) {
-            return;
-        }
+        if (!isAdded() || binding == null || event == null) return;
+
         existingImageId = event.getImageId();
         imageDirty = false;
         imageRemoved = false;
+
         binding.inputName.setText(stringValue(event.getEventName(), ""));
         binding.inputDescription.setText(stringValue(event.getEventDescription(), ""));
-        binding.inputLocation.setText(stringValue(event.getLocation(), ""));
         binding.inputCategory.setText(stringValue(event.getEventCategory(), ""));
         binding.inputGuidelines.setText(stringValue(event.getEventGuidelines(), ""));
         binding.checkGeolocation.setChecked(event.isGeolocationEnabled());
-
-        if (event.getRegistrationStartTime() != null) {
+        binding.checkPrivate.setChecked(event.isPrivate());
+        if (event.getRegistrationStartTime() != null)
             setDateTimeField(binding.inputRegistrationStart, event.getRegistrationStartTime());
-        }
-        if (event.getRegistrationEndTime() != null) {
+        if (event.getRegistrationEndTime() != null)
             setDateTimeField(binding.inputRegistrationEnd, event.getRegistrationEndTime());
-        }
-        if (event.getEventTime() != null) {
+        if (event.getEventTime() != null)
             setDateTimeField(binding.inputStartTime, event.getEventTime());
-        }
-
-        if (event.getEventCapacity() != null && event.getEventCapacity() > 0) {
+        if (event.getEventCapacity() != null && event.getEventCapacity() > 0)
             binding.inputEventLimit.setText(event.getEventCapacity().toString());
-        }
-        if (event.getRegistrationLimit() != null) {
+        if (event.getRegistrationLimit() != null)
             binding.inputRegistrationCapacity.setText(event.getRegistrationLimit().toString());
+
+        // Restore map pin
+        Double lat = event.getLocationLat();
+        Double lng = event.getLocationLng();
+        if (lat != null && lng != null) {
+            selectedLatLng = new LatLng(lat, lng);
+            binding.textSelectedLocation.setText(String.format("%.5f, %.5f", lat, lng));
+            if (pickerMap != null) {
+                placePin(selectedLatLng);
+                pickerMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, 13f));
+            }
+            // If pickerMap isn't ready yet, onMapReady will restore it from selectedLatLng
         }
 
         UUID imageUuid = event.getImageId();
@@ -333,16 +367,11 @@ public class EventCreateEditorFragment extends Fragment {
     private String encodeImageToBase64(Uri uri) throws IOException {
         try (InputStream inputStream = requireContext().getContentResolver().openInputStream(uri);
              ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            if (inputStream == null) {
-                throw new IOException("Unable to open image");
-            }
+            if (inputStream == null) throw new IOException("Unable to open image");
             byte[] buffer = new byte[4096];
             int read;
-            while ((read = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, read);
-            }
-            byte[] bytes = outputStream.toByteArray();
-            return Base64.encodeToString(bytes, Base64.NO_WRAP);
+            while ((read = inputStream.read(buffer)) != -1) outputStream.write(buffer, 0, read);
+            return Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP);
         }
     }
 
@@ -363,101 +392,47 @@ public class EventCreateEditorFragment extends Fragment {
                                         String name, String description,
                                         String eventCategory, String eventGuidelines,
                                         boolean geolocation, int eventCapacity,
-                                        String location, Integer registrationLimit, boolean isPrivate) {
-        UUID imageUuid = null;
-        if (imageId != null) {
-            try {
-                imageUuid = imageId;
-            } catch (IllegalArgumentException ignored) {
-                imageUuid = null;
-            }
-        }
-        if (name == null || name.isEmpty()) {
-            binding.layoutEventName.setError("Name is required");
-            binding.inputName.requestFocus();
-            return;
-        }
-        if (location == null || location.isEmpty()) {
-            binding.layoutEventLocation.setError("Location is required");
-            binding.inputLocation.requestFocus();
-            return;
-        }
-        if (eventTime == null || eventTime.isEmpty()) {
-            binding.layoutStartTime.setError("Event Start Time is required");
-            binding.inputStartTime.requestFocus();
-            return;
-        }
-        if (registrationStart == null || registrationStart.isEmpty()) {
-            binding.layoutRegistrationStart.setError("Registration Start Time is required");
-            binding.inputRegistrationStart.requestFocus();
-            return;
-        }
-        if (registrationEnd == null || registrationEnd.isEmpty()) {
-            binding.layoutRegistrationEnd.setError("Registration End Time is required");
-            binding.inputRegistrationEnd.requestFocus();
-            return;
-        }
-        if (description == null || description.isEmpty()) {
-            binding.layoutDescription.setError("Event Description is required");
-            binding.inputDescription.requestFocus();
-            return;
-        }
-        if (eventCapacity <= 0) {
-            binding.layoutEntrantCapacity.setError("Capacity cant be 0");
-            binding.inputEventLimit.requestFocus();
-            return;
-        }
-        ZonedDateTime regStartDt = parseUtcTag(binding.inputRegistrationStart);
-        ZonedDateTime regEndDt   = parseUtcTag(binding.inputRegistrationEnd);
-        ZonedDateTime eventDt    = parseUtcTag(binding.inputStartTime);
-        if (regEndDt != null && regStartDt != null && !regEndDt.isAfter(regStartDt)) {
-            binding.layoutRegistrationEnd.setError("Registration End should be after Registration Start");
-            binding.inputRegistrationEnd.requestFocus();
-            return;
-        }
-        if (eventDt != null && regEndDt != null && eventDt.isBefore(regEndDt)) {
-            binding.layoutStartTime.setError("Event Start should be after Registration End");
-            binding.inputStartTime.requestFocus();
-            return;
-        }
+                                        double locationLat, double locationLng,
+                                        Integer registrationLimit, boolean isPrivate) {
+        UUID imageUuid = (imageId != null) ? imageId : null;
 
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(
-            eventModel.createEvent(userId, deviceId, registrationStart, registrationEnd, eventTime,
-                            name, description, eventCategory, eventGuidelines, geolocation,
-                            eventCapacity, location, registrationLimit, imageUuid, isPrivate)
-                    .addOnSuccessListener(eventId -> {
-                        if (!isAdded() || binding == null) return;
-                        binding.saveButton.setEnabled(true);
-                        Toast.makeText(getContext(), "Event created", Toast.LENGTH_LONG).show();
-                        if (isAdded()) {
+                eventModel.createEvent(userId, deviceId, registrationStart, registrationEnd,
+                                eventTime, name, description, eventCategory, eventGuidelines,
+                                geolocation, eventCapacity, locationLat, locationLng,
+                                registrationLimit, imageUuid, isPrivate)
+                        .addOnSuccessListener(eventId -> {
+                            if (!isAdded() || binding == null) return;
+                            binding.saveButton.setEnabled(true);
+                            Toast.makeText(getContext(), "Event created", Toast.LENGTH_LONG).show();
                             Navigation.findNavController(requireView()).popBackStack();
-                        }
-                    })
-                    .addOnFailureListener(ex -> {
-                        if (!isAdded() || binding == null) return;
-                        binding.saveButton.setEnabled(true);
-                        Log.e(TAG, "Failed to create event", ex);
-                        Toast.makeText(getContext(), "Failed to create event", Toast.LENGTH_LONG).show();
-                    })
+                        })
+                        .addOnFailureListener(ex -> {
+                            if (!isAdded() || binding == null) return;
+                            binding.saveButton.setEnabled(true);
+                            Log.e(TAG, "Failed to create event", ex);
+                            Toast.makeText(getContext(), "Failed to create event", Toast.LENGTH_LONG).show();
+                        })
         );
     }
 
     private void updateEventFlow(String registrationStart, String registrationEnd, String eventTime,
-                                 String name, String description,
-                                 String eventCategory, String eventGuidelines,
-                                 boolean geolocation, int eventCapacity,
-                                 String location, Integer registrationLimit, boolean isPrivate) {
+                                 String name, String description, String eventCategory,
+                                 String eventGuidelines, boolean geolocation, int eventCapacity,
+                                 double locationLat, double locationLng,
+                                 Integer registrationLimit, boolean isPrivate) {
         if (imageDirty) {
             if (imageRemoved) {
                 updateEventWithImageId(null, registrationStart, registrationEnd, eventTime,
                         name, description, eventCategory, eventGuidelines, geolocation,
-                        eventCapacity, location, registrationLimit, isPrivate);
+                        eventCapacity, locationLat, locationLng, registrationLimit, isPrivate);
             } else if (selectedImageBase64 != null) {
                 imageModel.createImage(userId, deviceId, selectedImageBase64)
-                        .addOnSuccessListener(imageId -> updateEventWithImageId(imageId, registrationStart, registrationEnd,
-                                eventTime, name, description, eventCategory, eventGuidelines, geolocation,
-                                eventCapacity, location, registrationLimit, isPrivate))
+                        .addOnSuccessListener(imageId -> updateEventWithImageId(imageId, registrationStart,
+                                registrationEnd, eventTime, name, description, eventCategory,
+                                eventGuidelines, geolocation, eventCapacity, locationLat, locationLng,
+                                registrationLimit, isPrivate))
                         .addOnFailureListener(ex -> {
                             if (!isAdded() || binding == null) return;
                             binding.saveButton.setEnabled(true);
@@ -467,13 +442,13 @@ public class EventCreateEditorFragment extends Fragment {
             } else {
                 updateEventWithImageId(null, registrationStart, registrationEnd, eventTime,
                         name, description, eventCategory, eventGuidelines, geolocation,
-                        eventCapacity, location, registrationLimit, isPrivate);
+                        eventCapacity, locationLat, locationLng, registrationLimit, isPrivate);
             }
             return;
         }
-        updateEventWithImageId(existingImageId == null ? null : existingImageId,
-                registrationStart, registrationEnd, eventTime, name, description,
-                eventCategory, eventGuidelines, geolocation, eventCapacity, location, registrationLimit, isPrivate);
+        updateEventWithImageId(existingImageId, registrationStart, registrationEnd, eventTime,
+                name, description, eventCategory, eventGuidelines, geolocation,
+                eventCapacity, locationLat, locationLng, registrationLimit, isPrivate);
     }
 
     private void updateEventWithImageId(@Nullable UUID imageId, String registrationStart,
@@ -481,56 +456,44 @@ public class EventCreateEditorFragment extends Fragment {
                                         String name, String description,
                                         String eventCategory, String eventGuidelines,
                                         boolean geolocation, int eventCapacity,
-                                        String location, Integer registrationLimit, boolean isPrivate) {
-        UUID imageUuid = null;
-        if (imageId != null) {
-            try {
-                imageUuid = imageId;
-            } catch (IllegalArgumentException ignored) {
-                imageUuid = null;
-            }
-        }
+                                        double locationLat, double locationLng,
+                                        Integer registrationLimit, boolean isPrivate) {
+        UUID imageUuid = (imageId != null) ? imageId : null;
+
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(
-            eventModel.updateEvent(userId, deviceId, eventId,
-                            registrationStart, registrationEnd, eventTime,
-                            name, description, eventCategory, eventGuidelines,
-                            geolocation, eventCapacity, location, registrationLimit, imageUuid, isPrivate)
-                    .addOnSuccessListener(_done -> {
-                        if (!isAdded() || binding == null) return;
-                        binding.saveButton.setEnabled(true);
-                        Toast.makeText(getContext(), "Event updated", Toast.LENGTH_LONG).show();
-                        if (isAdded()) {
+                eventModel.updateEvent(userId, deviceId, eventId, registrationStart, registrationEnd,
+                                eventTime, name, description, eventCategory, eventGuidelines,
+                                geolocation, eventCapacity, locationLat, locationLng,
+                                registrationLimit, imageUuid, isPrivate)
+                        .addOnSuccessListener(_done -> {
+                            if (!isAdded() || binding == null) return;
+                            binding.saveButton.setEnabled(true);
+                            Toast.makeText(getContext(), "Event updated", Toast.LENGTH_LONG).show();
                             Navigation.findNavController(requireView()).popBackStack();
-                        }
-                    })
-                    .addOnFailureListener(ex -> {
-                        if (!isAdded() || binding == null) return;
-                        binding.saveButton.setEnabled(true);
-                        Log.e(TAG, "Failed to update event", ex);
-                        Toast.makeText(getContext(), "Failed to update event", Toast.LENGTH_LONG).show();
-                    })
+                        })
+                        .addOnFailureListener(ex -> {
+                            if (!isAdded() || binding == null) return;
+                            binding.saveButton.setEnabled(true);
+                            Log.e(TAG, "Failed to update event", ex);
+                            Toast.makeText(getContext(), "Failed to update event", Toast.LENGTH_LONG).show();
+                        })
         );
     }
-
 
     private static String safeText(@Nullable CharSequence text) {
         return text == null ? "" : text.toString().trim();
     }
 
     private static String stringValue(Object value, String fallback) {
-        if (value == null) {
-            return fallback;
-        }
+        if (value == null) return fallback;
         String result = value.toString().trim();
         return result.isEmpty() ? fallback : result;
     }
 
     @Nullable
     private static String normalizeEmpty(@Nullable String value) {
-        if (value == null || value.isEmpty()) {
-            return null;
-        }
+        if (value == null || value.isEmpty()) return null;
         return value;
     }
 
@@ -554,18 +517,24 @@ public class EventCreateEditorFragment extends Fragment {
             return null;
         }
     }
+
     private static Integer parseInt(@Nullable CharSequence text) {
-        if (text == null) {
-            return null;
-        }
+        if (text == null) return null;
         String value = text.toString().trim();
-        if (value.isEmpty()) {
-            return null;
-        }
+        if (value.isEmpty()) return null;
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException ex) {
             return null;
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        binding = null;
+        pickerMap = null;
+        selectedMarker = null;
     }
 }

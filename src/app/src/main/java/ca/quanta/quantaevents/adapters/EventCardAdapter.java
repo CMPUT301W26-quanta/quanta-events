@@ -1,5 +1,6 @@
 package ca.quanta.quantaevents.adapters;
 
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,6 +93,40 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
         }
         items.add(0, item);
         notifyItemInserted(0);
+    }
+
+    public void updateLocation(UUID eventId, String location) {
+        for (int i = 0; i < items.size(); i++) {
+            EventCardItem current = items.get(i);
+            if (current.getEventId() != null && current.getEventId().equals(eventId)) {
+                items.set(i, new EventCardItem(
+                        current.getEventId(),
+                        current.getTitle(),
+                        current.getRegistrationStartTime(),
+                        location,
+                        current.getImage()
+                ));
+                notifyItemChanged(i);
+                return;
+            }
+        }
+    }
+
+    public void updateImage(UUID eventId, Bitmap image) {
+        for (int i = 0; i < items.size(); i++) {
+            EventCardItem current = items.get(i);
+            if (current.getEventId() != null && current.getEventId().equals(eventId)) {
+                items.set(i, new EventCardItem(
+                        current.getEventId(),
+                        current.getTitle(),
+                        current.getRegistrationStartTime(),
+                        current.getLocation(),  // preserves location
+                        image
+                ));
+                notifyItemChanged(i);
+                return;
+            }
+        }
     }
 
     /**
