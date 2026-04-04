@@ -45,6 +45,7 @@ export async function createUser(request: CallableRequest) {
 						? {
 								enteredEvents: [],
 								history: [],
+								undismissedNotifications: [],
 								receiveNotifications: receiveNotifications ?? false,
 							}
 						: null,
