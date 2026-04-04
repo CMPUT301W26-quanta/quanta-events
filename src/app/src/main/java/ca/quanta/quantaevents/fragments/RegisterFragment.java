@@ -85,6 +85,25 @@ public class RegisterFragment extends Fragment {
         String email = normalizeEmpty(Optional.ofNullable(binding.inputEmail.getText()).map(e -> e.toString().trim()).orElse(null));
         String phone = normalizeEmpty(Optional.ofNullable(binding.inputPhone.getText()).map(e -> e.toString().trim()).orElse(null));
 
+        if (name == null) {
+            binding.layoutName.setError("Name is required");
+            binding.inputName.requestFocus();
+            return;
+        }
+        if (email == null) {
+            binding.layoutEmail.setError("Email is required");
+            binding.inputEmail.requestFocus();
+            return;
+        }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.layoutEmail.setError("Enter a valid email address");
+            binding.inputEmail.requestFocus();
+            return;
+        }
+
+        Boolean isEntrant = binding.checkEntrant.isChecked();
+        Boolean isOrganizer = binding.checkOrganizer.isChecked();
+        Boolean isAdmin = binding.checkAdmin.isChecked();
         Boolean getNotifications = binding.checkNotifications.isChecked();
         UUID deviceId = UUID.randomUUID();
         binding.saveButton.setEnabled(false);
@@ -92,12 +111,14 @@ public class RegisterFragment extends Fragment {
         loader.loadTask(
                 model.createUser(name, email, phone, getNotifications, deviceId)
                         .addOnSuccessListener(userId -> {
+                            if (!isAdded() || binding == null) return;
                             sessionStore.setSession(userId, deviceId);
                             binding.saveButton.setEnabled(true);
                             ToastManager.show(getContext(), "Account created", Toast.LENGTH_LONG);
                             tryRedirect();
                         })
                         .addOnFailureListener(ex -> {
+                            if (!isAdded() || binding == null) return;
                             binding.saveButton.setEnabled(true);
                             Log.e(TAG, "Failed to create account", ex);
                             ToastManager.show(getContext(), "Failed to create account", Toast.LENGTH_LONG);
@@ -118,6 +139,13 @@ public class RegisterFragment extends Fragment {
             return null;
         }
         return value;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+        redirectedToHome = false;
     }
 
     // triess redirecting user to appropriate fragment.

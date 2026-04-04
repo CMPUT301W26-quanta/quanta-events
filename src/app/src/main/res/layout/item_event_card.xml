@@ -92,7 +92,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:drawableStart="@drawable/material_symbols_location_rounded"
-                android:drawableTint="@color/color_dark_gray"
+                android:drawableTint="@color/color_dark_purple"
                 android:text="Some location"
                 android:textSize="16sp"
                 android:textColor="@color/text_color" />

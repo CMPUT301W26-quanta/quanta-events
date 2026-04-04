@@ -122,12 +122,11 @@ public class AdminEventBrowserFragment extends Fragment {
                         null,
                         EventViewModel.SortBy.REGISTRATION_END)
                 .addOnSuccessListener(events -> {
-                    if (!isAdded()) {
-                        return;
-                    }
+                    if (!isAdded() || binding == null) return;
                     bindEventList(events);
                 })
                 .addOnFailureListener(ex -> {
+                    if (!isAdded() || binding == null) return;
                     Log.e("AdminEventBrowser", "Failed to load events", ex);
                     if (ex instanceof FirebaseFunctionsException) {
                         FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
@@ -151,14 +150,13 @@ public class AdminEventBrowserFragment extends Fragment {
         ToastManager.cancel();
         hasLoaded = false;
         binding = null;
+        adapter = null;
     }
 
     // binds the event list to the view
     // The following function is from OpenAI, ChatGPT, "bindEventList implementation under AdminEventBrowser", 2026-03-12
     private void bindEventList(List<Event> events) {
-        if (!isAdded()) {
-            return;
-        }
+        if (!isAdded() || binding == null || adapter == null) return;
         if (events == null) {
             Log.d("AdminEventBrowser", "Event list is null");
             return;
@@ -199,9 +197,7 @@ public class AdminEventBrowserFragment extends Fragment {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
-                    if (!isAdded()) {
-                        return;
-                    }
+                    if (!isAdded() || binding == null || adapter == null) return;
                     Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;

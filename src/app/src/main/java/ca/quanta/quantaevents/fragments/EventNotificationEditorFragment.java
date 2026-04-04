@@ -58,7 +58,7 @@ public class EventNotificationEditorFragment extends Fragment {
         );
 
         binding.saveButton.setOnClickListener(_view -> {
-
+            binding.saveButton.setEnabled(false);
             String title = normalizeEmpty(Optional.ofNullable(binding.inputTitle.getText()).map(e -> e.toString().trim()).orElse(null));
             String message = normalizeEmpty(Optional.ofNullable(binding.inputMessage.getText()).map(e -> e.toString().trim()).orElse(null));
 
@@ -71,6 +71,7 @@ public class EventNotificationEditorFragment extends Fragment {
                     title, eventId.toString(),
                     waited, cancelled, selected, finale)
                     .addOnSuccessListener(notificationId -> {
+                        if (!isAdded() || binding == null) return;
                         binding.saveButton.setEnabled(true);
                         Toast.makeText(getContext(), "Notification created", Toast.LENGTH_LONG).show();
                         if (isAdded()) {
@@ -78,6 +79,7 @@ public class EventNotificationEditorFragment extends Fragment {
                         }
                     })
                     .addOnFailureListener(ex -> {
+                        if (!isAdded() || binding == null) return;
                         binding.saveButton.setEnabled(true);
                         Log.e("TAG", "Failed to create notification", ex);
                         Toast.makeText(getContext(), "Failed to create notification", Toast.LENGTH_LONG).show();
@@ -92,6 +94,12 @@ public class EventNotificationEditorFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentNotificationEditorBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 
     private void readEventId() {

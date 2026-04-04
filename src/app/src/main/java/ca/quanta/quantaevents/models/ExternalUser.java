@@ -9,11 +9,11 @@ public class ExternalUser {
 
     private final UUID userId;
     private final String name;
-    private final String email;
-    private final String phone;
     private final Boolean isEntrant;
     private final Boolean isOrganizer;
     private final Boolean isAdmin;
+    private final String email;
+    private final String phone;
 
     /**
      * Constructor for an ExternalUser object.
@@ -33,6 +33,16 @@ public class ExternalUser {
         this.isEntrant = isEntrant;
         this.isOrganizer = isOrganizer;
         this.isAdmin = isAdmin;
+    }
+
+    public ExternalUser(UUID userId, String name,String email, String phone) {
+        this.userId = userId;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.isEntrant = false;
+        this.isOrganizer = false;
+        this.isAdmin = false;
     }
 
     public UUID getUserId() {

@@ -60,6 +60,7 @@ public class EventQRCodeFragment extends Fragment {
 
         // keep scanning for qr codes and decode them
         binding.qrCodeScanner.decodeContinuous(result -> {
+            if (!isAdded() || binding == null) return;
             String text = result.getText();
             if (text.startsWith("quanta-events:")) {
                 String uuidStr = text.substring(14);

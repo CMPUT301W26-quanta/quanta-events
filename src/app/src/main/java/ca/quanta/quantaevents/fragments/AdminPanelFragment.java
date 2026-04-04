@@ -74,4 +74,10 @@ public class AdminPanelFragment extends Fragment implements Tagged {
         return TAG;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
 }

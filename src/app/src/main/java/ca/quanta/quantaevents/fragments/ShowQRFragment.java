@@ -43,6 +43,7 @@ public class ShowQRFragment extends Fragment {
 
         // sets up the qrcode image view to generate the QR code bitmap and set it as the image source
         binding.qrCodeImage.post(() -> {
+            if (!isAdded() || binding == null) return;
             try {
                 binding.qrCodeImage.setImageBitmap(generateQrCode(eventId, binding.qrCodeImage.getWidth()));
             } catch (WriterException e) {
@@ -99,4 +100,11 @@ public class ShowQRFragment extends Fragment {
         binding = FragmentShowQrBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
 }
