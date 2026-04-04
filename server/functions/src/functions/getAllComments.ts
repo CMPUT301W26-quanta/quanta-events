@@ -27,7 +27,9 @@ export async function getAllComments(
 		throw new HttpsError("not-found", "Event not found");
 	}
 
-	return (await eventRef.collection("comments").get()).docs.map(
-		util.commentDocToExternalComment,
+	const results = (await eventRef.collection("comments").get()).docs.map(
+		util.commentDocToExternalComment
 	);
+
+	return await Promise.all(results);
 }
