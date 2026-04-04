@@ -31,7 +31,7 @@
         android:layout_height="0dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
-        android:clipToPadding="false"
+        android:clipToPadding="true"
         android:scrollbars="vertical"
         android:overScrollMode="ifContentScrolls"
         app:layout_constraintTop_toBottomOf="@id/filter_layout"

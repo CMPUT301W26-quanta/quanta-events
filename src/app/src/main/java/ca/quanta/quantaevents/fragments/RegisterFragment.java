@@ -85,6 +85,22 @@ public class RegisterFragment extends Fragment {
         String email = normalizeEmpty(Optional.ofNullable(binding.inputEmail.getText()).map(e -> e.toString().trim()).orElse(null));
         String phone = normalizeEmpty(Optional.ofNullable(binding.inputPhone.getText()).map(e -> e.toString().trim()).orElse(null));
 
+        if (name == null) {
+            binding.layoutName.setError("Name is required");
+            binding.inputName.requestFocus();
+            return;
+        }
+        if (email == null) {
+            binding.layoutEmail.setError("Email is required");
+            binding.inputEmail.requestFocus();
+            return;
+        }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.layoutEmail.setError("Enter a valid email address");
+            binding.inputEmail.requestFocus();
+            return;
+        }
+
         Boolean isEntrant = binding.checkEntrant.isChecked();
         Boolean isOrganizer = binding.checkOrganizer.isChecked();
         Boolean isAdmin = binding.checkAdmin.isChecked();

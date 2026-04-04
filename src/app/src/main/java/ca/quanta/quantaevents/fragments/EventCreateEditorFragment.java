@@ -151,14 +151,57 @@ public class EventCreateEditorFragment extends Fragment {
         String eventGuidelines = normalizeEmpty(safeText(binding.inputGuidelines.getText()));
         boolean isPrivate = binding.checkPrivate.isChecked();
 
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(description)
-                || TextUtils.isEmpty(registrationStart) || TextUtils.isEmpty(registrationEnd)
-                || TextUtils.isEmpty(eventTime) || TextUtils.isEmpty(location) || eventCapacity == null) {
-            ToastManager.show(getContext(), "Fill required fields", Toast.LENGTH_LONG);
-            return;
-        }
         if (userId == null || deviceId == null) {
             ToastManager.show(getContext(), "Missing user session", Toast.LENGTH_LONG);
+            return;
+        }
+
+        if (name == null || name.isEmpty()) {
+            binding.layoutEventName.setError("Name is required");
+            binding.inputName.requestFocus();
+            return;
+        }
+        if (location == null || location.isEmpty()) {
+            binding.layoutEventLocation.setError("Location is required");
+            binding.inputLocation.requestFocus();
+            return;
+        }
+        if (eventTime == null || eventTime.isEmpty()) {
+            binding.layoutStartTime.setError("Event Start Time is required");
+            binding.inputStartTime.requestFocus();
+            return;
+        }
+        if (registrationStart == null || registrationStart.isEmpty()) {
+            binding.layoutRegistrationStart.setError("Registration Start Time is required");
+            binding.inputRegistrationStart.requestFocus();
+            return;
+        }
+        if (registrationEnd == null || registrationEnd.isEmpty()) {
+            binding.layoutRegistrationEnd.setError("Registration End Time is required");
+            binding.inputRegistrationEnd.requestFocus();
+            return;
+        }
+        if (description == null || description.isEmpty()) {
+            binding.layoutDescription.setError("Event Description is required");
+            binding.inputDescription.requestFocus();
+            return;
+        }
+        if (eventCapacity <= 0) {
+            binding.layoutEntrantCapacity.setError("Capacity cant be 0");
+            binding.inputEventLimit.requestFocus();
+            return;
+        }
+        ZonedDateTime regStartDt = parseUtcTag(binding.inputRegistrationStart);
+        ZonedDateTime regEndDt   = parseUtcTag(binding.inputRegistrationEnd);
+        ZonedDateTime eventDt    = parseUtcTag(binding.inputStartTime);
+        if (regEndDt != null && regStartDt != null && !regEndDt.isAfter(regStartDt)) {
+            binding.layoutRegistrationEnd.setError("Registration End should be after Registration Start");
+            binding.inputRegistrationEnd.requestFocus();
+            return;
+        }
+        if (eventDt != null && regEndDt != null && eventDt.isBefore(regEndDt)) {
+            binding.layoutStartTime.setError("Event Start should be after Registration End");
+            binding.inputStartTime.requestFocus();
             return;
         }
 
@@ -329,6 +372,54 @@ public class EventCreateEditorFragment extends Fragment {
                 imageUuid = null;
             }
         }
+        if (name == null || name.isEmpty()) {
+            binding.layoutEventName.setError("Name is required");
+            binding.inputName.requestFocus();
+            return;
+        }
+        if (location == null || location.isEmpty()) {
+            binding.layoutEventLocation.setError("Location is required");
+            binding.inputLocation.requestFocus();
+            return;
+        }
+        if (eventTime == null || eventTime.isEmpty()) {
+            binding.layoutStartTime.setError("Event Start Time is required");
+            binding.inputStartTime.requestFocus();
+            return;
+        }
+        if (registrationStart == null || registrationStart.isEmpty()) {
+            binding.layoutRegistrationStart.setError("Registration Start Time is required");
+            binding.inputRegistrationStart.requestFocus();
+            return;
+        }
+        if (registrationEnd == null || registrationEnd.isEmpty()) {
+            binding.layoutRegistrationEnd.setError("Registration End Time is required");
+            binding.inputRegistrationEnd.requestFocus();
+            return;
+        }
+        if (description == null || description.isEmpty()) {
+            binding.layoutDescription.setError("Event Description is required");
+            binding.inputDescription.requestFocus();
+            return;
+        }
+        if (eventCapacity <= 0) {
+            binding.layoutEntrantCapacity.setError("Capacity cant be 0");
+            binding.inputEventLimit.requestFocus();
+            return;
+        }
+        ZonedDateTime regStartDt = parseUtcTag(binding.inputRegistrationStart);
+        ZonedDateTime regEndDt   = parseUtcTag(binding.inputRegistrationEnd);
+        ZonedDateTime eventDt    = parseUtcTag(binding.inputStartTime);
+        if (regEndDt != null && regStartDt != null && !regEndDt.isAfter(regStartDt)) {
+            binding.layoutRegistrationEnd.setError("Registration End should be after Registration Start");
+            binding.inputRegistrationEnd.requestFocus();
+            return;
+        }
+        if (eventDt != null && regEndDt != null && eventDt.isBefore(regEndDt)) {
+            binding.layoutStartTime.setError("Event Start should be after Registration End");
+            binding.inputStartTime.requestFocus();
+            return;
+        }
 
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(
@@ -453,6 +544,16 @@ public class EventCreateEditorFragment extends Fragment {
         }
     }
 
+    @Nullable
+    private ZonedDateTime parseUtcTag(TextInputEditText input) {
+        Object tag = input.getTag();
+        if (!(tag instanceof String)) return null;
+        try {
+            return ZonedDateTime.parse((String) tag, utcFormatter);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
     private static Integer parseInt(@Nullable CharSequence text) {
         if (text == null) {
             return null;

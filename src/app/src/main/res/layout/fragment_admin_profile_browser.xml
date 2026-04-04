@@ -50,7 +50,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
-        android:clipToPadding="false"
+        android:clipToPadding="true"
         android:fadingEdge="vertical"
         android:requiresFadingEdge="vertical"
         android:fadingEdgeLength="20dp"

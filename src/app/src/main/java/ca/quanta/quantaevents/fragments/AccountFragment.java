@@ -164,6 +164,22 @@ public class AccountFragment extends Fragment implements Tagged {
         email = email.isEmpty() ? null : email;
         phone = phone.isEmpty() ? null : phone;
 
+        if (name == null) {
+            binding.layoutName.setError("Name is required");
+            binding.inputName.requestFocus();
+            return;
+        }
+        if (email == null) {
+            binding.layoutEmail.setError("Email is required");
+            binding.inputEmail.requestFocus();
+            return;
+        }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.layoutEmail.setError("Enter a valid email address");
+            binding.inputEmail.requestFocus();
+            return;
+        }
+
         Boolean receiveNotifications = binding.checkNotifications.isChecked();
 
         binding.saveButton.setEnabled(false);
