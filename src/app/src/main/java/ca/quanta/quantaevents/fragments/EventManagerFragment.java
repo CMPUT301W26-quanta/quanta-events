@@ -60,6 +60,8 @@ public class EventManagerFragment extends Fragment {
             deviceId = did;
         });
 
+        readArgs();
+
         // sets on click listener to navigate to editor fragment
         binding.editDetailsButton.setOnClickListener(
                 v -> {
@@ -110,8 +112,12 @@ public class EventManagerFragment extends Fragment {
                 binding.drawLotteryButton.setAlpha(0.5f);
                 EventViewModel events = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
                 loader.loadTask(events.drawLottery(userId, deviceId, eventId)
-                                .addOnSuccessListener(_void -> ToastManager.show(getContext(), "Drew lottery"))
+                                .addOnSuccessListener(_void -> {
+                                    if (!isAdded() || binding == null) return;
+                                    ToastManager.show(getContext(), "Drew lottery");
+                                })
                         .addOnFailureListener(exc -> {
+                            if (!isAdded() || binding == null) return;
                             exc.printStackTrace();
                             binding.drawLotteryButton.setEnabled(true);
                             binding.drawLotteryButton.setAlpha(1.0f);
@@ -135,5 +141,18 @@ public class EventManagerFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentEventManagerBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        binding = null;
+    }
+
+    private void readArgs() {
+        EventManagerFragmentArgs args = EventManagerFragmentArgs.fromBundle(getArguments());
+        eventId = args.getEventId();
+        isDrawn = args.getIsDrawn();
     }
 }

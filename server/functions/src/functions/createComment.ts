@@ -9,6 +9,7 @@ const createCommentInterface = util.standardForm(
 	z.object({
 		eventId: z.uuid(),
 		message: z.string(),
+		postTime: z.string()
 	}),
 );
 
@@ -34,6 +35,7 @@ export async function createComment(request: CallableRequest): Promise<string> {
 	commentRef.create({
 		senderId: payload.userId,
 		message: payload.data.message,
+		postTime: payload.data.postTime
 	});
 
 	return commentId;

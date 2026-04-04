@@ -5,12 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="2dp"
         android:fillViewport="true"
+        android:fadingEdge="vertical"
+        android:requiresFadingEdge="vertical"
+        android:fadingEdgeLength="100dp"
         android:backgroundTint="@color/color_dark_gray"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/layout_bottom_buttons"
@@ -25,6 +28,7 @@
             <!-- Event Banner Image -->
             <!-- change background later -->
 
+            <!-- Event Title -->
             <ImageView
                 android:id="@+id/imagePreview"
                 android:layout_width="match_parent"
@@ -35,7 +39,6 @@
                 android:contentDescription="@string/app_name"
                 android:background="@color/color_dark_gray" />
 
-            <!-- Event Title -->
             <TextView
                 android:id="@+id/textEventTitle"
                 android:layout_width="match_parent"
@@ -168,6 +171,7 @@
                 android:textSize="16sp"
                 android:textColor="@color/text_color" />
 
+
             <!-- Divider -->
             <View
                 android:layout_width="match_parent"
@@ -188,49 +192,86 @@
                 android:textColor="@color/text_color" />
 
             <!-- Comments Section -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_comment"
+            <RelativeLayout
+                android:id="@+id/enter_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:hint="Comment... "
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxStrokeColor="@color/border"
-                app:hintTextColor="@color/text_color"
-                app:placeholderText="eg. Here is a comment about this event. This event is very important, and it was a very good event"
-                app:placeholderTextColor="@color/color_dark_gray"
-                app:boxBackgroundColor="@color/color_light_gray"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                android:padding="8dp">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/comment"
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/comment_image"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerVertical="true"
+                    android:backgroundTint="@color/color_light_gray"
+                    android:src="@drawable/material_symbols_person_outline"/>
+
+                <Button
+                    android:id="@+id/send_comment"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp"
+                    android:gravity="center"
+                    android:layout_marginEnd="8dp"
+                    app:backgroundTint="@color/color_light_green"
+                    app:icon="@drawable/material_symbols_send_rounded"
+                    app:iconTint="@color/color_dark"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:cornerRadius="12dp"
+                    app:elevation="6dp"
+                    android:elevation="6dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layout_type_comment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textMultiLine"
-                    android:textColor="@color/text_color" />
+                    android:layout_toEndOf="@id/comment_image"
+                    android:layout_toStartOf="@id/send_comment"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:hint="Enter comment..."
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxStrokeColor="@color/border"
+                    app:hintTextColor="@color/text_color"
+                    app:boxBackgroundColor="@color/color_light_gray"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/comments_recycler_view"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="2dp"
-                    android:clipToPadding="false"
-                    android:scrollbars="vertical"
-                    android:fadingEdge="vertical"
-                    android:requiresFadingEdge="vertical"
-                    android:fadingEdgeLength="20dp"
-                    android:overScrollMode="ifContentScrolls"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/comment"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/type_comment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapSentences|textMultiLine"
+                        android:textColor="@color/text_color"/>
 
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="2dp"
+                android:text = "Comments"
+                android:textColor="@color/text_color"
+                android:textStyle = "bold" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id = "@+id/comments_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
-    </ScrollView>
+
+    </androidx.core.widget.NestedScrollView>
+
+
 
     <!-- Bottom Buttons -->
     <LinearLayout
@@ -245,6 +286,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
+
 
         <Button
             android:id="@+id/backButton"

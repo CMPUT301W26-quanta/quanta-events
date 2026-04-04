@@ -118,6 +118,7 @@ public class EntrantEventHistoryFragment extends Fragment {
                             EventViewModel.SortBy.NAME)
                     .addOnSuccessListener(this::bindEventList)
                     .addOnFailureListener(ex -> {
+                        if (!isAdded() || binding == null) return;
                         Log.e("EntrantEventHistory", "Failed to load events", ex);
                         if (ex instanceof FirebaseFunctionsException) {
                             FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
@@ -138,11 +139,13 @@ public class EntrantEventHistoryFragment extends Fragment {
         ToastManager.cancel();
         hasLoaded = false;
         binding = null;
+        adapter = null;
     }
 
     // bind the data to the view
     // The following function is from/based off OpenAI, ChatGPT, "bindEventList implementation for EntrantEventHistory", 2026-03-11
     private void bindEventList(List<Event> events) {
+        if (!isAdded() || binding == null || adapter == null) return;
         if (events == null) {
             Log.d("EntrantEventHistory", "Event list is null");
             return;
@@ -177,6 +180,7 @@ public class EntrantEventHistoryFragment extends Fragment {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
+                    if (!isAdded() || binding == null || adapter == null) return;
                     Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;

@@ -52,6 +52,16 @@ public class ProfileAdapter<VH extends ProfileAdapter.ProfileViewHolder> extends
         return this.profiles.size();
     }
 
+    public void setProfiles(List<ExternalUser> profiles) {
+        this.profiles.clear();
+        this.profiles.addAll(profiles);
+        notifyDataSetChanged();
+    }
+
+    public List<ExternalUser> getProfiles() {
+        return profiles;
+    }
+
     @Override
     @NonNull
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

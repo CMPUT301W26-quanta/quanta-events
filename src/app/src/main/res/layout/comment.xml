@@ -3,91 +3,78 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/comment_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginBottom="12dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="0dp"
-    app:strokeColor="@color/border"
-    app:strokeWidth="2dp">
+    android:layout_margin="1dp"
+    android:orientation="vertical"
+    app:cardBackgroundColor="@color/color_light_gray"
+    app:contentPadding="2dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="12dp"
-        android:gravity="center_vertical" />
+        android:layout_height="wrap_content">
 
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:id = "@+id/load_comment"
+            android:layout_marginEnd = "5dp"
+            android:layout_marginRight = "5dp"
+            android:src = "@drawable/material_symbols_person_outline"/>
 
-        <View
-            android:id="@+id/top_divider"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginTop="12dp"
-            android:background="@color/border"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <!-- Comment Information-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:paddingStart="12dp">
-
-
-        <!-- Time -->
-
-        <!-- User -->
         <TextView
-            android:id="@+id/event_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:drawableStart="@drawable/ic_round_schedule"
-            android:text="Some Time"
-            android:textColor="@color/text_color"
-            android:textSize="16sp"
-            app:drawableTint="@color/color_dark_gray" />
+            android:id = "@+id/comment_name"
+            android:layout_toRightOf="@id/load_comment"
+            android:text = "Jane"
+            android:textColor =  "@color/text_color"
+            android:textSize = "16sp"
+            android:textStyle = "bold"/>
 
         <TextView
-            android:id="@+id/user_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="User Name"
-            android:textColor="@color/text_color"
-            android:textSize="16sp" />
+            android:id="@+id/comment_text"
+            android:layout_below = "@id/comment_name"
+            android:layout_toEndOf = "@id/load_comment"
+            android:layout_toRightOf="@id/load_comment"
+            android:text = "Actual Comment Here"
+            android:textColor="@color/text_color"/>
 
-        <!-- Comment -->
         <TextView
-            android:id="@+id/comment_info"
-            android:layout_width="match_parent"
-            android:layout_height="61dp"
-            android:layout_marginTop="2dp"
-            android:text="Some comment"
-            android:textColor="@color/text_color"
-            android:textSize="16sp" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/comment_time"
+            android:layout_below="@id/comment_text"
+            android:layout_toEndOf="@id/load_comment"
+            android:layout_toRightOf="@id/load_comment"
+            android:text="00/00/0000" />
 
-        <ImageButton
-            android:id="@+id/delete_comment_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginVertical="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/bg_icon_container"
-            android:backgroundTint="@color/color_light_red"
-            android:contentDescription="Delete"
-            android:padding="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/material_symbols_delete_rounded" />
+        <com.google.android.material.button.MaterialButton
+            android:id = "@+id/delete_comment"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:layout_centerVertical="true"
+            app:backgroundTint="@color/color_light_red"
+            android:padding = "8dp"
+            app:icon = "@drawable/material_symbols_delete_rounded"
+            app:iconGravity="textStart"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:gravity="center"
+            android:layout_marginRight="8dp"
+            app:iconPadding="0dp"
+            app:cornerRadius="12dp"
+            style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton.Icon"
+            />
 
-    </LinearLayout>
+
+    </RelativeLayout>
+
+
 
 </com.google.android.material.card.MaterialCardView>
