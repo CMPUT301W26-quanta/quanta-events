@@ -146,6 +146,32 @@ declare global {
 
 	// *** External
 
+	/** The form sent as comments to the front end. */
+	interface ExternalComment {
+		commentId: string;
+
+		senderName: string;
+		senderId: string;
+		postTime: string;
+		message: string;
+	}
+
+	interface ExternalNotification {
+		title: string;
+		message: string;
+	}
+
+	interface ExternalUndismissedNotification {
+		notificationId: string;
+		eventId: string;
+
+		title: string;
+		message: string;
+
+		kind: "MESSAGE" | "LOTTERY" | "INVITE";
+		lotterySelected: boolean | null;
+	}
+
 	/** The user as sent to the frontend */
 	interface ExternalUser {
 		userId: string;
@@ -155,16 +181,6 @@ declare global {
 		isAdmin: boolean;
 		isOrganizer: boolean;
 		isEntrant: boolean;
-	}
-
-	/** The form sent as comments to the front end. */
-	interface ExternalComment {
-		commentId: string;
-
-		senderName: string;
-		senderId: string;
-		postTime: string;
-		message: string;
 	}
 
 	// collections

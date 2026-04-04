@@ -22,6 +22,7 @@ export async function createInvitation(request: CallableRequest) {
 	util.requireRole(userData, "organizer");
 
 	const notificationId = uuidv4();
+
 	logger.info(
 		`Creating invite ${notificationId} on event ${data.eventId} to user ${data.invitee}.`,
 	);

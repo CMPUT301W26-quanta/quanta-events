@@ -58,6 +58,11 @@ export const getAllNotifications = onCall(
 	functions.getAllNotifications,
 );
 
+export const getAllUndismissedNotifications = onCall(
+	{ maxInstances: 1 },
+	functions.getAllUndismissedNotifications,
+);
+
 export const getAllUsers = onCall({ maxInstances: 1 }, functions.getAllUsers);
 
 export const createEvent = onCall({ maxInstances: 1 }, functions.createEvent);
@@ -78,6 +83,11 @@ export const deleteEvent = onCall({ maxInstances: 1 }, functions.deleteEvent);
 export const deleteImage = onCall({ maxInstances: 1 }, functions.deleteImage);
 
 export const deleteUser = onCall({ maxInstances: 1 }, functions.deleteUser);
+
+export const dismissNotification = onCall(
+	{ maxInstances: 1 },
+	functions.dismissNotification,
+);
 
 export const drawLottery = onCall({ maxInstances: 1 }, functions.drawLottery);
 
