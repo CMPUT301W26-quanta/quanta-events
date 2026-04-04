@@ -102,11 +102,6 @@ public class AccountFragment extends Fragment implements Tagged {
 
         binding.inputPhone.setText(user.getPhoneNumber());
 
-        binding.checkEntrant.setChecked(user.isEntrant());
-        binding.checkOrganizer.setChecked(user.isOrganizer());
-
-        binding.checkAdmin.setChecked(user.isAdmin());
-
         User.Entrant entrant = user.getEntrant();
         if (entrant != null) {
             binding.checkNotifications.setChecked(entrant.getReceiveNotifications());
