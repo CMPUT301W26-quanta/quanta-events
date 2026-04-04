@@ -133,6 +133,7 @@ declare global {
 	/** The form comments are stored as in the database. */
 	interface CommentDocument {
 		senderId: string;
+		postTime: string;
 		message: string;
 	}
 
@@ -158,7 +159,9 @@ declare global {
 	interface ExternalComment {
 		commentId: string;
 
+		senderName: string;
 		senderId: string;
+		postTime: string;
 		message: string;
 	}
 }
