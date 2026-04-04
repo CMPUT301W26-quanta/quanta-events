@@ -86,12 +86,17 @@ public class RegisterFragment extends Fragment {
         String phone = normalizeEmpty(Optional.ofNullable(binding.inputPhone.getText()).map(e -> e.toString().trim()).orElse(null));
 
         if (name == null) {
-            binding.inputName.setError("Name is required");
+            binding.layoutName.setError("Name is required");
             binding.inputName.requestFocus();
             return;
         }
         if (email == null) {
-            binding.inputEmail.setError("Email is required");
+            binding.layoutEmail.setError("Email is required");
+            binding.inputEmail.requestFocus();
+            return;
+        }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.layoutEmail.setError("Enter a valid email address");
             binding.inputEmail.requestFocus();
             return;
         }
