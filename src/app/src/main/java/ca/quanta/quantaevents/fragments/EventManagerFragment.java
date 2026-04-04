@@ -103,6 +103,13 @@ public class EventManagerFragment extends Fragment {
                 }
         );
 
+        binding.inviteCoOrganizerButton.setOnClickListener(
+                v -> {
+                    NavDirections action = EventManagerFragmentDirections.actionEventManagerFragmentToInviteCoOrganizerFragment(eventId);
+                    Navigation.findNavController(v).navigate(action);
+                }
+        );
+
         if(isDrawn) {
             binding.drawLotteryButton.setEnabled(false);
             binding.drawLotteryButton.setAlpha(0.5f);
