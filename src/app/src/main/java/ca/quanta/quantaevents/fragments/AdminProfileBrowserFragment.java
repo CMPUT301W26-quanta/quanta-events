@@ -144,6 +144,7 @@ public class AdminProfileBrowserFragment extends Fragment {
                         .addOnSuccessListener(users -> {
                             // filter out admins
 
+                            if (!isAdded() || binding == null) return;
                             ArrayList<ExternalUser> nonAdminProfiles = new ArrayList<ExternalUser>();
 
                             for (ExternalUser user : users) {
@@ -160,6 +161,7 @@ public class AdminProfileBrowserFragment extends Fragment {
                             binding.profilesRecyclerView.setAdapter(profilesAdapter);
                         })
                         .addOnFailureListener(exception -> {
+                            if (!isAdded() || binding == null) return;
                             Log.e("AdminProfileBrowserFragment", "Failed to fetch all users.", exception);
 
                             ToastManager.show(getContext(), "Failed to fetch users", Toast.LENGTH_LONG);

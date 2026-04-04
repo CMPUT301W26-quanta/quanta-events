@@ -126,9 +126,11 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
                             null,
                             null,
                             null,
+                            null,
                             null)
                     .addOnSuccessListener(this::bindEventList)
                     .addOnFailureListener(ex -> {
+                        if (!isAdded() || binding == null) return;
                         Log.e("EntrantEventList", "Failed to load events", ex);
                         if (ex instanceof FirebaseFunctionsException) {
                             FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
@@ -149,9 +151,11 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
         ToastManager.cancel();
         hasLoaded = false;
         binding = null;
+        adapter = null;
     }
 
     private void bindEventList(List<Event> events) {
+        if (!isAdded() || binding == null || adapter == null) return;
         if (events == null) {
             Log.d("EntrantEventList", "Event list is null");
             return;
@@ -185,6 +189,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
+                    if (!isAdded() || binding == null || adapter == null) return;
                     Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;

@@ -198,12 +198,10 @@ public class EventDetailsFragment extends Fragment {
             this.eventModel.getEvent(this.eventId, this.userId, this.deviceId)
                     .addOnSuccessListener(event -> {this.bindEvent(event);loadComments(); })
                     .addOnFailureListener(ex -> {
-                                if (isAdded()) {
-                                    ToastManager.show(getContext(), "Failed to load event", Toast.LENGTH_LONG);
-                                    Navigation.findNavController(requireView()).popBackStack();
-                                }
-                            }
-                    )
+                        if (!isAdded() || binding == null) return;
+                        ToastManager.show(getContext(), "Failed to load event", Toast.LENGTH_LONG);
+                        Navigation.findNavController(requireView()).popBackStack();
+                    })
         );
     }
 
@@ -275,6 +273,7 @@ public class EventDetailsFragment extends Fragment {
     // bind the event details to the
     // ui elemtents in the view
     private void bindEvent(Event event) {
+        if (!isAdded() || binding == null) return;
         if (event == null) {
             return;
         }
@@ -308,6 +307,7 @@ public class EventDetailsFragment extends Fragment {
         if (imageUuid != null) {
             this.imageModel.getImage(imageUuid, this.userId, this.deviceId)
                     .addOnSuccessListener(imageData -> {
+                        if (!isAdded() || binding == null) return;
                         Object imageBase64 = imageData.getImageData();
                         if (imageBase64 != null) {
                             Bitmap bitmap = decodeBase64ToBitmap(imageBase64.toString());
@@ -331,9 +331,11 @@ public class EventDetailsFragment extends Fragment {
             this.binding.enrollButton.setOnClickListener(v -> {
                 this.eventModel.deleteEvent(this.eventId, this.userId, this.deviceId)
                         .addOnSuccessListener(success -> {
+                            if (!isAdded() || binding == null) return;
                             Navigation.findNavController(v).popBackStack();
                         })
                         .addOnFailureListener(exception -> {
+                            if (!isAdded() || binding == null) return;
                             Log.e("EventDetailsFragment", "Failed to delete event.", exception);
 
                             ToastManager.show(requireContext(), "Failed to delete event.", Toast.LENGTH_LONG);
@@ -374,9 +376,7 @@ public class EventDetailsFragment extends Fragment {
 
         eventModel.getOrganizerName(this.userId, this.deviceId, this.eventId)
                 .addOnSuccessListener(name -> {
-                    if (!isAdded()) {
-                        return;
-                    }
+                    if (!isAdded() || binding == null) return;
 
                     if (name == null) {
                         name = "[organizer's username is null]";
@@ -387,6 +387,7 @@ public class EventDetailsFragment extends Fragment {
                     if (isAdded()) this.binding.textOrganizer.setText(" Organized by " + name.trim());
                 })
                 .addOnFailureListener(exception -> {
+                    if (!isAdded() || binding == null) return;
                     ToastManager.show(getContext(), "Failed to fetch organizer name", Toast.LENGTH_LONG);
                     Log.e("EventDetailsFragment", "Failed to fetch organizer name.", exception);
 
@@ -407,6 +408,7 @@ public class EventDetailsFragment extends Fragment {
         Log.d("EventDetails", "updateWaitlistState: checking waitlist for eventId=" + this.eventId);
         this.eventModel.checkWaitlist(this.userId, this.deviceId, this.eventId)
                 .addOnSuccessListener(result -> {
+                    if (!isAdded() || binding == null) return;
                     inWaitlist = Boolean.TRUE.equals(result);
                     Log.d("EventDetails", "inWaitlist result=" + inWaitlist);
                     updateEnrollButtonLabel();
@@ -420,6 +422,7 @@ public class EventDetailsFragment extends Fragment {
         }
         this.eventModel.getWaitlistCount(this.userId, this.deviceId, this.eventId)
                 .addOnSuccessListener(count -> {
+                    if (!isAdded() || binding == null) return;
                     waitlistCount = count == null ? 0 : count;
                     updateWaitlistText();
                 })
@@ -429,14 +432,12 @@ public class EventDetailsFragment extends Fragment {
     }
 
     private void updateWaitlistText() {
-        if (isAdded()) this.binding.textWaitingList.setText(" Wait list: " + waitlistCount);
+        if (!isAdded() || binding == null) return;
+        this.binding.textWaitingList.setText(" Wait list: " + waitlistCount);
     }
 
     private void updateEnrollButtonLabel() {
-        if (!isAdded()) {
-            return;
-        }
-
+        if (!isAdded() || this.binding == null) return;
         if (this.isOrganizer || (this.isAdmin && this.fromAdmin)) {
             return;
         }
@@ -466,6 +467,7 @@ public class EventDetailsFragment extends Fragment {
             Log.d("EventDetails", "leaveWaitlist: eventId=" + this.eventId);
             this.eventModel.leaveWaitlist(this.userId, this.deviceId, this.eventId)
                     .addOnSuccessListener(_done -> {
+                        if (!isAdded() || binding == null) return;
                         inWaitlist = false;
                         Log.d("EventDetails", "leaveWaitlist: success");
                         updateEnrollButtonLabel();
@@ -474,6 +476,7 @@ public class EventDetailsFragment extends Fragment {
                     })
                     .addOnFailureListener(ex ->
                             {
+                                if (!isAdded() || binding == null) return;
                                 Log.e("EventDetails", "leaveWaitlist: failed", ex);
                                 ToastManager.show(getContext(), "Failed to leave waitlist", Toast.LENGTH_LONG);
                             }
@@ -535,6 +538,7 @@ public class EventDetailsFragment extends Fragment {
 
                 .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
                 .addOnSuccessListener(location -> {
+                    if (!isAdded() || binding == null) return;
                     if (location == null) {
                         ToastManager.show(
                                 getContext(),
@@ -551,6 +555,7 @@ public class EventDetailsFragment extends Fragment {
                     );
                 })
                 .addOnFailureListener(ex -> {
+                    if (!isAdded() || binding == null) return;
                     Log.e("EventDetails", "getCurrentLocation failed", ex);
                     ToastManager.show(
                             getContext(),
@@ -567,6 +572,7 @@ public class EventDetailsFragment extends Fragment {
     ) {
         eventModel.joinWaitlist(this.userId, this.deviceId, this.eventId, latitude, longitude, accuracyM)
                 .addOnSuccessListener(_done -> {
+                    if (!isAdded() || binding == null) return;
                     inWaitlist = true;
                     Log.d("EventDetails", "joinWaitlist: success");
                     updateEnrollButtonLabel();
@@ -574,6 +580,7 @@ public class EventDetailsFragment extends Fragment {
                     ToastManager.show(getContext(), "Joined waitlist", Toast.LENGTH_LONG);
                 })
                 .addOnFailureListener(ex -> {
+                    if (!isAdded() || binding == null) return;
                     Log.e("EventDetails", "joinWaitlist: failed", ex);
                     ToastManager.show(getContext(), ex.getMessage(), Toast.LENGTH_LONG);
                 });

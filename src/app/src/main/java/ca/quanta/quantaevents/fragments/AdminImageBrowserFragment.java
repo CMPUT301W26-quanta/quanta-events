@@ -42,13 +42,14 @@ public class AdminImageBrowserFragment extends Fragment {
             this.imageModel.getAllImages(this.userId, this.deviceId)
                     .addOnSuccessListener(imageIDs -> {
                         // use the adapter to display them
-
+                        if (!isAdded() || binding == null) return;
                         ImageCardAdapter imageCardsAdapter = new ImageCardAdapter(imageIDs, this);
 
                         binding.imageCardsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
                         binding.imageCardsRecyclerView.setAdapter(imageCardsAdapter);
                     })
                     .addOnFailureListener(exception -> {
+                        if (!isAdded() || binding == null) return;
                         Log.e("AdminImageBrowserFragment", "Failed to fetch images.", exception);
 
                         ToastManager.show(getContext(), "Failed to fetch images", Toast.LENGTH_LONG);
