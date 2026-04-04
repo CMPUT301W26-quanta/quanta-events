@@ -101,15 +101,12 @@ public class RegisterFragment extends Fragment {
             return;
         }
 
-        Boolean isEntrant = binding.checkEntrant.isChecked();
-        Boolean isOrganizer = binding.checkOrganizer.isChecked();
-        Boolean isAdmin = binding.checkAdmin.isChecked();
         Boolean getNotifications = binding.checkNotifications.isChecked();
         UUID deviceId = UUID.randomUUID();
         binding.saveButton.setEnabled(false);
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(
-                model.createUser(name, email, phone, isEntrant, isOrganizer, isAdmin, getNotifications, deviceId)
+                model.createUser(name, email, phone, getNotifications, deviceId)
                         .addOnSuccessListener(userId -> {
                             sessionStore.setSession(userId, deviceId);
                             binding.saveButton.setEnabled(true);
