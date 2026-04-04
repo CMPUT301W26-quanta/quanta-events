@@ -108,12 +108,14 @@ public class RegisterFragment extends Fragment {
         loader.loadTask(
                 model.createUser(name, email, phone, getNotifications, deviceId)
                         .addOnSuccessListener(userId -> {
+                            if (!isAdded() || binding == null) return;
                             sessionStore.setSession(userId, deviceId);
                             binding.saveButton.setEnabled(true);
                             ToastManager.show(getContext(), "Account created", Toast.LENGTH_LONG);
                             tryRedirect();
                         })
                         .addOnFailureListener(ex -> {
+                            if (!isAdded() || binding == null) return;
                             binding.saveButton.setEnabled(true);
                             Log.e(TAG, "Failed to create account", ex);
                             ToastManager.show(getContext(), "Failed to create account", Toast.LENGTH_LONG);
@@ -134,6 +136,13 @@ public class RegisterFragment extends Fragment {
             return null;
         }
         return value;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+        redirectedToHome = false;
     }
 
     // triess redirecting user to appropriate fragment.
