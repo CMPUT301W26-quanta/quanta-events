@@ -24,7 +24,7 @@ export async function getAllUsers(
 	const db = getFirestore();
 
 	if (search === null) {
-		util.requireRole(userData, "admin");
+		// util.requireRole(userData, "admin");
 
 		logger.info("Retrieving all users.");
 

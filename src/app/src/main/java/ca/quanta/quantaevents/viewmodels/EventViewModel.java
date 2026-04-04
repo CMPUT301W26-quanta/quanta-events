@@ -537,4 +537,28 @@ public class EventViewModel extends ViewModel {
                     return Tasks.forResult(externalUsers);
                 });
     }
+
+    /**
+     *
+     * @param userId UUID to identify user.
+     * @param deviceId UUID to identify user's device.
+     * @param eventId UUID to identify event.
+     * @param recipientId UUID to identify recipient.
+     * @return null on success, error on failure
+     */
+    public Task<Void> createCoOrganizerInvitation(UUID userId, UUID deviceId, UUID eventId, UUID recipientId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        payload.put("recipientId", recipientId.toString());
+        data.put("data", payload);
+
+        return functions.getHttpsCallable("createCoOrganizerInvitation")
+                .call(data)
+                .onSuccessTask(task -> Tasks.forResult(null));
+    }
+
 }
