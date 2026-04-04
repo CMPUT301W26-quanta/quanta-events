@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         FirebaseApp.initializeApp(this);
-        FirebaseFunctions.getInstance().useEmulator("10.0.2.2", 5001);
 
         FragmentInfoStore infoStore = new ViewModelProvider(this).get(FragmentInfoStore.class);
         SessionStore sessionStore = new ViewModelProvider(this).get(SessionStore.class);

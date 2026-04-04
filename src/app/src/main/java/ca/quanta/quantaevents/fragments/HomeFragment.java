@@ -1,9 +1,11 @@
 package ca.quanta.quantaevents.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,23 +13,32 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.firebase.functions.FirebaseFunctionsException;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
+import ca.quanta.quantaevents.adapters.InviteNotificationAdapter;
+import ca.quanta.quantaevents.adapters.NotificationAdapter;
 import ca.quanta.quantaevents.burger.SmartBurgerState;
 import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentHomeBinding;
+import ca.quanta.quantaevents.models.ExternalNotification;
+import ca.quanta.quantaevents.models.ExternalUndismissedNotification;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.ToastManager;
+import ca.quanta.quantaevents.viewmodels.NotificationViewModel;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
 public class HomeFragment extends Fragment implements Tagged {
     private FragmentHomeBinding binding;
     private SessionStore sessionStore;
     private UserViewModel userModel;
+    private NotificationViewModel notificationModel;
     private UUID userId;
     private UUID deviceId;
 
@@ -47,9 +58,12 @@ public class HomeFragment extends Fragment implements Tagged {
         infoStore.setIconRes(R.drawable.material_symbols_home_outline);
 
         // manages user session which checks if user is registered
-        sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
-        userModel = new ViewModelProvider(this).get(UserViewModel.class);
-        sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
+        this.sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
+
+        this.userModel = new ViewModelProvider(this).get(UserViewModel.class);
+        this.notificationModel = new ViewModelProvider(this).get(NotificationViewModel.class);
+
+        this.sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             this.userId = uid;
             this.deviceId = did;
 
@@ -58,7 +72,7 @@ public class HomeFragment extends Fragment implements Tagged {
 
         // listener for info button
 
-        binding.infoButton.setOnClickListener(_view -> {
+        this.binding.infoButton.setOnClickListener(_view -> {
             NavDirections action = HomeFragmentDirections.actionHomeFragmentToInformationFragment();
             Navigation.findNavController(requireView()).navigate(action);
         });
@@ -82,17 +96,64 @@ public class HomeFragment extends Fragment implements Tagged {
     //validates user by checking if they
     // exist in database if not handle it properly.
     private void maybeValidateUser() {
-        if (userId == null || deviceId == null) {
-            return;
-        }
-        userModel.getUser(userId, deviceId)
+        if (this.userId == null || this.deviceId == null) return;
+
+        this.userModel.getUser(this.userId, this.deviceId)
                 .addOnFailureListener(ex -> {
-                    if (!isAdded() || binding == null) return;
+                    if (!isAdded() || this.binding == null) return;
                     if (isUserNotFound(ex)) {
                         handleMissingUser();
                     }
                 })
-                .addOnCanceledListener(this::handleMissingUser);
+                .addOnCanceledListener(this::handleMissingUser)
+                .addOnSuccessListener(user -> {
+                    this.loadNotifications();
+                });
+    }
+
+    private void loadNotifications() {
+        notificationModel.getAllUndismissedNotifications(this.userId, this.deviceId)
+                .addOnSuccessListener(this::getAndDisplayNotifications)
+                .addOnFailureListener(exception -> {
+                    Log.e("HomeFragment", "Failed to fetch notifications.", exception);
+
+                    Toast.makeText(getContext(), "Failed to fetch notifications." + exception.getMessage(), Toast.LENGTH_LONG).show();
+
+                    if (exception instanceof FirebaseFunctionsException) {
+                        Log.e("HomeFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
+                    }
+                });
+    }
+
+    private void getAndDisplayNotifications(ArrayList<ExternalUndismissedNotification> notifications) {
+        // **** use adapters to display them
+
+        if (!isAdded() || this.binding == null) return;
+
+        ArrayList<ExternalUndismissedNotification> inviteNotifications = new ArrayList<>();
+        ArrayList<ExternalUndismissedNotification> lotteryNotifications = new ArrayList<>();
+        ArrayList<ExternalUndismissedNotification> messageNotifications = new ArrayList<>();
+
+        for (ExternalUndismissedNotification notification : notifications) {
+            switch (notification.getKind()) {
+                case "INVITE": inviteNotifications.add(notification); break;
+                case "LOTTERY": lotteryNotifications.add(notification); break;
+                case "MESSAGE": messageNotifications.add(notification); break;
+            }
+        }
+
+        InviteNotificationAdapter inviteNotificationAdapter = new InviteNotificationAdapter(inviteNotifications, this);
+
+        // **** set up the notification recycler views
+
+        this.binding.inviteNotificationsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        this.binding.inviteNotificationsRecyclerView.setAdapter(inviteNotificationAdapter);
+
+        // **** display toast in case there are none
+
+        if (inviteNotifications.isEmpty() && lotteryNotifications.isEmpty() && messageNotifications.isEmpty()) {
+            ToastManager.show(getContext(), "No notifications to display.", Toast.LENGTH_LONG);
+        }
     }
 
     private boolean isUserNotFound(Exception ex) {
