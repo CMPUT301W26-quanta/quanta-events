@@ -52,6 +52,7 @@ public class EntrantEventBrowserFragment extends Fragment {
     private String filterFrom = null;
     private String filterTo = null;
     private String filterCategory = null;
+    private Integer filterCapacity = null;
 
     private final DateTimeFormatter displayFormatter =
             DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
@@ -111,6 +112,7 @@ public class EntrantEventBrowserFragment extends Fragment {
                     filterFrom = filters.getString("from");
                     filterTo = filters.getString("to");
                     filterCategory = filters.getString("category");
+                    filterCapacity = filters.getInt("capacity");
 
                     Navigation.findNavController(requireView())
                             .getCurrentBackStackEntry()
@@ -131,6 +133,7 @@ public class EntrantEventBrowserFragment extends Fragment {
                     filterFrom = filters.getString("from");
                     filterTo = filters.getString("to");
                     filterCategory = filters.getString("category");
+                    filterCapacity = filters.getInt("capacity");
 
                     Navigation.findNavController(requireView())
                             .getCurrentBackStackEntry()
@@ -157,6 +160,7 @@ public class EntrantEventBrowserFragment extends Fragment {
         hasLoaded = false;
         loadedInitialEvents = false;
         binding = null;
+        adapter = null;
     }
 
     // decides if events should be loaded based on if they
@@ -191,14 +195,14 @@ public class EntrantEventBrowserFragment extends Fragment {
                             filterFrom,
                             filterTo,
                             filterCategory,
+                            filterCapacity,
                             EventViewModel.SortBy.REGISTRATION_START)
                     .addOnSuccessListener(events -> {
-                        if (!isAdded()) {
-                            return;
-                        }
+                        if (!isAdded() || binding == null) return;
                         bindEventList(events);
                     })
                     .addOnFailureListener(ex -> {
+                        if (!isAdded() || binding == null) return;
                         Log.e("EntrantEventBrowser", "Failed to load events", ex);
                         if (ex instanceof FirebaseFunctionsException) {
                             FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
@@ -210,7 +214,7 @@ public class EntrantEventBrowserFragment extends Fragment {
                             return;
                         }
                         if (isAdded()) {
-                            ToastManager.show(requireContext(), "Failed to load events", Toast.LENGTH_LONG);
+                            ToastManager.show(getContext(), "Failed to load events", Toast.LENGTH_LONG);
                         }
                     })
         );
@@ -219,9 +223,7 @@ public class EntrantEventBrowserFragment extends Fragment {
     // The following function is from OpenAI, ChatGPT, "bindEventList implementation for EntrantEventBrowser", 2026-03-11
 
     private void bindEventList(List<Event> events) {
-        if (!isAdded()) {
-            return;
-        }
+        if (!isAdded() || binding == null || adapter == null) return;
         if (events == null) {
             Log.d("EntrantEventBrowser", "Event list is null");
             return;
@@ -229,7 +231,7 @@ public class EntrantEventBrowserFragment extends Fragment {
         ToastManager.cancel();
         Log.d("EntrantEventBrowser", "Loaded events count=" + events.size());
         if (events.isEmpty()) {
-            ToastManager.show(requireContext(), "No events to enroll in", Toast.LENGTH_LONG);
+            ToastManager.show(getContext(), "No events to enroll in", Toast.LENGTH_LONG);
             adapter.setItems(new ArrayList<>());
             return;
         }
@@ -256,9 +258,7 @@ public class EntrantEventBrowserFragment extends Fragment {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
-                    if (!isAdded()) {
-                        return;
-                    }
+                    if (!isAdded() || binding == null || adapter == null) return;
                     Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;

@@ -27,14 +27,25 @@ public class EventManagerFragment extends Fragment {
     private UUID userId;
     private UUID deviceId;
     private UUID eventId;
-    private Boolean isDrawn;
+    private boolean isDrawn;
+
+    private boolean isPrivate;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventManagerFragmentArgs args = EventManagerFragmentArgs.fromBundle(getArguments());
+        eventId = args.getEventId();
+        isDrawn = args.getIsDrawn();
+        isPrivate = args.getIsPrivate();
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
-        // set title of the page to Event Manaher and the subtitle.
+        // set title of the page to Event Manager and the subtitle.
         // also sets the icon for the page
         infoStore.setTitle("Event Manager");
         infoStore.setSubtitle("Manage your Events");
@@ -58,13 +69,25 @@ public class EventManagerFragment extends Fragment {
                     Navigation.findNavController(v).navigate(action);
                 }
         );
-        // sets onc lick listener to navigate to show qr fragment
-        binding.shareQrButton.setOnClickListener(
-                v -> {
-                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToShowqrfragment(eventId);
-                    Navigation.findNavController(v).navigate(action);
-                }
-        );
+        if (isPrivate) {
+            binding.shareQrButton.setText("Invite Entrants");
+            binding.shareQrButton.setOnClickListener(
+                    v -> {
+                        NavDirections action = EventManagerFragmentDirections.actionEventManagerFragmentToEventInviteFragment(eventId);
+                        Navigation.findNavController(v).navigate(action);
+                    }
+            );
+        } else {
+            binding.shareQrButton.setText("Share QR Code");
+            // sets onc lick listener to navigate to show qr fragment
+            binding.shareQrButton.setOnClickListener(
+                    v -> {
+                        NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToShowqrfragment(eventId);
+                        Navigation.findNavController(v).navigate(action);
+                    }
+            );
+        }
+
         //sets on click listener to navigate to waiting list fragment
         binding.viewWaitListButton.setOnClickListener(
                 v -> {
@@ -89,12 +112,16 @@ public class EventManagerFragment extends Fragment {
                 binding.drawLotteryButton.setAlpha(0.5f);
                 EventViewModel events = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
                 loader.loadTask(events.drawLottery(userId, deviceId, eventId)
-                                .addOnSuccessListener(_void -> ToastManager.show(requireContext(), "Drew lottery"))
+                                .addOnSuccessListener(_void -> {
+                                    if (!isAdded() || binding == null) return;
+                                    ToastManager.show(getContext(), "Drew lottery");
+                                })
                         .addOnFailureListener(exc -> {
+                            if (!isAdded() || binding == null) return;
                             exc.printStackTrace();
                             binding.drawLotteryButton.setEnabled(true);
                             binding.drawLotteryButton.setAlpha(1.0f);
-                            ToastManager.show(requireContext(), "Failed to draw lottery");
+                            ToastManager.show(getContext(), "Failed to draw lottery");
                         })
                 );
             });
@@ -114,6 +141,13 @@ public class EventManagerFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentEventManagerBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        binding = null;
     }
 
     private void readArgs() {

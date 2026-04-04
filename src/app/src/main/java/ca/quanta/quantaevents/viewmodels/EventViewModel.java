@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.models.Event;
+import ca.quanta.quantaevents.models.ExternalUser;
+
 import androidx.annotation.Nullable;
 
 /**
@@ -85,7 +87,7 @@ public class EventViewModel extends ViewModel {
                                   String eventName, String eventDescription,
                                   String eventCategory, String eventGuidelines,
                                   boolean geolocation, int eventCapacity,
-                                  String location, Integer registrationLimit, UUID imageId) {
+                                  String location, Integer registrationLimit, UUID imageId, boolean isPrivate) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -103,16 +105,42 @@ public class EventViewModel extends ViewModel {
         payload.put("location", location);
         payload.put("registrationLimit", registrationLimit);
         payload.put("imageId", imageId == null ? null : imageId.toString());
+        payload.put("isPrivate", isPrivate);
         data.put("data", payload);
 
         return functions
                 .getHttpsCallable("createEvent")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, UUID>() {
+                .onSuccessTask(callResult -> {
+                    Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                    return Tasks.forResult(UUID.fromString((String) result.get("eventId")));
+                });
+    }
+
+    /**
+     * Calls the deleteEvent cloud function and deletes the event (and its image)
+     * from the database.
+     * @param eventId UUID to identify the event to delete.
+     * @param userId UUID to identify this user.
+     * @param deviceId UUID to identify this user's device.
+     * @return True if successful, and error if unsuccessful.
+     */
+    public Task<Boolean> deleteEvent(UUID eventId, UUID userId, UUID deviceId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("deleteEvent")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, Boolean>() {
                     @Override
-                    public UUID then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
-                        return UUID.fromString((String) result.get("eventId"));
+                    public Boolean then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                        return true;
                     }
                 });
     }
@@ -137,13 +165,10 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getEvent")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Event>() {
-                    @Override
-                    public Event then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        Map<String, Object> eventData = (Map<String, Object>) task.getResult().getData();
+                .onSuccessTask(callResult -> {
+                    Map<String, Object> eventData = (Map<String, Object>) callResult.getData();
 
-                        return new Event(eventId, eventData);
-                    }
+                    return Tasks.forResult(new Event(eventId, eventData));
                 });
     }
 
@@ -164,7 +189,7 @@ public class EventViewModel extends ViewModel {
     public Task<List<Event>> getEvents(UUID userId, UUID deviceId, int max,
                                        UUID startFrom, Fetch fetch,
                                        String startDate, String endDate,
-                                       String search, SortBy sortBy) {
+                                       String search, Integer capacity, SortBy sortBy) {
         Map<String, Object> data = new HashMap<>();
 
         data.put("userId", userId.toString());
@@ -188,6 +213,7 @@ public class EventViewModel extends ViewModel {
         filter.put("startDate", startDate);
         filter.put("endDate", endDate);
         filter.put("search", search);
+        filter.put("capacity", capacity);
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("max", max);
@@ -201,24 +227,21 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getEvents")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, List<Event>>() {
-                    @Override
-                    public List<Event> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        List<Map<String, Object>> result = (List<Map<String, Object>>) task.getResult().getData();
-                        Log.d("EventViewModel", "getEvents result=" + result);
-                        ArrayList<Event> events = new ArrayList<>();
-                        if (result == null) {
-                            return events;
-                        }
-                        for (Map<String, Object> item : result) {
-                            Event event = new Event(item);
-                            if (event != null) {
-                                events.add(event);
-                            }
-                        }
-                        System.out.println("EVENTS ARRAY" + events);
-                        return events;
+                .onSuccessTask(callResult -> {
+                    List<Map<String, Object>> result = (List<Map<String, Object>>) callResult.getData();
+                    Log.d("EventViewModel", "getEvents result=" + result);
+                    ArrayList<Event> events = new ArrayList<>();
+                    if (result == null) {
+                        return Tasks.forResult(events);
                     }
+                    for (Map<String, Object> item : result) {
+                        Event event = new Event(item);
+                        if (event != null) {
+                            events.add(event);
+                        }
+                    }
+                    System.out.println("EVENTS ARRAY" + events);
+                    return Tasks.forResult(events);
                 });
     }
 
@@ -242,13 +265,10 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getOrganizerName")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, String>() {
-                    @Override
-                    public String then(@NonNull Task<HttpsCallableResult> task) {
-                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
+                .onSuccessTask(callResult -> {
+                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
                         Object name = result == null ? null : result.get("name");
-                        return name == null ? null : name.toString();
-                    }
+                        return Tasks.forResult(name == null ? null : name.toString());
                 });
     }
 
@@ -272,13 +292,10 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getWaitlistCount")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Integer>() {
-                    @Override
-                    public Integer then(@NonNull Task<HttpsCallableResult> task) {
-                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
+                .onSuccessTask(callResult -> {
+                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
                         Object count = result == null ? null : result.get("count");
-                        return count instanceof Number ? ((Number) count).intValue() : 0;
-                    }
+                        return Tasks.forResult(count instanceof Number ? ((Number) count).intValue() : 0);
                 });
     }
 
@@ -305,16 +322,14 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("checkWaitlist")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Boolean>() {
-                    @Override
-                    public Boolean then(@NonNull Task<HttpsCallableResult> task) {
-                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
+                .onSuccessTask(callResult -> {
+                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
                         Log.d("EventViewModel", "checkWaitlist result=" + result);
                         Object inWaitlist = result == null ? null : result.get("inWaitlist");
-                        return inWaitlist instanceof Boolean ? (Boolean) inWaitlist : false;
-                    }
+                        return Tasks.forResult(inWaitlist instanceof Boolean ? (Boolean) inWaitlist : false);
                 });
     }
+
 
     /**
      * Calls the joinWaitlist cloud function to add a user to an event waitlist.
@@ -351,12 +366,9 @@ public class EventViewModel extends ViewModel {
         return FirebaseFunctions.getInstance()
                 .getHttpsCallable("joinWaitlist")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Void>() {
-                    @Override
-                    public Void then(@NonNull Task<HttpsCallableResult> task) {
+                .onSuccessTask(callResult -> {
                         Log.d("EventViewModel", "joinWaitlist success");
-                        return null;
-                    }
+                        return Tasks.forResult(null);
                 });
     }
 
@@ -383,12 +395,9 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("leaveWaitlist")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Void>() {
-                    @Override
-                    public Void then(@NonNull Task<HttpsCallableResult> task) {
+                .onSuccessTask(callResult -> {
                         Log.d("EventViewModel", "leaveWaitlist success");
-                        return null;
-                    }
+                        return Tasks.forResult(null);
                 });
     }
 
@@ -416,7 +425,7 @@ public class EventViewModel extends ViewModel {
                                   String eventName, String eventDescription,
                                   String eventCategory, String eventGuidelines,
                                   boolean geolocation, int eventCapacity,
-                                  String location, Integer registrationLimit, UUID imageId) {
+                                  String location, Integer registrationLimit, UUID imageId, boolean isPrivate) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -435,6 +444,7 @@ public class EventViewModel extends ViewModel {
         payload.put("location", location);
         payload.put("registrationLimit", registrationLimit);
         payload.put("imageId", imageId == null ? null : imageId.toString());
+        payload.put("isPrivate", isPrivate);
         data.put("data", payload);
 
         return functions
@@ -463,5 +473,68 @@ public class EventViewModel extends ViewModel {
         return functions.getHttpsCallable("drawLottery")
                 .call(data)
                 .onSuccessTask(task -> Tasks.forResult(null));
+    }
+
+    /**
+     *
+     * @param userId UUID to identify user.
+     * @param deviceId UUID to identify user's device.
+     * @param eventId UUID to identify event.
+     * @param invitee UUID to identify invitee.
+     * @return null on success, error on failure
+     */
+    public Task<Void> createInvitation(UUID userId, UUID deviceId, UUID eventId, UUID invitee) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        payload.put("invitee", invitee.toString());
+        data.put("data", payload);
+
+        return functions.getHttpsCallable("createInvitation")
+                .call(data)
+                .onSuccessTask(task -> Tasks.forResult(null));
+    }
+
+    /**
+     * Calls the getWaitlist cloud function and returns users on the requested list.
+     *
+     * @param userId    UUID to identify user.
+     * @param deviceId  UUID to identify user's device.
+     * @param eventId   UUID to identify the event.
+     * @param listType  The list to fetch (waitList, cancelledList, finalList, rejectedList, selectedList).
+     * @return List of ExternalUser objects on the requested list.
+     */
+    public Task<List<ExternalUser>> getWaitlist(UUID userId, UUID deviceId, UUID eventId, String listType) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        payload.put("listType", listType);
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("getWaitlist")
+                .call(data)
+                .onSuccessTask(callResult -> {
+                    Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                    List<Map<String, Object>> users = (List<Map<String, Object>>) result.get("users");
+                    ArrayList<ExternalUser> externalUsers = new ArrayList<>();
+                    if (users == null) return Tasks.forResult(externalUsers);
+                    System.out.println("WAITLIST" + users);
+                    for (Map<String, Object> user : users) {
+                        externalUsers.add(new ExternalUser(
+                                UUID.fromString((String) user.get("userId")),
+                                (String) user.get("name"),
+                                (String) user.get("email"),
+                                (String) user.get("phone")
+                        ));
+                    }
+                    return Tasks.forResult(externalUsers);
+                });
     }
 }

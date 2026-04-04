@@ -126,9 +126,11 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
                             null,
                             null,
                             null,
+                            null,
                             null)
                     .addOnSuccessListener(this::bindEventList)
                     .addOnFailureListener(ex -> {
+                        if (!isAdded() || binding == null) return;
                         Log.e("EntrantEventList", "Failed to load events", ex);
                         if (ex instanceof FirebaseFunctionsException) {
                             FirebaseFunctionsException fex = (FirebaseFunctionsException) ex;
@@ -138,7 +140,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
                             handleMissingUser();
                             return;
                         }
-                        ToastManager.show(requireContext(), "Failed to load events", Toast.LENGTH_LONG);
+                        ToastManager.show(getContext(), "Failed to load events", Toast.LENGTH_LONG);
                     })
         );
     }
@@ -149,16 +151,18 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
         ToastManager.cancel();
         hasLoaded = false;
         binding = null;
+        adapter = null;
     }
 
     private void bindEventList(List<Event> events) {
+        if (!isAdded() || binding == null || adapter == null) return;
         if (events == null) {
             Log.d("EntrantEventList", "Event list is null");
             return;
         }
         Log.d("EntrantEventList", "Loaded events count=" + events.size());
         if (events.isEmpty()) {
-            ToastManager.show(requireContext(), "Not enrolled in any event", Toast.LENGTH_LONG);
+            ToastManager.show(getContext(), "Not enrolled in any event", Toast.LENGTH_LONG);
             adapter.setItems(new ArrayList<>());
             return;
         }
@@ -185,6 +189,7 @@ public class EntrantEventListFragment extends Fragment implements Tagged {
     private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
+                    if (!isAdded() || binding == null || adapter == null) return;
                     Object imageData = data.getImageData();
                     if (imageData == null) {
                         return;

@@ -58,28 +58,31 @@ public class EventNotificationEditorFragment extends Fragment {
         );
 
         binding.saveButton.setOnClickListener(_view -> {
-
+            binding.saveButton.setEnabled(false);
             String title = normalizeEmpty(Optional.ofNullable(binding.inputTitle.getText()).map(e -> e.toString().trim()).orElse(null));
             String message = normalizeEmpty(Optional.ofNullable(binding.inputMessage.getText()).map(e -> e.toString().trim()).orElse(null));
 
             Boolean cancelled = binding.checkCancelled.isChecked();
             Boolean waited = binding.checkWaitingList.isChecked();
             Boolean selected = binding.checkSelected.isChecked();
+            Boolean finale = binding.checkFinal.isChecked();
 
             model.createNotification(userId, deviceId, message,
                     title, eventId.toString(),
-                    waited, cancelled, selected)
+                    waited, cancelled, selected, finale)
                     .addOnSuccessListener(notificationId -> {
+                        if (!isAdded() || binding == null) return;
                         binding.saveButton.setEnabled(true);
-                        Toast.makeText(requireContext(), "Notification created", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Notification created", Toast.LENGTH_LONG).show();
                         if (isAdded()) {
                             Navigation.findNavController(requireView()).popBackStack();
                         }
                     })
                     .addOnFailureListener(ex -> {
+                        if (!isAdded() || binding == null) return;
                         binding.saveButton.setEnabled(true);
                         Log.e("TAG", "Failed to create notification", ex);
-                        Toast.makeText(requireContext(), "Failed to create notification", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Failed to create notification", Toast.LENGTH_LONG).show();
                     });
 
         });
@@ -91,6 +94,12 @@ public class EventNotificationEditorFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentNotificationEditorBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 
     private void readEventId() {

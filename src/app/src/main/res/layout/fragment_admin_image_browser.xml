@@ -14,7 +14,7 @@
         android:fadingEdge="vertical"
         android:requiresFadingEdge="vertical"
         android:fadingEdgeLength="20dp"
-        android:clipToPadding="false"
+        android:clipToPadding="true"
         android:scrollbars="vertical"
         android:overScrollMode="ifContentScrolls"
         app:layout_constraintTop_toTopOf="parent"

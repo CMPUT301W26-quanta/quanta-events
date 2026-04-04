@@ -16,14 +16,19 @@ declare global {
 		notifToken: string | null;
 	}
 
-    interface EntrantMap {
+	interface EntrantMap {
+		/** List of UUIDs of the events this entrant is actively entered in */
 		enteredEvents: string[];
+		/** List of UUIDs of the events this entrant has previously entered in */
 		history: string[];
+		/** Whether the user should recieve notifications or not */
 		receiveNotifications: boolean;
 	}
 
 	interface OrganizerMap {
+		/** List of the UUIDS of the events created by this organizer */
 		createdEvents: string[];
+		/** List of the UUIDs of the MESSAGE type notifications sent by this organizer */
 		sentNotifications: string[];
 	}
 
@@ -36,50 +41,99 @@ declare global {
 	};
 
 	interface EventDocument {
+		// Identification props
+		/** The UUID of the event (same as the document id) */
 		eventId: string;
-		organizer: string;
-		waitList: string[];
-		selectedList: string[];
-		rejectedList: string[];
-		cancelledList: string[];
-		finalList: string[];
-		registrationStartTime: Timestamp;
-		registrationEndTime: Timestamp;
-		eventTime: Timestamp;
-		eventName: string;
-		eventDescription: string;
-		eventGuidelines: string | null;
-		location: string;
-		eventCategory: string | null;
-		geolocation: boolean;
-		eventCapacity: number;
-		registrationLimit: number | null;
-		imageId: string | null;
-		drawn?: boolean;
-	}
 
-	interface ExternalUser {
-		userId: string;
-		name: string | null;
-		isAdmin: boolean;
-		isOrganizer: boolean;
-		isEntrant: boolean;
+		/** The UUID of the organizer */
+		organizer: string;
+
+		// Registration props
+		/** List of the UUIDs of entrants enrolled in this event */
+		waitList: string[];
+		/** List of the UUIDs of entrants selected for this event */
+		selectedList: string[];
+		/** List of the UUIDs of entrants rejected from this event */
+		rejectedList: string[];
+		/** List of the UUIDs of entrants cancelled in this event */
+		cancelledList: string[];
+		/** List of the UUIDs of entrants accepted in this event */
+		finalList: string[];
+		/** Timestamp marking the start of the registration timeframe */
+		registrationStartTime: Timestamp;
+		/** Timestamp marking the end of the registration timeframe */
+		registrationEndTime: Timestamp;
+
+		// Event detail props
+		/** Timestamp marking the time of the event's occurence */
+		eventTime: Timestamp;
+		/** The name of the event */
+		eventName: string;
+		/** The description of the event */
+		eventDescription: string;
+		/** The guidelines of the event, if any */
+		eventGuidelines: string | null;
+		/** The location of the event */
+		location: string;
+		/** The category of the event, if applicable */
+		eventCategory: string | null;
+		/** If there is a geolocation requirement for this event */
+		geolocation: boolean;
+		/** The capacity of the event */
+		eventCapacity: number;
+		/** The registration limit of the event */
+		registrationLimit: number | null;
+		/** The id of the image of the event, if applicable */
+		imageId: string | null;
+
+		// Extra
+		/** Whether or not the event has been drawn */
+		drawn?: boolean;
+		/** Whether this event is private */
+		isPrivate?: boolean;
 	}
 
 	interface NotificationDocument {
+		/** The UUID of the source event */
 		eventId: string;
+
+		/** The UUIDs of the target users */
+		targetUsers: string[];
 
 		title: string;
 		message: string;
 
+		kind: NotificationAnyKind;
+	}
+
+	type NotificationAnyKind =
+		| NotificationMessageKind
+		| NotificationLotteryKind
+		| NotificationInviteKind;
+
+	interface NotificationMessageKind {
+		kind: "MESSAGE";
+
 		waited: boolean;
 		selected: boolean;
 		cancelled: boolean;
+		final: boolean;
+	}
+
+	interface NotificationLotteryKind {
+		kind: "LOTTERY";
+
+		selected: boolean;
+	}
+
+	interface NotificationInviteKind {
+		kind: "INVITE";
 	}
 
 	/** The form comments are stored as in the database. */
 	interface CommentDocument {
 		senderId: string;
+		postTime: string;
 		message: string;
 	}
 
@@ -90,20 +144,24 @@ declare global {
 
 	// *** External
 
+	/** The user as sent to the frontend */
+	interface ExternalUser {
+		userId: string;
+		name: string | null;
+		phone: string | null;
+		email: string | null;
+		isAdmin: boolean;
+		isOrganizer: boolean;
+		isEntrant: boolean;
+	}
+
 	/** The form sent as comments to the front end. */
 	interface ExternalComment {
 		commentId: string;
 
+		senderName: string;
 		senderId: string;
+		postTime: string;
 		message: string;
-	}
-
-	interface ExternalUser {
-		userId: string;
-
-		name: string | null;
-		isAdmin: boolean;
-		isOrganizer: boolean;
-		isEntrant: boolean;
 	}
 }

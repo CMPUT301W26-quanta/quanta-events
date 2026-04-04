@@ -7,11 +7,13 @@ import java.util.UUID;
  */
 public class ExternalUser {
 
-    private UUID userId;
-    private String name;
-    private Boolean isEntrant;
-    private Boolean isOrganizer;
-    private Boolean isAdmin;
+    private final UUID userId;
+    private final String name;
+    private final Boolean isEntrant;
+    private final Boolean isOrganizer;
+    private final Boolean isAdmin;
+    private final String email;
+    private final String phone;
 
     /**
      * Constructor for an ExternalUser object.
@@ -22,12 +24,25 @@ public class ExternalUser {
      * @param isOrganizer Whether or not the user is an organizer.
      * @param isAdmin Whether or not hte user is an administrator.
      */
-    public ExternalUser(UUID userId, String name, Boolean isEntrant, Boolean isOrganizer, Boolean isAdmin) {
+    public ExternalUser(UUID userId, String name,String email,
+      String phone, Boolean isEntrant, Boolean isOrganizer, Boolean isAdmin) {
         this.userId = userId;
         this.name = name;
+        this.email = email;
+        this.phone = phone;
         this.isEntrant = isEntrant;
         this.isOrganizer = isOrganizer;
         this.isAdmin = isAdmin;
+    }
+
+    public ExternalUser(UUID userId, String name,String email, String phone) {
+        this.userId = userId;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.isEntrant = false;
+        this.isOrganizer = false;
+        this.isAdmin = false;
     }
 
     public UUID getUserId() {
@@ -36,6 +51,14 @@ public class ExternalUser {
 
     public String getName() {
         return this.name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPhone() {
+        return phone;
     }
 
     public Boolean isEntrant() {

@@ -79,9 +79,10 @@ public class AdminNotificationHistoryFragment extends Fragment {
         this.notificationModel.getAllNotifications(this.userId, this.deviceId, profileID)
                 .addOnSuccessListener(this::getAndDisplayNotifications)
                 .addOnFailureListener(exception -> {
+                    if (!isAdded() || binding == null) return;
                     Log.e("AdminNotificationHistoryFragment", "Failed to fetch notifications.", exception);
 
-                    ToastManager.show(requireContext(), "Failed to fetch notifications", Toast.LENGTH_LONG);
+                    ToastManager.show(getContext(), "Failed to fetch notifications", Toast.LENGTH_LONG);
 
                     if (exception instanceof FirebaseFunctionsException) {
                         Log.e("AdminNotificationHistoryFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
@@ -91,7 +92,7 @@ public class AdminNotificationHistoryFragment extends Fragment {
 
     private void getAndDisplayNotifications(ArrayList<Notification> notifications) {
         // **** use the adapter to display them
-
+        if (!isAdded() || binding == null) return;
         NotificationAdapter notificationAdapter = new NotificationAdapter(notifications);
 
         // **** set up the notification recycler view
@@ -102,7 +103,7 @@ public class AdminNotificationHistoryFragment extends Fragment {
         // **** display toast in case there are none
 
         if (notifications.isEmpty()) {
-            ToastManager.show(requireContext(), "No notifications to display.", Toast.LENGTH_LONG);
+            ToastManager.show(getContext(), "No notifications to display.", Toast.LENGTH_LONG);
         }
     }
 
@@ -111,5 +112,12 @@ public class AdminNotificationHistoryFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentAdminNotificationHistoryBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ToastManager.cancel();
+        binding = null;
     }
 }

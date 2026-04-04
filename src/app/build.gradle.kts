@@ -73,4 +73,5 @@ dependencies {
 
     implementation(libs.zxing.android.embedded)
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("de.hdodenhof:circleimageview:3.1.0")
 }

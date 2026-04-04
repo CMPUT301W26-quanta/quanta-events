@@ -1,12 +1,10 @@
 package ca.quanta.quantaevents.viewmodels;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.HttpsCallableResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,9 +27,10 @@ public class CommentViewModel extends ViewModel {
      * @param deviceId This user's device id (for permissions checking).
      * @param eventId The event to post the comment to.
      * @param message The content of the comment.
+     * @param postTime The time at which the comment was posted.
      * @return The ID of the created comment.
      */
-    public Task<UUID> createComment(UUID userId, UUID deviceId, UUID eventId, String message) {
+    public Task<UUID> createComment(UUID userId, UUID deviceId, UUID eventId, String message, String postTime) {
         Map<String, Object> data = new HashMap<>();
 
         data.put("userId", userId.toString());
@@ -40,19 +39,17 @@ public class CommentViewModel extends ViewModel {
         Map<String, Object> payload = new HashMap<>();
         payload.put("eventId", eventId.toString());
         payload.put("message", message);
+        payload.put("postTime", postTime);
 
         data.put("data", payload);
 
         return functions
                 .getHttpsCallable("createComment")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, UUID>() {
+                .onSuccessTask(callResult -> {
                     // Access return value of the function createUser
-                    @Override
-                    public UUID then(@NonNull Task<HttpsCallableResult> task) {
-                        String result = (String) task.getResult().getData();
-                        return UUID.fromString(result);
-                    }
+                    String result = (String) callResult.getData();
+                    return Tasks.forResult(UUID.fromString(result));
                 });
     }
 
@@ -77,23 +74,22 @@ public class CommentViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("getAllComments")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, ArrayList<Comment>>() {
-                    @Override
-                    public ArrayList<Comment> then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        List<Map<String, Object>> commentObjects = (List<Map<String, Object>>) task.getResult().getData();
-                        ArrayList<Comment> comments = new ArrayList<>();
+                .onSuccessTask(callResult -> {
+                    List<Map<String, Object>> commentObjects = (List<Map<String, Object>>) callResult.getData();
+                    ArrayList<Comment> comments = new ArrayList<>();
 
                         for (Map<String, Object> commentObject : commentObjects) {
-                            UUID commentId = UUID.fromString((String) commentObject.get("commentId"));
-                            UUID senderId = UUID.fromString((String) commentObject.get("senderId"));
+                            String commentId = (String)commentObject.get("commentId");
+                            String senderId = (String) commentObject.get("senderId");
                             String message = (String) commentObject.get("message");
+                            String postTime = (String) commentObject.get("postTime");
+                            String senderName = (String) commentObject.get("senderName");
 
-                            comments.add(new Comment(commentId, senderId, message));
+                            comments.add(new Comment(UUID.fromString(commentId), UUID.fromString(senderId), message, postTime, senderName));
                         }
 
-                        return comments;
-                    }
-                });
+                        return Tasks.forResult(comments);
+                    });
     }
 
     /**
@@ -118,11 +114,8 @@ public class CommentViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("deleteComment")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Void>() {
-                    @Override
-                    public Void then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        return null;
-                    }
+                .onSuccessTask(callResult -> {
+                    return Tasks.forResult(null);
                 });
     }
 }

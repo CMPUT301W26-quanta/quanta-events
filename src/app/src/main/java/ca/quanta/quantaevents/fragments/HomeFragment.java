@@ -73,6 +73,12 @@ public class HomeFragment extends Fragment implements Tagged {
         return binding.getRoot();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
     //validates user by checking if they
     // exist in database if not handle it properly.
     private void maybeValidateUser() {
@@ -81,6 +87,7 @@ public class HomeFragment extends Fragment implements Tagged {
         }
         userModel.getUser(userId, deviceId)
                 .addOnFailureListener(ex -> {
+                    if (!isAdded() || binding == null) return;
                     if (isUserNotFound(ex)) {
                         handleMissingUser();
                     }
@@ -98,6 +105,7 @@ public class HomeFragment extends Fragment implements Tagged {
 
     // clears shared_pereferencs file if the userid does not exist on database
     private void handleMissingUser() {
+        if (!isAdded() || binding == null) return;
         sessionStore.clearSession();
         if (isAdded()) {
             Navigation.findNavController(requireView()).navigate(R.id.registerFragment);

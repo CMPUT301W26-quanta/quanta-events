@@ -19,6 +19,7 @@ const getEventsInterface = util.standardForm(
 			startDate: z.iso.datetime({ offset: true }).nullable(),
 			endDate: z.iso.datetime({ offset: true }).nullable(),
 			search: z.string().nullable(),
+			capacity: z.int().nullable(),
 		}),
 		sortBy: z
 			.enum(["registrationEnd", "registrationStart", "name"])
@@ -105,11 +106,15 @@ export async function getEvents(
 		return [];
 	}
 
-	const docs: EventDocument[] = queryResult.docs.map((doc) => doc.data());
+	let docResults: EventDocument[] = queryResult.docs.map((doc) => doc.data());
 
-	let docResults: EventDocument[];
+	if (filter.capacity !== null) {
+		const filterCapacity = filter.capacity;
+		docResults = docResults.filter((doc) => doc.eventCapacity <= filterCapacity);
+	}
+
 	if (filter.search !== null && filter.search.trim().length > 0) {
-		docResults = new Fuse(docs, {
+		docResults = new Fuse(docResults, {
 			keys: [
 				{ name: "eventName", getFn: (data) => data.eventName },
 				{
@@ -121,7 +126,6 @@ export async function getEvents(
 			.search(filter.search)
 			.map((result) => result.item);
 	} else {
-		docResults = docs;
 		switch (sortBy) {
 			case "registrationEnd":
 				docResults.sort((a, b) =>
@@ -137,6 +141,10 @@ export async function getEvents(
 				docResults.sort((a, b) => sort(a.eventName, b.eventName));
 				break;
 		}
+	}
+
+	if (filter.fetch === "available") {
+		docResults = docResults.filter((doc) => !(doc.isPrivate ?? false));
 	}
 
 	docResults = docResults
