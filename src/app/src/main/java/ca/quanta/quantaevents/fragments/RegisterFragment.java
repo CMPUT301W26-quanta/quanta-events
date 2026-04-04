@@ -56,6 +56,7 @@ public class RegisterFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
+        sessionStore.setSession(UUID.fromString("26dee92a-d4d1-4faa-8157-cbd5d8ada4f1"), UUID.fromString("e291f380-2464-44e2-9f6f-874deee512e2"));
         observeSessionAndRedirect();
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);

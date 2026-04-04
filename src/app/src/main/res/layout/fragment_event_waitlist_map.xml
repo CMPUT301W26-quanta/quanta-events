@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginTop="26dp"
+        android:layout_marginRight="6dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/rounded_border_box"
+        android:clipToOutline="true"
+        android:outlineProvider="background"
+        app:layout_constraintBottom_toTopOf="@id/back_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/map_error_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:visibility="gone"
+            android:text="Map unavailable"
+            android:textColor="@color/text_color"
+            android:background="@color/color_dark_gray" />
+
+    </FrameLayout>
+
+    <Button
+        android:id="@+id/back_button"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="20dp"
+        android:text="Back"
+        android:backgroundTint="@color/color_light_purple"
+        android:textColor="@color/text_color"
+        app:cornerRadius="12dp"
+        app:strokeColor="@color/border"
+        app:strokeWidth="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/error_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text=""
+        android:textColor="@color/color_light_red"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frameLayout" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

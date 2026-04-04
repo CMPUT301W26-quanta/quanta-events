@@ -218,6 +218,7 @@ public class EventDetailsFragment extends Fragment {
                 commentModel.getAllComments(this.userId, this.deviceId, this.eventId)
                         .addOnSuccessListener(comments -> {
                             // use the adapter to display them
+                            if (!isAdded() || binding == null) return;
 
                             this.commentAdapter = new CommentAdapter(comments, this, this.eventId, isOrganizer, isAdmin);
 
@@ -226,6 +227,7 @@ public class EventDetailsFragment extends Fragment {
                             binding.commentsRecyclerView.setAdapter(commentAdapter);
                         })
                         .addOnFailureListener(ex -> {
+                                    if (!isAdded() || binding == null) return;
                                     if (isAdded()) {
                                         ToastManager.show(requireContext(), "Failed to load comments", Toast.LENGTH_LONG);
                                         Navigation.findNavController(requireView()).popBackStack();
