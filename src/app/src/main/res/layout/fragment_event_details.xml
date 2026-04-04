@@ -11,6 +11,9 @@
         android:layout_height="0dp"
         android:layout_marginTop="2dp"
         android:fillViewport="true"
+        android:fadingEdge="vertical"
+        android:requiresFadingEdge="vertical"
+        android:fadingEdgeLength="100dp"
         android:backgroundTint="@color/color_dark_gray"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/layout_bottom_buttons"
@@ -190,40 +193,66 @@
 
             <!-- Comments Section -->
             <RelativeLayout
-                android:id = "@+id/enter_comment"
+                android:id="@+id/enter_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@id/textDescription"
-                app:layout_constraintStart_toStartOf="@id/layout_bottom_buttons"
-                app:layout_constraintEnd_toEndOf="@id/layout_bottom_buttons" >
+                android:padding="8dp">
 
                 <de.hdodenhof.circleimageview.CircleImageView
-                    android:id = "@+id/comment_image"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:backgroundTint="@color/color_light_gray"
-                    android:src = "@drawable/material_symbols_person_outline" />
-
-                <EditText
-                    android:id = "@+id/type_comment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_toStartOf="@id/send_comment"
-                    android:layout_toEndOf="@id/comment_image"
-                    android:layout_weight ="1"
-                    android:background="@color/color_light_gray"
-                    android:hint = "Enter Comment ..."
-                    android:inputType="textCapSentences|textMultiLine"
-                    android:padding="15dp"/>
-
-                <ImageButton
-                    android:id = "@+id/send_comment"
+                    android:id="@+id/comment_image"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_alignParentRight="true"
-                    android:background="@color/color_light_gray"
-                    android:padding = "15dp"
-                    android:src = "@drawable/material_symbols_arrow_north_east"/>
+                    android:layout_centerVertical="true"
+                    android:backgroundTint="@color/color_light_gray"
+                    android:src="@drawable/material_symbols_person_outline"/>
+
+                <Button
+                    android:id="@+id/send_comment"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp"
+                    android:gravity="center"
+                    android:layout_marginEnd="8dp"
+                    app:backgroundTint="@color/color_light_green"
+                    app:icon="@drawable/material_symbols_send_rounded"
+                    app:iconTint="@color/color_dark"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:cornerRadius="12dp"
+                    app:elevation="6dp"
+                    android:elevation="6dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layout_type_comment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/comment_image"
+                    android:layout_toStartOf="@id/send_comment"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:hint="Enter comment..."
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxStrokeColor="@color/border"
+                    app:hintTextColor="@color/text_color"
+                    app:boxBackgroundColor="@color/color_light_gray"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/type_comment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapSentences|textMultiLine"
+                        android:textColor="@color/text_color"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
 
             </RelativeLayout>
 
