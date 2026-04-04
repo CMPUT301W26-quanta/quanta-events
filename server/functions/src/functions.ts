@@ -29,4 +29,5 @@ export * from "./functions/joinWaitlist";
 export * from "./functions/leaveWaitlist";
 export * from "./functions/setToken";
 export * from "./functions/updateEvent";
+export * from "./functions/updateRoles";
 export * from "./functions/updateUser";

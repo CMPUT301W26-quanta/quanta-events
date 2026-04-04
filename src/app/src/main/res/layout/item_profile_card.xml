@@ -28,6 +28,13 @@
             android:textSize="16sp"
             android:textColor="@color/text_color" />
 
+        <ImageView
+            android:id="@+id/icon_edit"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/material_symbols_edit_outline" />
+
         <!-- Notifications icon (organizer only - visibility set to gone by the profile adapter -->
         <ImageView
             android:id="@+id/icon_notifications"
