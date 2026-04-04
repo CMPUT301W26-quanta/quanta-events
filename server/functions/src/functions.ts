@@ -28,3 +28,4 @@ export * from "./functions/setToken";
 export * from "./functions/updateEvent";
 export * from "./functions/updateUser";
 export * from "./functions/deleteEvent";
+export * from "./functions/updateRoles";

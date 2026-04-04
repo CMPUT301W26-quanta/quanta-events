@@ -81,6 +81,24 @@ public class AdminProfileBrowserFragment extends Fragment {
             // Set name
             binding.profileName.setText(user.getName());
 
+            binding.iconEdit.setOnClickListener(view -> {
+                int profilePosition = this.getBindingAdapterPosition();
+
+                if (profilePosition == RecyclerView.NO_POSITION) {
+                    return;
+                }
+
+                if (this.userId == null || this.deviceId == null) {
+                    Toast.makeText(binding.getRoot().getContext(), "Still loading user. Please try again.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                // Navigate to new screen
+                UUID targetUserId = user.getUserId();
+                NavDirections action = ca.quanta.quantaevents.fragments.AdminProfileBrowserFragmentDirections.actionAdminprofilebrowserFragmentToAdminAccountEditFragment(targetUserId);
+                Navigation.findNavController(view).navigate(action);
+            });
+
             // Setup close button
             binding.iconClose.setOnClickListener(view -> {
                 int profilePosition = this.getBindingAdapterPosition();
