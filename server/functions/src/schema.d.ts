@@ -1,6 +1,6 @@
 // the actual underlying forms of each of the documents
 
-import { Timestamp } from "firebase-admin/firestore";
+import { CollectionReference, Timestamp } from "firebase-admin/firestore";
 
 type NotNull<V> = V extends null ? never : V;
 
@@ -21,6 +21,8 @@ declare global {
 		enteredEvents: string[];
 		/** List of UUIDs of the events this entrant has previously entered in */
 		history: string[];
+		/** List of UUIDs of the notifications this entrant has not handled yet. */
+		undismissedNotifications: string[];
 		/** Whether the user should recieve notifications or not */
 		receiveNotifications: boolean;
 	}
@@ -146,6 +148,32 @@ declare global {
 
 	// *** External
 
+	/** The form sent as comments to the front end. */
+	interface ExternalComment {
+		commentId: string;
+
+		senderName: string;
+		senderId: string;
+		postTime: string;
+		message: string;
+	}
+
+	interface ExternalNotification {
+		title: string;
+		message: string;
+	}
+
+	interface ExternalUndismissedNotification {
+		notificationId: string;
+		eventId: string;
+
+		title: string;
+		message: string;
+
+		kind: "MESSAGE" | "LOTTERY" | "INVITE";
+		lotterySelected: boolean | null;
+	}
+
 	/** The user as sent to the frontend */
 	interface ExternalUser {
 		userId: string;
@@ -157,13 +185,16 @@ declare global {
 		isEntrant: boolean;
 	}
 
-	/** The form sent as comments to the front end. */
-	interface ExternalComment {
-		commentId: string;
+	// collections
 
-		senderName: string;
-		senderId: string;
-		postTime: string;
-		message: string;
-	}
+	type CommentDocCollection = CollectionReference<
+		CommentDocument,
+		CommentDocument
+	>;
+	type EventDocCollection = CollectionReference<EventDocument, EventDocument>;
+	type NotificationDocCollection = CollectionReference<
+		NotificationDocument,
+		NotificationDocument
+	>;
+	type UserDocCollection = CollectionReference<UserDocument, UserDocument>;
 }

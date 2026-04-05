@@ -51,12 +51,13 @@ public class AccountFragment extends Fragment implements Tagged {
         infoStore.setSubtitle("Change account details");
         infoStore.setIconRes(R.drawable.material_symbols_person_outline);
 
-        sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
-        userModel = new ViewModelProvider(this).get(UserViewModel.class);
+        this.sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
+        this.userModel = new ViewModelProvider(this).get(UserViewModel.class);
+
         // verify and check session
-        sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
-            userId = uid;
-            deviceId = did;
+        this.sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
+            this.userId = uid;
+            this.deviceId = did;
             maybeLoadUser();
         });
         SwitchMaterial darkModeSwitch = view.findViewById(R.id.switchDarkMode);
@@ -65,12 +66,13 @@ public class AccountFragment extends Fragment implements Tagged {
             ThemeSwitch.setDarkMode(requireContext(), isChecked);
         });
         // set on click listener for back button
-        binding.deleteButton.setOnClickListener(
+        this.binding.deleteButton.setOnClickListener(
                 v -> {
                     deleteUser();
                 }
         );
-        binding.saveButton.setOnClickListener(
+
+        this.binding.saveButton.setOnClickListener(
                 v -> {
                     updateUser();
                 }

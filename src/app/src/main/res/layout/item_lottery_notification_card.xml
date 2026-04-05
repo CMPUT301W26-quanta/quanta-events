@@ -19,37 +19,46 @@
         android:padding="12dp"
         android:gravity="center_vertical">
 
-        <!-- Name -->
+        <!-- Message -->
         <TextView
-            android:id="@+id/profile_name"
+            android:id="@+id/notification_message"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:text="Loading message..."
             android:textSize="16sp"
             android:textColor="@color/text_color" />
 
+        <!-- Accept icon -->
         <ImageView
-            android:id="@+id/icon_edit"
+            android:id="@+id/icon_accept"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="12dp"
-            android:src="@drawable/material_symbols_edit_outline" />
+            android:src="@drawable/material_symbols_check_small" />
 
-        <!-- Notifications icon (organizer only - visibility set to gone by the profile adapter -->
+        <!-- Decline icon -->
         <ImageView
-            android:id="@+id/icon_notifications"
+            android:id="@+id/icon_decline"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="12dp"
-            android:src="@drawable/material_symbols_notifications_outline" />
+            android:src="@drawable/material_symbols_close_small" />
 
-        <!-- X / Delete icon -->
+        <!-- Dismiss icon -->
         <ImageView
-            android:id="@+id/icon_close"
+            android:id="@+id/icon_dismiss"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:contentDescription="Delete"
-            android:src="@drawable/material_symbols_close" />
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/material_symbols_delete" />
+
+        <!-- Event icon -->
+        <ImageView
+            android:id="@+id/icon_event"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/material_symbols_event_outline" />
 
     </LinearLayout>
 

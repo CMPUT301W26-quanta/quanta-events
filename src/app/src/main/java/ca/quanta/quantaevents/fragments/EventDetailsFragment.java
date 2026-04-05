@@ -6,7 +6,6 @@ import static android.view.View.VISIBLE;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,7 +15,6 @@ import android.widget.Toast;
 import android.Manifest;
 import android.content.pm.PackageManager;
 
-import android.app.ProgressDialog;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -32,22 +30,15 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.CommentAdapter;
-import ca.quanta.quantaevents.adapters.ImageCardAdapter;
-import ca.quanta.quantaevents.adapters.NotificationAdapter;
 import ca.quanta.quantaevents.burger.SmartBurger;
 import ca.quanta.quantaevents.databinding.FragmentEventDetailsBinding;
 import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Comment;
 import ca.quanta.quantaevents.models.Event;
-import ca.quanta.quantaevents.models.Notification;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.utils.GeocoderUtil;
@@ -68,12 +59,8 @@ public class EventDetailsFragment extends Fragment {
     private SessionStore sessionStore;
     private EventViewModel eventModel;
     private ImageViewModel imageModel;
-
     private CommentViewModel commentModel;
-
     private CommentAdapter commentAdapter;
-
-
     private UUID userId;
     private UUID deviceId;
     private UUID eventId;
@@ -114,14 +101,12 @@ public class EventDetailsFragment extends Fragment {
 
         this.model = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
-
-        //set up the session store and get this user
+        // set up the session store and get this user
 
         this.sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
         this.eventModel = new ViewModelProvider(this).get(EventViewModel.class);
         this.imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
         this.commentModel = new ViewModelProvider(this).get(CommentViewModel.class);
-
 
         // reads event id passed in form of arguments using bundles
         readEventId();
@@ -138,7 +123,6 @@ public class EventDetailsFragment extends Fragment {
             isAdmin = mask != null && (mask & SmartBurger.ADMIN_GROUP) != 0;
             updateManageButton(null);
         });
-
 
         // set up back button on click listener
 
@@ -195,7 +179,9 @@ public class EventDetailsFragment extends Fragment {
             Navigation.findNavController(requireView()).navigate(action);
             return;
         }
+
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
+
         loader.loadTask(
             this.eventModel.getEvent(this.eventId, this.userId, this.deviceId)
                     .addOnSuccessListener(event -> {this.bindEvent(event);loadComments(); })
@@ -207,46 +193,52 @@ public class EventDetailsFragment extends Fragment {
         );
     }
 
-    //load the comment details
+    // load the comment details
 
-    private void loadComments(){
+    private void loadComments() {
         if (this.userId == null || this.deviceId == null) {
             NavDirections action = EventDetailsFragmentDirections.actionGlobalRegisterFragment();
             Navigation.findNavController(requireView()).navigate(action);
             return;
         }
+
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(
                 commentModel.getAllComments(this.userId, this.deviceId, this.eventId)
                         .addOnSuccessListener(comments -> {
+                            if (!this.isAdded() || this.binding == null) return;
+
                             // use the adapter to display them
                             if (!isAdded() || binding == null) return;
 
-                            this.commentAdapter = new CommentAdapter(comments, this, this.eventId, isOrganizer, isAdmin);
+                            this.commentAdapter = new CommentAdapter(
+                                    comments,
+                                    this,
+                                    this.commentModel,
+                                    this.eventId,
+                                    this.userId,
+                                    this.deviceId,
+                                    isOrganizer,
+                                    isAdmin
+                            );
 
-
-                            binding.commentsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                            binding.commentsRecyclerView.setAdapter(commentAdapter);
+                            this.binding.commentsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                            this.binding.commentsRecyclerView.setAdapter(commentAdapter);
                         })
                         .addOnFailureListener(ex -> {
-                                    if (!isAdded() || binding == null) return;
-                                    if (isAdded()) {
-                                        ToastManager.show(requireContext(), "Failed to load comments", Toast.LENGTH_LONG);
-                                        Navigation.findNavController(requireView()).popBackStack();
-                                    }
-                                }
-                        )
+                            if (!this.isAdded() || this.binding == null) return;
+
+                            ToastManager.show(this.getContext(), "Failed to load comments", Toast.LENGTH_LONG);
+                            Navigation.findNavController(requireView()).popBackStack();
+                        })
         );
 
         binding.sendComment.setOnClickListener(v ->{
-
             String message = binding.typeComment.getText().toString();
             binding.typeComment.setText("");
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
             String postTime = now.format(formatter);
-
-
 
             model.getUser(this.userId, this.deviceId).addOnSuccessListener(user -> {
                  String name = user.getName();
@@ -255,27 +247,21 @@ public class EventDetailsFragment extends Fragment {
                     Comment comment = new Comment(commentId, this.userId, message, postTime, name);
                     this.commentAdapter.addComment(comment);
                 })
+                        .addOnFailureListener(exception -> {
+                            Log.e("EventDetailsFragment", "Failed to delete an comment.", exception);
 
-                .addOnFailureListener(exception -> {
-                    Log.e("EventDetailsFragment", "Failed to delete an comment.", exception);
+                            Toast.makeText(getContext(), "Failed to add comment: " + exception.getMessage(), Toast.LENGTH_LONG).show();
 
-                    Toast.makeText(this.requireContext(), "Failed to add comment: " + exception.getMessage(), Toast.LENGTH_LONG).show();
-
-                    if (exception instanceof FirebaseFunctionsException) {
-                        Log.e("EventDetailsFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
-                    }
-                });
+                            if (exception instanceof FirebaseFunctionsException) {
+                                Log.e("EventDetailsFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
+                            }
+                        });
             });
-
-
-
-
         });
     }
 
-
     // bind the event details to the
-    // ui elemtents in the view
+    // ui elements in the view
     private void bindEvent(Event event) {
         if (!isAdded() || binding == null) return;
         if (event == null) {
