@@ -1,7 +1,7 @@
+import { logger } from "firebase-functions";
 import { CallableRequest } from "firebase-functions/https";
 import * as z from "zod";
 import * as util from "../util";
-import { logger } from "firebase-functions";
 
 const getUserInterface = z.object({
 	userId: z.uuid(),

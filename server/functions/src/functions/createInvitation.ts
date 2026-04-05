@@ -1,9 +1,9 @@
+import { getFirestore } from "firebase-admin/firestore";
+import { logger } from "firebase-functions";
+import { CallableRequest, HttpsError } from "firebase-functions/https";
+import { v4 as uuidv4 } from "uuid";
 import * as z from "zod";
 import * as util from "../util";
-import { CallableRequest, HttpsError } from "firebase-functions/https";
-import { CollectionReference, getFirestore } from "firebase-admin/firestore";
-import { v4 as uuidv4 } from "uuid";
-import { logger } from "firebase-functions";
 
 const createInvitationInterface = util.standardForm(
 	z.object({
@@ -13,42 +13,65 @@ const createInvitationInterface = util.standardForm(
 );
 
 export async function createInvitation(request: CallableRequest) {
-	const {
-		userId,
-		deviceId,
-		data: { eventId, invitee },
-	} = util.parseInterface(createInvitationInterface, request);
+	const { userId, deviceId, data } = util.parseInterface(
+		createInvitationInterface,
+		request,
+	);
+
 	const userData = await util.verifyUser(userId, deviceId);
 	util.requireRole(userData, "organizer");
 
+	const notificationId = uuidv4();
+
+	logger.info(
+		`Creating invite ${notificationId} on event ${data.eventId} to user ${data.invitee}.`,
+	);
+
 	const db = getFirestore();
 
-	const eventDocuments = db.collection("events") as CollectionReference<
-		EventDocument,
-		EventDocument
-	>;
-	const eventDocument = (await eventDocuments.doc(eventId).get()).data()!;
+	const eventCollection = db.collection("events") as EventDocCollection;
+	const eventRef = eventCollection.doc(data.eventId);
+	const event = await eventRef.get();
 
-	const inviteNotif: NotificationDocument = {
-		eventId,
-		title: eventDocument.eventName,
-		message: "You were invited to a private event!",
-		targetUsers: [invitee],
-		kind: {
-			kind: "INVITE",
-		},
-	};
-
-	try {
-		await db.collection("notifications").doc(uuidv4()).create(inviteNotif);
-	} catch (e) {
-		logger.error("Notification cannot be created, as it already exists", e);
-		throw new HttpsError("already-exists", "Notification already exists");
+	if (!event.exists) {
+		throw new HttpsError("not-found", "The target event does not exist");
 	}
 
-	util.sendNotification(
-		inviteNotif.targetUsers[0],
-		inviteNotif.title,
-		inviteNotif.message,
-	);
+	const eventDoc = event.data()!;
+
+	const notificationCollection = db.collection(
+		"notifications",
+	) as NotificationDocCollection;
+	const notificationRef = notificationCollection.doc(notificationId);
+
+	try {
+		await notificationRef.create(
+			util.enforceFull<NotificationDocument>({
+				eventId: data.eventId,
+
+				targetUsers: [data.invitee],
+
+				title: eventDoc.eventName,
+				message: "You were invited to a private event!",
+
+				kind: { kind: "INVITE" },
+			}),
+		);
+	} catch (e) {
+		logger.error(
+			"Failed to send invite notification because it already exists.",
+			e,
+		);
+		throw new HttpsError(
+			"already-exists",
+			"Invite notification already exists",
+		);
+	}
+
+	const notification = await notificationRef.get();
+	const notificationDoc = notification.data()!;
+
+	await util.sendNotification(data.invitee, notificationId, notificationDoc);
+
+	return {};
 }
