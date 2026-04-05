@@ -1,5 +1,7 @@
 package ca.quanta.quantaevents.viewmodels;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModel;
@@ -32,14 +34,11 @@ public class UserViewModel extends ViewModel {
      * @param name             Name of the user.
      * @param email            Email address of the user.
      * @param phone            Phone number of the user.
-     * @param isEntrant        Boolean that's true when the user selects to be an Entrant. (Will be removed in final checkpoint)
-     * @param isOrganizer      Boolean that's true when the user selects to be an Organizer. (Will be removed in final checkpoint)
-     * @param isAdmin          Boolean that's true when the user selects to be an Admin. (Will be removed in final checkpoint)
      * @param getNotifications Boolean that's true when the user selects to receive notifications. (Will be removed in final checkpoint)
      * @param deviceId         UUID identifying the user's device.
      * @return UUID assigned to newly created user.
      */
-    public Task<UUID> createUser(String name, String email, String phone, Boolean isEntrant, Boolean isOrganizer, Boolean isAdmin, Boolean getNotifications, UUID deviceId) {
+    public Task<UUID> createUser(String name, String email, String phone, Boolean getNotifications, UUID deviceId) {
         // Arguments for createUser passed in data Map
         Map<String, Object> data = new HashMap<>();
 
@@ -48,9 +47,6 @@ public class UserViewModel extends ViewModel {
         data.put("email", email);
         data.put("phone", phone);
         data.put("receiveNotifications", getNotifications);
-        data.put("isEntrant", isEntrant);
-        data.put("isOrganizer", isOrganizer);
-        data.put("isAdmin", isAdmin);
 
         return functions
                 .getHttpsCallable("createUser")
@@ -210,6 +206,39 @@ public class UserViewModel extends ViewModel {
                 .onSuccessTask(callResult -> {
                         Map<String, Object> result = (Map<String, Object>) callResult.getData();
                         return Tasks.forResult(null);
+                });
+    }
+
+    /**
+     * Calls the updateRoles cloud function, updating the roles of a user.
+     * @param userId UUID to identify the invoker.
+     * @param deviceId UUID to identify the invoker's device.
+     * @param targetUserId UUID identifying the user to be updated.
+     * @param isEntrant Boolean that's true if the user should be an entrant.
+     * @param isOrganizer Boolean that's true if the user should be an organizer.
+     * @param isAdmin Boolean that's true if the user should be an admin.
+     * @return Void task object.
+     */
+    public Task<Void> updateRoles(UUID userId, UUID deviceId, UUID targetUserId, Boolean isEntrant,
+                                  Boolean isOrganizer, Boolean isAdmin) {
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("targetUserId", targetUserId.toString());
+        payload.put("isEntrant", isEntrant);
+        payload.put("isOrganizer", isOrganizer);
+        payload.put("isAdmin", isAdmin);
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("updateRoles")
+                .call(data)
+                .onSuccessTask(callResult -> {
+                    Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                    return Tasks.forResult(null);
                 });
     }
 

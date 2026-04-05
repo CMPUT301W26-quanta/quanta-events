@@ -29,3 +29,4 @@ export * from "./functions/updateEvent";
 export * from "./functions/updateUser";
 export * from "./functions/deleteEvent";
 export * from "./functions/getWaitlistMap";
+export * from "./functions/updateRoles";

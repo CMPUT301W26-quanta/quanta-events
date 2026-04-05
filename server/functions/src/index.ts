@@ -124,3 +124,5 @@ export const getWaitlistMap = onCall({ maxInstances: 1}, functions.getWaitlistMa
 export const getEvents = onCall({ maxInstances: 1 }, functions.getEvents);
 
 export const setToken = onCall({ maxInstances: 1 }, functions.setToken);
+
+export const updateRoles = onCall({ maxInstances: 1 }, functions.updateRoles);
