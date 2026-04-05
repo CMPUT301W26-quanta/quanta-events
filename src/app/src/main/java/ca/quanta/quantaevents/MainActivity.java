@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         // our app is not designed to support dark mode properly.
         // eg. the background becomes dark, but the text remains dark so you can't read it
         // So force light mode
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         setContentView(binding.getRoot());
 
         try {

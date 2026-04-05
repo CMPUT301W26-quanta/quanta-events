@@ -1,7 +1,9 @@
 package ca.quanta.quantaevents.fragments;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.icu.util.Calendar;
@@ -19,10 +21,13 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -75,7 +80,8 @@ public class EventCreateEditorFragment extends Fragment {
     private Marker selectedMarker;
 
     private SessionStore sessionStore;
-
+    private FusedLocationProviderClient fusedLocationClient;
+    private ActivityResultLauncher<String> locationPermissionLauncher;
     public EventCreateEditorFragment() {}
 
     @Override
@@ -89,6 +95,7 @@ public class EventCreateEditorFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         eventModel = new ViewModelProvider(this).get(EventViewModel.class);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
         imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
 
@@ -121,18 +128,34 @@ public class EventCreateEditorFragment extends Fragment {
                 pickerMap = googleMap;
                 pickerMap.getUiSettings().setZoomControlsEnabled(true);
 
-                // Restore pin if editing or if user already picked before rotation
-                if (selectedLatLng != null) {
-                    placePin(selectedLatLng);
-                    pickerMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, 13f));
-                }
-
                 pickerMap.setOnMapClickListener(latLng -> {
                     selectedLatLng = latLng;
                     placePin(latLng);
                     binding.textSelectedLocation.setText(
                             String.format("%.5f, %.5f", latLng.latitude, latLng.longitude));
                 });
+
+                // If editing and pin already set, show it and go there
+                if (selectedLatLng != null) {
+                    placePin(selectedLatLng);
+                    pickerMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, 13f));
+                    return; // don't move to user location if we already have a pin
+                }
+
+                // Otherwise move to user's location
+                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    fusedLocationClient.getCurrentLocation(
+                                    com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY, null)
+                            .addOnSuccessListener(location -> {
+                                if (location != null && pickerMap != null) {
+                                    LatLng userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                    pickerMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 13f));
+                                }
+                            });
+                } else {
+                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+                }
             });
         } else {
             binding.mapErrorText.setVisibility(View.VISIBLE);
@@ -163,6 +186,26 @@ public class EventCreateEditorFragment extends Fragment {
                         ToastManager.show(getContext(), "Failed to read image", Toast.LENGTH_LONG);
                     }
                 });
+        locationPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                granted -> {
+                    if (granted && pickerMap != null) {
+                        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                                == PackageManager.PERMISSION_GRANTED) {
+                            fusedLocationClient.getCurrentLocation(
+                                    com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY, null
+                            ).addOnSuccessListener(location -> {
+                                if (location != null && pickerMap != null) {
+                                    LatLng userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                    pickerMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 13f));
+                                }
+                            });
+                        }
+                    } else {
+                        ToastManager.show(getContext(), "Location permission denied", Toast.LENGTH_LONG);
+                    }
+                }
+        );
     }
 
     private void saveEvent() {
@@ -346,7 +389,6 @@ public class EventCreateEditorFragment extends Fragment {
                 placePin(selectedLatLng);
                 pickerMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, 13f));
             }
-            // If pickerMap isn't ready yet, onMapReady will restore it from selectedLatLng
         }
 
         UUID imageUuid = event.getImageId();
