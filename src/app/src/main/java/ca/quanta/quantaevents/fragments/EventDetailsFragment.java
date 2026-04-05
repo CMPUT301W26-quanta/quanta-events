@@ -481,7 +481,7 @@ public class EventDetailsFragment extends Fragment {
                             {
                                 if (!isAdded() || binding == null) return;
                                 Log.e("EventDetails", "leaveWaitlist: failed", ex);
-                                ToastManager.show(getContext(), "Failed to leave waitlist", Toast.LENGTH_LONG);
+                                ToastManager.show(getContext(), ex.getMessage(), Toast.LENGTH_LONG);
                             }
                     );
         } else {
