@@ -282,7 +282,8 @@
                 android:text="Private Event"
                 android:textColor="@color/text_color"
                 android:textSize="16sp"
-                app:thumbTint="@color/color_light"
+                app:thumbTint="@color/switch_thumb_color"
+                app:trackTint="@color/switch_track_color"
                 android:paddingVertical="12dp" />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -294,8 +295,17 @@
                 android:text="Enable Geolocation"
                 android:textColor="@color/text_color"
                 android:textSize="16sp"
-                app:thumbTint="@color/color_light"
+                app:thumbTint="@color/switch_thumb_color"
+                app:trackTint="@color/switch_track_color"
                 android:paddingVertical="12dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Enabling this will allow entrants only within 15km radius to join"
+                android:textColor="@color/color_dark_gray"
+                android:textSize="12sp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="8dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"

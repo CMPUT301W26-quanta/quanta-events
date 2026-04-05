@@ -13,6 +13,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
+import ca.quanta.quantaevents.utils.ThemeSwitch;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.functions.FirebaseFunctionsException;
 
 import java.util.UUID;
@@ -57,7 +59,11 @@ public class AccountFragment extends Fragment implements Tagged {
             deviceId = did;
             maybeLoadUser();
         });
-
+        SwitchMaterial darkModeSwitch = view.findViewById(R.id.switchDarkMode);
+        binding.switchDarkMode.setChecked(ThemeSwitch.isDarkMode(requireContext()));
+        binding.switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            ThemeSwitch.setDarkMode(requireContext(), isChecked);
+        });
         // set on click listener for back button
         binding.deleteButton.setOnClickListener(
                 v -> {
