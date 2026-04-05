@@ -1,18 +1,12 @@
 package ca.quanta.quantaevents.adapters;
 
-import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.widget.Toast;
@@ -24,47 +18,43 @@ import java.util.List;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
+import ca.quanta.quantaevents.fragments.EventDetailsFragment;
 import ca.quanta.quantaevents.models.Comment;
-import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.CommentViewModel;
-import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder> {
-
     List<Comment> list;
 
-    private Fragment parentFragment;
-
+    private EventDetailsFragment parentFragment;
     private CommentViewModel commentModel;
 
-    private SessionStore sessionStore;
+    private UUID userId;
+    private UUID deviceId;
+    private UUID eventId;
 
-    UUID userId;
-    UUID deviceId;
-    UUID eventId;
+    private boolean isOrganizer;
+    private boolean isAdmin;
 
-    boolean isOrganizer;
-    boolean isAdmin;
-
-    public CommentAdapter(List<Comment> list, Fragment parentFragment, UUID eventId, boolean isOrganizer, boolean isAdmin) {
+    public CommentAdapter(
+            List<Comment> list,
+            EventDetailsFragment parentFragment,
+            CommentViewModel commentModel,
+            UUID eventId,
+            UUID userId,
+            UUID deviceId,
+            boolean isOrganizer,
+            boolean isAdmin
+    ) {
         this.list = list;
         this.parentFragment = parentFragment;
+        this.commentModel = commentModel;
+
         this.eventId = eventId;
-
-        this.commentModel = new ViewModelProvider(this.parentFragment.getActivity()).get(CommentViewModel.class);
-        this.sessionStore = new ViewModelProvider(this.parentFragment.requireActivity()).get(SessionStore.class);
-
-        this.userId = null;
-        this.deviceId = null;
+        this.userId = userId;
+        this.deviceId = deviceId;
 
         this.isOrganizer = isOrganizer;
         this.isAdmin = isAdmin;
-
-        sessionStore.observeSession(this.parentFragment.getViewLifecycleOwner(), (userId, deviceId) -> {
-            this.userId = userId;
-            this.deviceId = deviceId;
-        });
-
     }
 
     @NonNull
@@ -105,15 +95,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
                     .addOnFailureListener(exception -> {
                         Log.e("CommentAdapter", "Failed to delete an comment.", exception);
 
-                        Toast.makeText(this.parentFragment.requireContext(), "Failed to remove comment: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(this.parentFragment.getContext(), "Failed to remove comment: " + exception.getMessage(), Toast.LENGTH_LONG).show();
 
                         if (exception instanceof FirebaseFunctionsException) {
                             Log.e("CommentAdapter", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
                         }
                     });
         });
-
-
     }
 
     @Override
@@ -124,7 +112,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
     public void addComment(Comment comment){
         this.list.add(comment);
         this.notifyItemInserted(this.list.size()-1);
-
     }
 
     class MyHolder extends RecyclerView.ViewHolder {

@@ -18,13 +18,14 @@ export async function updateRoles(request: CallableRequest) {
         updateRolesInterface,
         request,
     );
-        
+
     const { targetUserId, isEntrant, isOrganizer, isAdmin } = data;
-    
-    await util.verifyUser(userId, deviceId);
+
+    const userData =await util.verifyUser(userId, deviceId);
+    util.requireRole(userData, "admin");
 
     const db = getFirestore();
-    
+
     const userDocuments = db.collection("users") as CollectionReference<
             UserDocument,
             UserDocument
@@ -38,7 +39,7 @@ export async function updateRoles(request: CallableRequest) {
 
     // Granted entrant permission
     if (isEntrant && currentEntrant == null) {
-        userDoc!.entrant = {enteredEvents: [], history: [], receiveNotifications: true};  // Reset and make true as default
+        userDoc!.entrant = {enteredEvents: [], history: [], undismissedNotifications: [], receiveNotifications: true};  // Reset and make true as default
     }
     // Banned from being entrant
     else if (!isEntrant && currentEntrant !== null) {
@@ -68,9 +69,7 @@ export async function updateRoles(request: CallableRequest) {
         organizer: currentOrganizer,
         admin: currentAdmin,
     };
-    
-    await db.collection("users").doc(targetUserId).update(updates);
-    
-    logger.info("Updated roles for user", { targetUserId });
 
+    await db.collection("users").doc(targetUserId).update(updates);
+    logger.info("Updated roles for user", { targetUserId });
 }

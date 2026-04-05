@@ -19,37 +19,30 @@
         android:padding="12dp"
         android:gravity="center_vertical">
 
-        <!-- Name -->
+        <!-- Message -->
         <TextView
-            android:id="@+id/profile_name"
+            android:id="@+id/notification_message"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:text="Loading message..."
             android:textSize="16sp"
             android:textColor="@color/text_color" />
 
+        <!-- Dismiss icon -->
         <ImageView
-            android:id="@+id/icon_edit"
+            android:id="@+id/icon_dismiss"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="12dp"
-            android:src="@drawable/material_symbols_edit_outline" />
+            android:src="@drawable/material_symbols_delete" />
 
-        <!-- Notifications icon (organizer only - visibility set to gone by the profile adapter -->
+        <!-- Event icon -->
         <ImageView
-            android:id="@+id/icon_notifications"
+            android:id="@+id/icon_event"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginEnd="12dp"
-            android:src="@drawable/material_symbols_notifications_outline" />
-
-        <!-- X / Delete icon -->
-        <ImageView
-            android:id="@+id/icon_close"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:contentDescription="Delete"
-            android:src="@drawable/material_symbols_close" />
+            android:src="@drawable/material_symbols_event_outline" />
 
     </LinearLayout>
 
