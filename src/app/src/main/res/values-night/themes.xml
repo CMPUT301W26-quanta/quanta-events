@@ -13,15 +13,21 @@
         <item name="cornerSize">8dp</item>
     </style>
 
-    <style name="ThemeOverlay.QuantaEvents.DatePicker" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+    <style name="ThemeOverlay.QuantaEvents.DatePicker" parent="ThemeOverlay.Material3.MaterialCalendar">
+        <item name="colorSurface">@color/color_light_gray</item>
+        <item name="colorOnSurface">@color/text_color</item>
+        <item name="colorOnSurfaceVariant">@color/text_color</item>
         <item name="colorPrimary">@color/color_dark_purple</item>
-        <item name="colorOnPrimary">@color/color_light_purple</item>
-        <item name="colorAccent">@color/color_dark_gray</item>
+        <item name="colorOnPrimary">@color/color_light</item>
     </style>
 
-    <style name="ThemeOverlay.QuantaEvents.TimePicker" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+    <style name="ThemeOverlay.QuantaEvents.TimePicker" parent="ThemeOverlay.Material3.MaterialTimePicker">
+        <item name="colorSurface">@color/color_light_gray</item>
+        <item name="colorOnSurface">@color/text_color</item>
+        <item name="colorOnSurfaceVariant">@color/text_color</item>
         <item name="colorPrimary">@color/color_dark_purple</item>
-        <item name="colorOnPrimary">@color/color_light_purple</item>
-        <item name="colorAccent">@color/color_dark_gray</item>
+        <item name="colorOnPrimary">@color/color_light</item>
     </style>
+
+
 </resources>

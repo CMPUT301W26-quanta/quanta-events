@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="color_dark">#E6E1E5</color>
-    <color name="color_dark_gray">#8799A6</color>
-    <color name="color_light_gray">#2B2930</color>
-    <color name="color_light">#1C1B1F</color>
-    <color name="color_light_purple">#3B2D5E</color>
-    <color name="color_dark_purple">#D8B4FE</color>
+    <color name="color_dark_gray">#A1A1B3</color>
+    <color name="color_light_gray">#1F1D24</color>
+    <color name="color_light">#121016</color>
+    <color name="color_light_purple">#3E2F57</color>
+    <color name="color_dark_purple">#CDB4FF</color>
     <color name="color_light_red">#7F1D1D</color>
     <color name="color_light_green">#14532D</color>
 
