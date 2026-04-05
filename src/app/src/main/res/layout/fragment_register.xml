@@ -103,39 +103,6 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <CheckBox
-                android:id="@+id/check_entrant"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:checked="true"
-                android:text="Make me an entrant."
-                android:textColor="@color/text_color"
-                app:buttonTint="@color/color_dark_purple"
-                app:strokeColor="@color/border"
-                app:strokeWidth="2dp" />
-
-            <CheckBox
-                android:id="@+id/check_organizer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Make me an organizer."
-                android:textColor="@color/text_color"
-                app:buttonTint="@color/color_dark_purple"
-                app:strokeColor="@color/border"
-                app:strokeWidth="2dp" />
-
-            <CheckBox
-                android:id="@+id/check_admin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Make me an administrator."
-                android:textColor="@color/text_color"
-                app:buttonTint="@color/color_dark_purple"
-                app:strokeColor="@color/border"
-                app:strokeWidth="2dp" />
-
-            <CheckBox
                 android:id="@+id/check_notifications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

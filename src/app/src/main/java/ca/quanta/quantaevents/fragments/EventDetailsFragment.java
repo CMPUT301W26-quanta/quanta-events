@@ -50,6 +50,7 @@ import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.models.Notification;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.GeocoderUtil;
 import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.CommentViewModel;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
@@ -59,6 +60,7 @@ import ca.quanta.quantaevents.viewmodels.UserViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.functions.FirebaseFunctionsException;
 
 public class EventDetailsFragment extends Fragment {
@@ -218,6 +220,7 @@ public class EventDetailsFragment extends Fragment {
                 commentModel.getAllComments(this.userId, this.deviceId, this.eventId)
                         .addOnSuccessListener(comments -> {
                             // use the adapter to display them
+                            if (!isAdded() || binding == null) return;
 
                             this.commentAdapter = new CommentAdapter(comments, this, this.eventId, isOrganizer, isAdmin);
 
@@ -226,6 +229,7 @@ public class EventDetailsFragment extends Fragment {
                             binding.commentsRecyclerView.setAdapter(commentAdapter);
                         })
                         .addOnFailureListener(ex -> {
+                                    if (!isAdded() || binding == null) return;
                                     if (isAdded()) {
                                         ToastManager.show(requireContext(), "Failed to load comments", Toast.LENGTH_LONG);
                                         Navigation.findNavController(requireView()).popBackStack();
@@ -289,7 +293,20 @@ public class EventDetailsFragment extends Fragment {
         String organizer = event.getOrganizerId() == null ? "Unknown" : event.getOrganizerId().toString();
         System.out.println(organizer);
         binding.eventStartTime.setText(" " + formatLocalTime(event.getRegistrationStartTime()));
-        binding.textLocation.setText(" " + stringValue(event.getLocation(), "TBD"));
+        binding.textLocation.setText(" Loading location...");
+        Double lat = event.getLocationLat();
+        Double lng = event.getLocationLng();
+        if (lat != null && lng != null) {
+            GeocoderUtil.reverseGeocode(requireContext(), new LatLng(lat, lng), locationName ->
+                    requireActivity().runOnUiThread(() -> {
+                        if (!isAdded() || binding == null) return;
+                        binding.textLocation.setText(" " + locationName);
+                    })
+            );
+        } else {
+            binding.textLocation.setText(" TBD");
+        }
+
         binding.registrationEndTime.setText(" " + formatLocalTime(event.getRegistrationEndTime()));
         binding.registrationStartTime.setText(" " + formatLocalTime(event.getRegistrationStartTime()));
         binding.textGuidelines.setText(" " + stringValue(event.getEventGuidelines(), "No Event Guidelines!"));

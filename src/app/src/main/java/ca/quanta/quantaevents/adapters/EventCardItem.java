@@ -54,4 +54,7 @@ public class EventCardItem {
     public EventCardItem withImage(@Nullable Bitmap image) {
         return new EventCardItem(eventId, title, registerStartTime, location, image);
     }
+    public EventCardItem withLocation(String location) {
+        return new EventCardItem(eventId, title, registerStartTime, location, image);
+    }
 }

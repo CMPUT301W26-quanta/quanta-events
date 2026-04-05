@@ -119,8 +119,11 @@ export const getNotification = onCall(
 	functions.getNotification,
 );
 
+export const getWaitlistMap = onCall({ maxInstances: 1}, functions.getWaitlistMap);
+
 export const getEvents = onCall({ maxInstances: 1 }, functions.getEvents);
 
 export const setToken = onCall({ maxInstances: 1 }, functions.setToken);
 
 export const createCoOrganizerInvitation = onCall({ maxInstances: 1 }, functions.createCoOrganizerInvitation);
+export const updateRoles = onCall({ maxInstances: 1 }, functions.updateRoles);
