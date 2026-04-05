@@ -79,12 +79,18 @@
                 app:cardElevation="2dp"
                 app:cardBackgroundColor="@color/color_light_gray">
 
-                <fragment
-                    android:id="@+id/mapPicker"
-                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                <ca.quanta.quantaevents.utils.MapTouchWrapper
+                    android:id="@+id/mapTouchWrapper"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent">
 
+                    <fragment
+                        android:id="@+id/mapPicker"
+                        android:name="com.google.android.gms.maps.SupportMapFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </ca.quanta.quantaevents.utils.MapTouchWrapper>
             </androidx.cardview.widget.CardView>
 
             <TextView
