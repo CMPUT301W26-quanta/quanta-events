@@ -18,6 +18,7 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.functions.FirebaseFunctionsException;
 
 import java.time.ZoneId;
@@ -35,6 +36,7 @@ import ca.quanta.quantaevents.loading.LoaderState;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
+import ca.quanta.quantaevents.utils.GeocoderUtil;
 import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
@@ -235,37 +237,54 @@ public class EntrantEventBrowserFragment extends Fragment {
             adapter.setItems(new ArrayList<>());
             return;
         }
+
         ArrayList<EventCardItem> items = new ArrayList<>();
         for (Event event : events) {
-            if (event == null) {
-                continue;
-            }
+            if (event == null) continue;
             UUID eventId = event.getEventId();
             String title = stringValue(event.getEventName(), "Event");
             String time = formatLocalTime(event.getEventTime());
-            String location = stringValue(event.getLocation(), "TBD");
+            Double lat = event.getLocationLat();
+            Double lng = event.getLocationLng();
+            String location = (lat != null && lng != null)
+                    ? String.format("%.5f, %.5f", lat, lng)
+                    : "TBD";
             items.add(new EventCardItem(eventId, title, time, location, null));
         }
+
         adapter.setItems(items);
+
         for (int i = 0; i < events.size(); i++) {
             Event event = events.get(i);
-            if (event != null && event.getImageId() != null && i < items.size()) {
-                fetchAndAttachImage(event.getEventId(), items.get(i), event.getImageId());
+            if (event == null) continue;
+
+            Double lat = event.getLocationLat();
+            Double lng = event.getLocationLng();
+            if (lat != null && lng != null) {
+                final Event finalEvent = event;
+                GeocoderUtil.reverseGeocode(requireContext(), new LatLng(lat, lng), locationName ->
+                        requireActivity().runOnUiThread(() -> {
+                            if (!isAdded() || binding == null || adapter == null) return;
+                            adapter.updateLocation(finalEvent.getEventId(), locationName);
+                        })
+                );
+            }
+
+            if (event.getImageId() != null) {
+                fetchAndAttachImage(event.getEventId(), event.getImageId());
             }
         }
     }
 
-    private void fetchAndAttachImage(UUID eventId, EventCardItem item, UUID imageId) {
+    private void fetchAndAttachImage(UUID eventId, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
                     if (!isAdded() || binding == null || adapter == null) return;
                     Object imageData = data.getImageData();
-                    if (imageData == null) {
-                        return;
-                    }
+                    if (imageData == null) return;
                     Bitmap bitmap = decodeBase64ToBitmap(imageData.toString());
                     if (bitmap != null) {
-                        adapter.updateInsert(item.withImage(bitmap));
+                        adapter.updateImage(eventId, bitmap);
                     }
                 });
     }

@@ -16,9 +16,11 @@ const updateEventInterface = util.standardForm(
 		eventGuidelines: z.string().nullable(),
 		geolocation: z.boolean(),
 		eventCapacity: z.int(),
-		location: z.string(),
+		locationLat: z.number(),
+    locationLng: z.number(),
 		registrationLimit: z.number().int().nullable(),
 		imageId: z.uuid().nullable(),
+    isPrivate: z.boolean()
 	}),
 );
 
@@ -39,14 +41,16 @@ export async function updateEvent(request: CallableRequest) {
 		eventGuidelines,
 		geolocation,
 		eventCapacity,
-		location,
+		locationLat,
+    locationLng,
 		registrationLimit,
 		imageId,
+    isPrivate,
 	} = data;
 
 	const userData = await util.verifyUser(userId, deviceId);
 
-	util.requireRole(userData, "organizer");
+	 await util.requireRole(userData, "organizer");
 
 	const db = getFirestore();
 
@@ -75,9 +79,11 @@ export async function updateEvent(request: CallableRequest) {
 		eventGuidelines,
 		geolocation,
 		eventCapacity,
-		location,
+		locationLat,
+    locationLng,
 		registrationLimit,
 		imageId,
+    isPrivate,
 	};
 
 	await db.collection("events").doc(eventId).update(updates);

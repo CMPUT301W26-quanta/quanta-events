@@ -5,12 +5,14 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +89,7 @@ public class EventViewModel extends ViewModel {
                                   String eventName, String eventDescription,
                                   String eventCategory, String eventGuidelines,
                                   boolean geolocation, int eventCapacity,
-                                  String location, Integer registrationLimit, UUID imageId, boolean isPrivate) {
+                                  Double locationLat, Double locationLng, Integer registrationLimit, UUID imageId, boolean isPrivate) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -102,7 +104,8 @@ public class EventViewModel extends ViewModel {
         payload.put("eventGuidelines", eventGuidelines);
         payload.put("geolocation", geolocation);
         payload.put("eventCapacity", eventCapacity);
-        payload.put("location", location);
+        payload.put("locationLat", locationLat);
+        payload.put("locationLng", locationLng);
         payload.put("registrationLimit", registrationLimit);
         payload.put("imageId", imageId == null ? null : imageId.toString());
         payload.put("isPrivate", isPrivate);
@@ -425,7 +428,7 @@ public class EventViewModel extends ViewModel {
                                   String eventName, String eventDescription,
                                   String eventCategory, String eventGuidelines,
                                   boolean geolocation, int eventCapacity,
-                                  String location, Integer registrationLimit, UUID imageId, boolean isPrivate) {
+                                  Double locationLat, Double locationLng, Integer registrationLimit, UUID imageId, boolean isPrivate) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -441,12 +444,13 @@ public class EventViewModel extends ViewModel {
         payload.put("eventGuidelines", eventGuidelines);
         payload.put("geolocation", geolocation);
         payload.put("eventCapacity", eventCapacity);
-        payload.put("location", location);
+        payload.put("locationLat", locationLat);
+        payload.put("locationLng", locationLng);
         payload.put("registrationLimit", registrationLimit);
         payload.put("imageId", imageId == null ? null : imageId.toString());
         payload.put("isPrivate", isPrivate);
         data.put("data", payload);
-
+        System.out.println(payload);
         return functions
                 .getHttpsCallable("updateEvent")
                 .call(data)
@@ -535,6 +539,38 @@ public class EventViewModel extends ViewModel {
                         ));
                     }
                     return Tasks.forResult(externalUsers);
+                });
+    }
+
+    public Task<List<Map.Entry<ExternalUser, LatLng>>> getWaitlistMap(UUID userId, UUID deviceId, UUID eventId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("getWaitlistMap")
+                .call(data)
+                .onSuccessTask(callResult -> {
+                    Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                    List<Map<String, Object>> entries = (List<Map<String, Object>>) result.get("entries");
+                    ArrayList<Map.Entry<ExternalUser, LatLng>> waitlistEntries = new ArrayList<>();
+                    if (entries == null) return Tasks.forResult(waitlistEntries);
+                    for (Map<String, Object> entry : entries) {
+                        ExternalUser user = new ExternalUser(
+                                UUID.fromString((String) entry.get("userId")),
+                                (String) entry.get("name"),
+                                (String) entry.get("email"),
+                                (String) entry.get("phone")
+                        );
+                        double lat = ((Number) entry.get("latitude")).doubleValue();
+                        double lng = ((Number) entry.get("longitude")).doubleValue();
+                        waitlistEntries.add(new AbstractMap.SimpleEntry<>(user, new LatLng(lat, lng)));
+                    }
+                    return Tasks.forResult(waitlistEntries);
                 });
     }
 }
