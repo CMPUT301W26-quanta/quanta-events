@@ -25,6 +25,8 @@ export * from "./functions/getUser";
 export * from "./functions/getWaitlist";
 export * from "./functions/getWaitlistCount";
 export * from "./functions/health";
+export * from "./functions/inviteAccept";
+export * from "./functions/inviteReject";
 export * from "./functions/joinWaitlist";
 export * from "./functions/leaveWaitlist";
 export * from "./functions/setToken";

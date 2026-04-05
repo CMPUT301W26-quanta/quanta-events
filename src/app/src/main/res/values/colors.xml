@@ -20,4 +20,5 @@
 
     <color name="card_background_default">@color/color_light_gray</color>
     <color name="card_background_organizer">@color/color_light_purple</color>
+    <color name="card_background_admin">@color/color_light_green</color>
 </resources>

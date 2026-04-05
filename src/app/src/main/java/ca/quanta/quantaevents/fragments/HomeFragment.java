@@ -22,15 +22,17 @@ import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.InviteNotificationAdapter;
-import ca.quanta.quantaevents.adapters.NotificationAdapter;
+import ca.quanta.quantaevents.adapters.LotteryNotificationAdapter;
+import ca.quanta.quantaevents.adapters.MessageNotificationAdapter;
 import ca.quanta.quantaevents.burger.SmartBurgerState;
 import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentHomeBinding;
-import ca.quanta.quantaevents.models.ExternalNotification;
 import ca.quanta.quantaevents.models.ExternalUndismissedNotification;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.utils.ToastManager;
+import ca.quanta.quantaevents.viewmodels.EventViewModel;
+import ca.quanta.quantaevents.viewmodels.InviteViewModel;
 import ca.quanta.quantaevents.viewmodels.NotificationViewModel;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
@@ -38,7 +40,9 @@ public class HomeFragment extends Fragment implements Tagged {
     private FragmentHomeBinding binding;
     private SessionStore sessionStore;
     private UserViewModel userModel;
+    private EventViewModel eventModel;
     private NotificationViewModel notificationModel;
+    private InviteViewModel inviteModel;
     private UUID userId;
     private UUID deviceId;
 
@@ -61,7 +65,9 @@ public class HomeFragment extends Fragment implements Tagged {
         this.sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
 
         this.userModel = new ViewModelProvider(this).get(UserViewModel.class);
+        this.eventModel = new ViewModelProvider(this).get(EventViewModel.class);
         this.notificationModel = new ViewModelProvider(this).get(NotificationViewModel.class);
+        this.inviteModel = new ViewModelProvider(this).get(InviteViewModel.class);
 
         this.sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             this.userId = uid;
@@ -93,7 +99,7 @@ public class HomeFragment extends Fragment implements Tagged {
         binding = null;
     }
 
-    //validates user by checking if they
+    // validates user by checking if they
     // exist in database if not handle it properly.
     private void maybeValidateUser() {
         if (this.userId == null || this.deviceId == null) return;
@@ -142,17 +148,25 @@ public class HomeFragment extends Fragment implements Tagged {
             }
         }
 
-        InviteNotificationAdapter inviteNotificationAdapter = new InviteNotificationAdapter(inviteNotifications, this);
+        InviteNotificationAdapter inviteNotificationAdapter = new InviteNotificationAdapter(inviteNotifications, this, this.eventModel, this.notificationModel, this.userId, this.deviceId);
+        LotteryNotificationAdapter lotteryNotificationAdapter = new LotteryNotificationAdapter(lotteryNotifications, this, this.eventModel, this.notificationModel, this.inviteModel, this.userId, this.deviceId);
+        MessageNotificationAdapter messageNotificationAdapter = new MessageNotificationAdapter(messageNotifications, this, this.eventModel, this.notificationModel, this.userId, this.deviceId);
 
         // **** set up the notification recycler views
 
-        this.binding.inviteNotificationsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        this.binding.inviteNotificationsRecyclerView.setLayoutManager(new LinearLayoutManager(this.requireContext()));
         this.binding.inviteNotificationsRecyclerView.setAdapter(inviteNotificationAdapter);
+
+        this.binding.lotteryNotificationsRecyclerView.setLayoutManager(new LinearLayoutManager(this.requireContext()));
+        this.binding.lotteryNotificationsRecyclerView.setAdapter(lotteryNotificationAdapter);
+
+        this.binding.messageNotificationsRecyclerView.setLayoutManager(new LinearLayoutManager(this.requireContext()));
+        this.binding.messageNotificationsRecyclerView.setAdapter(messageNotificationAdapter);
 
         // **** display toast in case there are none
 
         if (inviteNotifications.isEmpty() && lotteryNotifications.isEmpty() && messageNotifications.isEmpty()) {
-            ToastManager.show(getContext(), "No notifications to display.", Toast.LENGTH_LONG);
+            ToastManager.show(this.getContext(), "No notifications to display.", Toast.LENGTH_LONG);
         }
     }
 

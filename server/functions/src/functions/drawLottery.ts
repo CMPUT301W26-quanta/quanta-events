@@ -6,9 +6,7 @@ import * as z from "zod";
 import * as util from "../util";
 
 const drawLotteryInterface = util.standardForm(
-	z.object({
-		eventId: z.uuid(),
-	}),
+	z.object({ eventId: z.uuid() }),
 );
 
 export async function drawLottery(request: CallableRequest) {
@@ -193,8 +191,8 @@ export async function drawLottery(request: CallableRequest) {
 	);
 
 	try {
-		selectedNotificationRef.create(selectedNotif);
-		rejectedNotificationRef.create(rejectedNotif);
+		await selectedNotificationRef.create(selectedNotif);
+		await rejectedNotificationRef.create(rejectedNotif);
 	} catch (e) {
 		logger.error(
 			"Selected/rejected notification cannot be created, as it already exists.",

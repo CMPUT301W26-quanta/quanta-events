@@ -103,6 +103,10 @@ export const getWaitlistCount = onCall(
 	functions.getWaitlistCount,
 );
 
+export const inviteAccept = onCall({ maxInstances: 1 }, functions.inviteAccept);
+
+export const inviteReject = onCall({ maxInstances: 1 }, functions.inviteReject);
+
 export const joinWaitlist = onCall({ maxInstances: 1 }, functions.joinWaitlist);
 
 export const leaveWaitlist = onCall(

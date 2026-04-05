@@ -244,16 +244,15 @@ public class EventDetailsFragment extends Fragment {
                     Comment comment = new Comment(commentId, this.userId, message, postTime, name);
                     this.commentAdapter.addComment(comment);
                 })
+                        .addOnFailureListener(exception -> {
+                            Log.e("EventDetailsFragment", "Failed to delete an comment.", exception);
 
-                .addOnFailureListener(exception -> {
-                    Log.e("EventDetailsFragment", "Failed to delete an comment.", exception);
+                            Toast.makeText(getContext(), "Failed to add comment: " + exception.getMessage(), Toast.LENGTH_LONG).show();
 
-                    Toast.makeText(getContext(), "Failed to add comment: " + exception.getMessage(), Toast.LENGTH_LONG).show();
-
-                    if (exception instanceof FirebaseFunctionsException) {
-                        Log.e("EventDetailsFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
-                    }
-                });
+                            if (exception instanceof FirebaseFunctionsException) {
+                                Log.e("EventDetailsFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
+                            }
+                        });
             });
         });
     }

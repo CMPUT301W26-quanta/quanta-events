@@ -4,15 +4,15 @@ import { logger } from "firebase-functions";
 
 async function sendAndroidNotification(
 	notifToken: string,
-	title: string,
-	body: string,
+	notificationTitle: string,
+	notificationBody: string,
 ) {
 	const message: Message = {
 		token: notifToken,
 
 		notification: {
-			title,
-			body,
+			title: notificationTitle,
+			body: notificationBody,
 		},
 
 		android: { priority: "high" },
@@ -63,6 +63,14 @@ export async function sendNotification(
 		return;
 	}
 
+	// add the notification to the user's undismissed notifications list,
+	// so that it will appear on their home page
+
+	await userRef.update(
+		new FieldPath("entrant", "undismissedNotifications"),
+		FieldValue.arrayUnion(notificationId),
+	);
+
 	// send an android notification only if the recipient has enabled receiving notifications
 
 	if (userDoc.entrant.receiveNotifications) {
@@ -72,14 +80,6 @@ export async function sendNotification(
 			notificationDoc.message,
 		);
 	}
-
-	// add the notification to the user's undismissed notifications list,
-	// so that it will appear on their home page
-
-	await userRef.update(
-		new FieldPath("entrant", "undismissedNotifications"),
-		FieldValue.arrayUnion(notificationId),
-	);
 }
 
 export async function sendBatchNotifications(
