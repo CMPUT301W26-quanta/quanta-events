@@ -3,6 +3,7 @@ package ca.quanta.quantaevents.fragments;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,19 +19,24 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentEventWaitlistMapBinding;
+import ca.quanta.quantaevents.models.ExternalUser;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 
 public class EventWaitingListMapFragment extends Fragment implements OnMapReadyCallback {
+    private static final String TAG = "WaitlistMapFragment";
     private FragmentEventWaitlistMapBinding binding;
     private GoogleMap googleMap;
     private UUID eventId;
@@ -56,7 +62,6 @@ public class EventWaitingListMapFragment extends Fragment implements OnMapReadyC
 
         eventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
 
-        // Read eventId from nav args
         EventWaitingListMapFragmentArgs args = EventWaitingListMapFragmentArgs.fromBundle(getArguments());
         eventId = args.getEventId();
 
@@ -118,12 +123,13 @@ public class EventWaitingListMapFragment extends Fragment implements OnMapReadyC
 
                     LatLng eventLocation = new LatLng(lat, lng);
 
-                    // Drop pin at event location
+                    // Event location pin (red)
                     googleMap.addMarker(new MarkerOptions()
                             .position(eventLocation)
-                            .title(event.getEventName()));
+                            .title("Event Location for " + event.getEventName())
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
-                    // Draw 15km radius circle
+                    // 15km radius circle
                     googleMap.addCircle(new CircleOptions()
                             .center(eventLocation)
                             .radius(15000)
@@ -131,8 +137,32 @@ public class EventWaitingListMapFragment extends Fragment implements OnMapReadyC
                             .strokeColor(0xFFD8B4FE)
                             .fillColor(0x40E9D5FF));
 
-                    // Zoom to fit the circle
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eventLocation, 10f));
+
+                    // Load waitlist entries
+                    eventViewModel.getWaitlistMap(userId, deviceId, eventId)
+                            .addOnSuccessListener(entries -> {
+                                if (!isAdded() || binding == null) return;
+
+                                for (Map.Entry<ExternalUser, LatLng> entry : entries) {
+
+                                    ExternalUser user = entry.getKey();
+                                    LatLng position = entry.getValue();
+
+                                    String title = user.getName() != null ? user.getName() : "Entrant";
+                                    String snippet = user.getEmail() != null ? user.getEmail() : user.getUserId().toString();
+
+                                    googleMap.addMarker(new MarkerOptions()
+                                            .position(position)
+                                            .title(title)
+                                            .snippet(snippet)
+                                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+                                }
+                            })
+                            .addOnFailureListener(ex -> {
+                                if (!isAdded() || binding == null) return;
+                                Log.w(TAG, "Failed to load waitlist entries", ex);
+                            });
                 })
                 .addOnFailureListener(ex -> {
                     if (!isAdded() || binding == null) return;
