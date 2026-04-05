@@ -109,6 +109,15 @@
                 app:buttonTint="@color/color_dark_gray"
                 app:strokeColor="@color/border"
                 app:strokeWidth="2dp" />
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchDarkMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dark Mode"
+                android:textSize="16sp"
+                android:paddingVertical="12dp"
+                app:thumbTint="@color/switch_thumb_color"
+                app:trackTint="@color/switch_track_color" />
         </LinearLayout>
     </ScrollView>
 

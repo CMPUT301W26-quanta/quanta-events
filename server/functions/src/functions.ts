@@ -24,6 +24,7 @@ export * from "./functions/getOrganizerName";
 export * from "./functions/getUser";
 export * from "./functions/getWaitlist";
 export * from "./functions/getWaitlistCount";
+export * from "./functions/getWaitlistMap";
 export * from "./functions/health";
 export * from "./functions/inviteAccept";
 export * from "./functions/inviteReject";

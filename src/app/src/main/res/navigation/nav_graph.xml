@@ -214,6 +214,13 @@
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
+            android:id="@+id/action_eventmanagerfragment_to_eventwaitinglistmapfragment"
+            app:destination="@id/eventWaitingListMapFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
             android:id="@+id/action_eventmanagerfragment_to_sendnotificationfragment"
             app:destination="@id/eventNotificationEditorFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
@@ -359,6 +366,23 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/eventWaitingListMapFragment"
+        android:name="ca.quanta.quantaevents.fragments.EventWaitingListMapFragment"
+        android:label="fragment_entrant_event_history"
+        tools:layout="@layout/fragment_entrant_event_history">
+        <action
+            android:id="@+id/action_entrantEventHistoryFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <argument
+            android:name="eventId"
+            app:argType="java.util.UUID" />
     </fragment>
 
     <fragment

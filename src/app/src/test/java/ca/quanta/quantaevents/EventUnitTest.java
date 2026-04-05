@@ -23,7 +23,8 @@ public class EventUnitTest {
     private static final ZonedDateTime EVENT_TIME = ZonedDateTime.of(2026, 5, 26, 12, 0, 0, 0, ZoneId.systemDefault());
     private static final String NAME = "EventName";
     private static final String DESCRIPTION = "Event Description";
-    private static final String LOCATION = "Here";
+    private static final Double LOCATIONLAT = 53.5232723;
+    private static final Double LOCATIONLNG = -113.5262886;
     private static final String CATEGORY = "Test Category";
 
     private static final String GUIDELINES = "Test Guidlines";
@@ -59,7 +60,8 @@ public class EventUnitTest {
                 EVENT_TIME,
                 NAME,
                 DESCRIPTION,
-                LOCATION,
+                LOCATIONLAT,
+                LOCATIONLNG,
                 CATEGORY,
                 GUIDELINES,
                 true,
@@ -81,7 +83,8 @@ public class EventUnitTest {
         assertEquals(END, event.getRegistrationEndTime());
         assertEquals(EVENT_TIME, event.getEventTime());
         assertEquals(DESCRIPTION, event.getEventDescription());
-        assertEquals(LOCATION, event.getLocation());
+        assertEquals(LOCATIONLAT, event.getLocationLat());
+        assertEquals(LOCATIONLNG, event.getLocationLng());
         assertEquals(CATEGORY, event.getEventCategory());
         assertEquals(GUIDELINES, event.getEventGuidelines());
         assertTrue(event.isGeolocationEnabled());
@@ -101,7 +104,8 @@ public class EventUnitTest {
                 EVENT_TIME,
                 NAME,
                 DESCRIPTION,
-                LOCATION,
+                LOCATIONLAT,
+                LOCATIONLNG,
                 CATEGORY,
                 GUIDELINES,
                 false,

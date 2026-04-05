@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -99,6 +100,14 @@ public class EventManagerFragment extends Fragment {
         binding.sendNotificationButton.setOnClickListener(
                 v -> {
                     NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToSendnotificationfragment(eventId);
+                    Navigation.findNavController(v).navigate(action);
+                }
+        );
+
+        // set on click listener to navigate to waitlist map fragment
+        binding.viewWaitListMapButton.setOnClickListener(
+                v -> {
+                    NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToEventwaitinglistmapfragment(eventId);
                     Navigation.findNavController(v).navigate(action);
                 }
         );

@@ -75,8 +75,10 @@ declare global {
 		eventDescription: string;
 		/** The guidelines of the event, if any */
 		eventGuidelines: string | null;
-		/** The location of the event */
-		location: string;
+		/** The latitude of the event */
+		locationLat: number;
+    /** The longitude of the the event */
+    locationLng: number;
 		/** The category of the event, if applicable */
 		eventCategory: string | null;
 		/** If there is a geolocation requirement for this event */
