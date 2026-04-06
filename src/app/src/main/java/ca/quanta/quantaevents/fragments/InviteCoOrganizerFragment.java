@@ -82,11 +82,11 @@ public class InviteCoOrganizerFragment extends Fragment {
 
         /**
          * Constructor for an organizer profile view holder.
-         * @param itemView
-         * @param userId
-         * @param deviceId
-         * @param model
-         * @param listener
+         * @param itemView Root view of the view holder.
+         * @param userId UUID identifying the user.
+         * @param deviceId UUID identifying the user's device.
+         * @param model User view model to allow for the calling of cloud functions.
+         * @param listener Invite button click listener.
          */
         public OrganizerProfileViewHolder(@NonNull View itemView, UUID userId, UUID deviceId, UserViewModel model, InviteCoOrganizerFragment.OrganizerProfileViewHolder.OnInviteButtonClickedListener listener) {
             super(itemView);
