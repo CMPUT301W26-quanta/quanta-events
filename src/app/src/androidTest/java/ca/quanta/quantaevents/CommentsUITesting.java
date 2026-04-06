@@ -41,7 +41,6 @@ public class CommentsUITesting {
 
         Matcher<View> burgerButton = allOf(withContentDescription("Open Menu"), isDescendantOfA(withId(R.id.coordinator)));
 
-        waitForView(burgerButton);
         onView(burgerButton).perform(click());
         clickMenuItem("Event List");
 
@@ -89,27 +88,10 @@ public class CommentsUITesting {
         onView(withId(R.id.comment_text)).check(matches(withText("")));
     }
 
-    private void waitForView(Matcher<View> matcher){
-
-        long end = System.currentTimeMillis() + 5000;
-        while (System.currentTimeMillis() < end){
-            try {
-                onView(matcher).check(matches(isDisplayed()));
-                return;
-            } catch (Throwable e) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ignored) {}
-            }
-        }
-        onView(matcher).check(matches(isDisplayed()));
-
-    }
 
     private void clickMenuItem(String label){
         Matcher<View> item = allOf(withContentDescription(label), isDescendantOfA(withId(R.id.coordinator)));
 
-        waitForView(item);
         onView(item).perform(click());
     }
 
