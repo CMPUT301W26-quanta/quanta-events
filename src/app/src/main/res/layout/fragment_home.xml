@@ -26,15 +26,16 @@
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
         android:clipToPadding="true"
-        android:scrollbars="vertical"
         android:fadingEdge="vertical"
-        android:requiresFadingEdge="vertical"
         android:fadingEdgeLength="20dp"
         android:overScrollMode="ifContentScrolls"
-        app:layout_constraintTop_toBottomOf="@id/info_button"
+        android:requiresFadingEdge="vertical"
+        android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@id/lottery_notifications_recycler_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/info_button" />
 
     <!-- LOTTERY Notification RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
@@ -66,6 +67,23 @@
         android:fadingEdgeLength="20dp"
         android:overScrollMode="ifContentScrolls"
         app:layout_constraintTop_toBottomOf="@id/lottery_notifications_recycler_view"
+        app:layout_constraintBottom_toTopOf="@id/coInvite_notifications_recycler_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- coInvite Notification RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/coInvite_notifications_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:clipToPadding="true"
+        android:scrollbars="vertical"
+        android:fadingEdge="vertical"
+        android:requiresFadingEdge="vertical"
+        android:fadingEdgeLength="20dp"
+        android:overScrollMode="ifContentScrolls"
+        app:layout_constraintTop_toBottomOf="@id/message_notifications_recycler_view"
         app:layout_constraintBottom_toTopOf="@id/menu_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

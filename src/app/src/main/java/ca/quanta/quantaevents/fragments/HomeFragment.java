@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
+import ca.quanta.quantaevents.adapters.CoInviteNotificationAdapter;
 import ca.quanta.quantaevents.adapters.InviteNotificationAdapter;
 import ca.quanta.quantaevents.adapters.LotteryNotificationAdapter;
 import ca.quanta.quantaevents.adapters.MessageNotificationAdapter;
@@ -139,18 +140,21 @@ public class HomeFragment extends Fragment implements Tagged {
         ArrayList<ExternalUndismissedNotification> inviteNotifications = new ArrayList<>();
         ArrayList<ExternalUndismissedNotification> lotteryNotifications = new ArrayList<>();
         ArrayList<ExternalUndismissedNotification> messageNotifications = new ArrayList<>();
+        ArrayList<ExternalUndismissedNotification> coInviteNotifications = new ArrayList<>();
 
         for (ExternalUndismissedNotification notification : notifications) {
             switch (notification.getKind()) {
                 case "INVITE": inviteNotifications.add(notification); break;
                 case "LOTTERY": lotteryNotifications.add(notification); break;
                 case "MESSAGE": messageNotifications.add(notification); break;
+                case "COINVITE": coInviteNotifications.add(notification); break;
             }
         }
 
         InviteNotificationAdapter inviteNotificationAdapter = new InviteNotificationAdapter(inviteNotifications, this, this.eventModel, this.notificationModel, this.userId, this.deviceId);
         LotteryNotificationAdapter lotteryNotificationAdapter = new LotteryNotificationAdapter(lotteryNotifications, this, this.eventModel, this.notificationModel, this.inviteModel, this.userId, this.deviceId);
         MessageNotificationAdapter messageNotificationAdapter = new MessageNotificationAdapter(messageNotifications, this, this.eventModel, this.notificationModel, this.userId, this.deviceId);
+        CoInviteNotificationAdapter coInviteNotificationAdapter = new CoInviteNotificationAdapter(coInviteNotifications, this, this.eventModel, this.notificationModel, this.inviteModel, this.userId, this.deviceId);
 
         // **** set up the notification recycler views
 
@@ -162,6 +166,9 @@ public class HomeFragment extends Fragment implements Tagged {
 
         this.binding.messageNotificationsRecyclerView.setLayoutManager(new LinearLayoutManager(this.requireContext()));
         this.binding.messageNotificationsRecyclerView.setAdapter(messageNotificationAdapter);
+
+        this.binding.coInviteNotificationsRecyclerView.setLayoutManager(new LinearLayoutManager(this.requireContext()));
+        this.binding.coInviteNotificationsRecyclerView.setAdapter(coInviteNotificationAdapter);
 
         // **** display toast in case there are none
 

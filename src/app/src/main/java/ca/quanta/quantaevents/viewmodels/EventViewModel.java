@@ -269,9 +269,9 @@ public class EventViewModel extends ViewModel {
                 .getHttpsCallable("getOrganizerName")
                 .call(data)
                 .onSuccessTask(callResult -> {
-                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
-                        Object name = result == null ? null : result.get("name");
-                        return Tasks.forResult(name == null ? null : name.toString());
+                    Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                    Object name = result == null ? null : result.get("name");
+                    return Tasks.forResult(name == null ? null : name.toString());
                 });
     }
 
@@ -296,9 +296,9 @@ public class EventViewModel extends ViewModel {
                 .getHttpsCallable("getWaitlistCount")
                 .call(data)
                 .onSuccessTask(callResult -> {
-                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
-                        Object count = result == null ? null : result.get("count");
-                        return Tasks.forResult(count instanceof Number ? ((Number) count).intValue() : 0);
+                    Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                    Object count = result == null ? null : result.get("count");
+                    return Tasks.forResult(count instanceof Number ? ((Number) count).intValue() : 0);
                 });
     }
 
@@ -326,10 +326,10 @@ public class EventViewModel extends ViewModel {
                 .getHttpsCallable("checkWaitlist")
                 .call(data)
                 .onSuccessTask(callResult -> {
-                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
-                        Log.d("EventViewModel", "checkWaitlist result=" + result);
-                        Object inWaitlist = result == null ? null : result.get("inWaitlist");
-                        return Tasks.forResult(inWaitlist instanceof Boolean ? (Boolean) inWaitlist : false);
+                    Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                    Log.d("EventViewModel", "checkWaitlist result=" + result);
+                    Object inWaitlist = result == null ? null : result.get("inWaitlist");
+                    return Tasks.forResult(inWaitlist instanceof Boolean ? (Boolean) inWaitlist : false);
                 });
     }
 
@@ -370,8 +370,8 @@ public class EventViewModel extends ViewModel {
                 .getHttpsCallable("joinWaitlist")
                 .call(data)
                 .onSuccessTask(callResult -> {
-                        Log.d("EventViewModel", "joinWaitlist success");
-                        return Tasks.forResult(null);
+                    Log.d("EventViewModel", "joinWaitlist success");
+                    return Tasks.forResult(null);
                 });
     }
 
@@ -399,8 +399,8 @@ public class EventViewModel extends ViewModel {
                 .getHttpsCallable("leaveWaitlist")
                 .call(data)
                 .onSuccessTask(callResult -> {
-                        Log.d("EventViewModel", "leaveWaitlist success");
-                        return Tasks.forResult(null);
+                    Log.d("EventViewModel", "leaveWaitlist success");
+                    return Tasks.forResult(null);
                 });
     }
 
@@ -550,17 +550,17 @@ public class EventViewModel extends ViewModel {
      * @param recipientId UUID to identify recipient.
      * @return null on success, error on failure
      */
-    public Task<Void> createCoOrganizerInvitation(UUID userId, UUID deviceId, UUID eventId, UUID recipientId) {
+    public Task<Void> createCoInvitation(UUID userId, UUID deviceId, UUID eventId, UUID recipientId) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("eventId", eventId.toString());
-        payload.put("recipientId", recipientId.toString());
+        payload.put("invitee", recipientId.toString());
         data.put("data", payload);
 
-        return functions.getHttpsCallable("createCoOrganizerInvitation")
+        return functions.getHttpsCallable("createCoInvitation")
                 .call(data)
                 .onSuccessTask(task -> Tasks.forResult(null));
     }

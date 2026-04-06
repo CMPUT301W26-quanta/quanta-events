@@ -139,5 +139,10 @@ export const getEvents = onCall({ maxInstances: 1 }, functions.getEvents);
 
 export const setToken = onCall({ maxInstances: 1 }, functions.setToken);
 
-export const createCoOrganizerInvitation = onCall({ maxInstances: 1 }, functions.createCoOrganizerInvitation);
 export const updateRoles = onCall({ maxInstances: 1 }, functions.updateRoles);
+
+export const createCoInvitation = onCall({ maxInstances: 1 }, functions.createCoInvitation);
+
+export const coInviteAccept = onCall({ maxInstances: 1 }, functions.coInviteAccept);
+
+export const coInviteReject = onCall({ maxInstances: 1 }, functions.coInviteReject);

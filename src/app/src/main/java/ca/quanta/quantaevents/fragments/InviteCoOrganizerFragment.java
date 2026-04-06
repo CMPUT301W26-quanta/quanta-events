@@ -193,7 +193,7 @@ public class InviteCoOrganizerFragment extends Fragment {
 
             // Send an invitation to be a co organizer
             InviteCoOrganizerFragmentArgs args = InviteCoOrganizerFragmentArgs.fromBundle(this.getArguments());
-            eventModel.createCoOrganizerInvitation(this.userId, this.deviceId, args.getEventId(), profileID);
+            eventModel.createCoInvitation(this.userId, this.deviceId, args.getEventId(), profileID);
 
         });
         ProfileAdapter<InviteCoOrganizerFragment.OrganizerProfileViewHolder> profilesAdapter = new ProfileAdapter(entrantProfiles, factory);
