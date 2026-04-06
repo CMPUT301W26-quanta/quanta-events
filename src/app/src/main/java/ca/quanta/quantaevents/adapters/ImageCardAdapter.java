@@ -26,6 +26,9 @@ import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
+/**
+ * Adapter for handling image cards.
+ */
 public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.ImageCardViewHolder> {
     private final ArrayList<UUID> imageIDs;
 
@@ -37,6 +40,11 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
     private UUID userId;
     private UUID deviceId;
 
+    /**
+     * Constructor for an image card adapter.
+     * @param imageIDs ArrayList of UUIDs identifying images.
+     * @param parentFragment Fragment hosting the image cards.
+     */
     public ImageCardAdapter(ArrayList<UUID> imageIDs, Fragment parentFragment) {
         this.parentFragment = parentFragment;
 
@@ -56,11 +64,22 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
         });
     }
 
+    /**
+     * Gets the number of images displayed.
+     * @return Integer representing number of images.
+     */
     @Override
     public int getItemCount() {
         return imageIDs.size();
     }
 
+    /**
+     * Inflates image card layout.
+     * @param parent   The ViewGroup into which the new View will be added after it is bound to
+     *                 an adapter position.
+     * @param viewType The view type of the new View.
+     * @return View holder holding an inflated image card view.
+     */
     @Override
     @NonNull
     public ImageCardViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -70,6 +89,11 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
         return new ImageCardViewHolder(itemView);
     }
 
+    /**
+     * Converts a base64 string to a bitmap of image data.
+     * @param base64 Base64 format string of image data.
+     * @return Bitmap of image data is successful, null otherwise.
+     */
     private static Bitmap decodeBase64ToBitmap(String base64) {
         try {
             byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
@@ -80,6 +104,12 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
         }
     }
 
+    /**
+     * Handles interaction with the image card.
+     * @param holder   The ViewHolder which should be updated to represent the contents of the
+     *                 item at the given position in the data set.
+     * @param position The position of the item within the adapter's data set.
+     */
     @Override
     public void onBindViewHolder(@NonNull ImageCardViewHolder holder, int position) {
         UUID imageId = this.imageIDs.get(position);
@@ -140,11 +170,18 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
         });
     }
 
+    /**
+     * View holder for displaying an image card.
+     */
     public static class ImageCardViewHolder extends RecyclerView.ViewHolder {
         MaterialCardView card;
         ImageView image;
         ImageButton buttonRemove;
 
+        /**
+         * Constructor for an image card view holder.
+         * @param itemView Inflated image card view.
+         */
         public ImageCardViewHolder(@NonNull View itemView) {
             super(itemView);
 
