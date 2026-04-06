@@ -1,120 +1,140 @@
+import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
-import { CallableRequest } from "firebase-functions/https";
+import { CallableRequest, HttpsError } from "firebase-functions/https";
 import * as z from "zod";
 import * as util from "../util";
-import { getFirestore, CollectionReference, FieldValue } from "firebase-admin/firestore";
 
 const updateRolesInterface = util.standardForm(
-    z.object({
-        targetUserId: z.uuid(),
-        isEntrant: z.boolean(),
-        isOrganizer: z.boolean(),
-        isAdmin: z.boolean(),
-    }),
+	z.object({
+		targetUserId: z.uuid(),
+		isEntrant: z.boolean(),
+		isOrganizer: z.boolean(),
+		isAdmin: z.boolean(),
+	}),
 );
 
 export async function updateRoles(request: CallableRequest) {
-    const { userId, deviceId, data } = util.parseInterface(
-        updateRolesInterface,
-        request,
-    );
+	const { userId, deviceId, data } = util.parseInterface(
+		updateRolesInterface,
+		request,
+	);
 
-    const { targetUserId, isEntrant, isOrganizer, isAdmin } = data;
+	const userData = await util.verifyUser(userId, deviceId);
+	util.requireRole(userData, "admin");
 
-    const userData =await util.verifyUser(userId, deviceId);
-    util.requireRole(userData, "admin");
+	logger.info(`Updating roles for user ${data.targetUserId}.`);
 
-    const db = getFirestore();
+	const db = getFirestore();
 
-    const userDocuments = db.collection("users") as CollectionReference<
-            UserDocument,
-            UserDocument
-        >;
-    const userDoc = (await userDocuments.doc(targetUserId).get()).data();
+	const userCollection = db.collection("users") as UserDocCollection;
+	const userRef = userCollection.doc(data.targetUserId);
+	const user = await userRef.get();
 
-    // Check if the user currently has these roles
-    let currentEntrant = userDoc?.entrant;
-    let currentOrganizer = userDoc?.organizer;
-    let currentAdmin = userDoc?.admin;
+	if (!user.exists) {
+		throw new HttpsError("not-found", "The target user does not exist.");
+	}
 
-    const eventsSnapshot = await db.collection("events").get();
+	const userDoc = user.data()!;
 
-    // Granted entrant permission
-    if (isEntrant && currentEntrant == null) {
-        userDoc!.entrant = {enteredEvents: [], history: [], undismissedNotifications: [], receiveNotifications: true};  // Reset and make true as default
-    }
-    // Banned from being entrant
-    else if (!isEntrant && currentEntrant !== null) {
+	// Check if the user currently has these roles
+	let currentEntrant = userDoc?.entrant;
+	let currentOrganizer = userDoc?.organizer;
+	let currentAdmin = userDoc?.admin;
 
-        const entrantUpdates = eventsSnapshot.docs.map(async (eventDoc) => {
+	const eventCollection = db.collection("events") as EventDocCollection;
+	const events = await eventCollection.get();
 
-            const event = eventDoc.data();
-    
-            const isInAnyList =
-                event.waitList?.includes(targetUserId) ||
-                event.finalList?.includes(targetUserId) ||
-                event.cancelledList?.includes(targetUserId) ||
-                event.rejectedList?.includes(targetUserId) ||
-                event.selectedList?.includes(targetUserId);
-    
-            if (!isInAnyList) return;
-    
-            return eventDoc.ref.update({
-                waitList: FieldValue.arrayRemove(targetUserId),
-                finalList: FieldValue.arrayRemove(targetUserId),
-                cancelledList: FieldValue.arrayRemove(targetUserId),
-                rejectedList: FieldValue.arrayRemove(targetUserId),
-                selectedList: FieldValue.arrayRemove(targetUserId),
-            });
-        });
+	// Granted entrant permission
+	if (data.isEntrant && currentEntrant === null) {
+		userDoc.entrant = util.enforceFull<EntrantMap>({
+			enteredEvents: [],
+			history: [],
+			undismissedNotifications: [],
+			receiveNotifications: true,
+            coOrganizedEvents: [],
+		});
+	}
 
-        await Promise.all(entrantUpdates);
+	// Banned from being entrant
+	else if (!data.isEntrant && currentEntrant !== null) {
+		const entrantUpdatePromises = events.docs.map(async (event) => {
+			const eventDoc = event.data()!;
 
-        userDoc!.entrant = null;
-    }
+			const isInSelectedList = eventDoc.selectedList?.includes(
+				data.targetUserId,
+			);
 
-    if (isOrganizer && currentOrganizer == null) {
-        userDoc!.organizer = { createdEvents: [], sentNotifications: [] };
-    }
-    else if (!isOrganizer && currentOrganizer !== null) {
+			const isInAnyList =
+				eventDoc.waitList?.includes(data.targetUserId) ||
+				eventDoc.finalList?.includes(data.targetUserId) ||
+				eventDoc.cancelledList?.includes(data.targetUserId) ||
+				eventDoc.rejectedList?.includes(data.targetUserId) ||
+				isInSelectedList;
 
-        const organizerUpdates = eventsSnapshot.docs.map(async (eventDoc) => {
-            const event = eventDoc.data();
+			if (!isInAnyList) return;
 
-            if (event.imageId !== null) {
-                await util.removeImage(event.imageId);
-            }
-    
-            if (event.organizer === targetUserId) {
-                return eventDoc.ref.delete();
-            }
-    
-            return;
+			if (isInSelectedList && eventDoc.rejectedList.length > 0) {
+				await util.rejectedToSelected(event.id);
+			}
 
-        });
+			return event.ref.update({
+				waitList: FieldValue.arrayRemove(data.targetUserId),
+				finalList: FieldValue.arrayRemove(data.targetUserId),
+				cancelledList: FieldValue.arrayRemove(data.targetUserId),
+				rejectedList: FieldValue.arrayRemove(data.targetUserId),
+				selectedList: FieldValue.arrayRemove(data.targetUserId),
+			});
+		});
 
-        await Promise.all(organizerUpdates);
+		await Promise.all(entrantUpdatePromises);
 
-        userDoc!.organizer = null;
-    }
+		userDoc.entrant = null;
+	}
 
-    if (isAdmin && currentAdmin == null) {
-        userDoc!.admin = {};
-    }
-    else if (!isAdmin && currentAdmin !== null) {
-        userDoc!.admin = null;
-    }
+	// Granted organizer permission
+	if (data.isOrganizer && currentOrganizer === null) {
+		userDoc.organizer = util.enforceFull<OrganizerMap>({
+			createdEvents: [],
+			sentNotifications: [],
+		});
+	}
 
-    currentEntrant = userDoc?.entrant;
-    currentOrganizer = userDoc?.organizer;
-    currentAdmin = userDoc?.admin;
+	// Banned from being an organizer
+	else if (!data.isOrganizer && currentOrganizer !== null) {
+		const organizerUpdatePromises = events.docs.map(async (event) => {
+			const eventDoc = event.data()!;
 
-    const updates: Record<string, any> = {
-        entrant: currentEntrant,
-        organizer: currentOrganizer,
-        admin: currentAdmin,
-    };
+			if (eventDoc.organizer === data.targetUserId) {
+				return util.deleteEvent(event.id);
+			}
 
-    await db.collection("users").doc(targetUserId).update(updates);
-    logger.info("Updated roles for user", { targetUserId });
+			return;
+		});
+
+		await Promise.all(organizerUpdatePromises);
+
+		userDoc.organizer = null;
+	}
+
+	// Granted admin permission
+	if (data.isAdmin && currentAdmin === null) {
+		userDoc.admin = {};
+	}
+
+	// Banned from being an admin
+	else if (!data.isAdmin && currentAdmin !== null) {
+		userDoc.admin = null;
+	}
+
+	currentEntrant = userDoc.entrant;
+	currentOrganizer = userDoc.organizer;
+	currentAdmin = userDoc.admin;
+
+	const updates: Record<string, any> = {
+		entrant: currentEntrant,
+		organizer: currentOrganizer,
+		admin: currentAdmin,
+	};
+
+	await db.collection("users").doc(data.targetUserId).update(updates);
 }

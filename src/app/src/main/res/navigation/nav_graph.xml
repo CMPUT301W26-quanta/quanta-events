@@ -243,6 +243,23 @@
         <argument
             android:name="isPrivate"
             app:argType="boolean" />
+        <action
+            android:id="@+id/action_eventManagerFragment_to_inviteCoOrganizerFragment"
+            app:destination="@id/invite_co_organizer_fragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/invite_co_organizer_fragment"
+        android:name="ca.quanta.quantaevents.fragments.InviteCoOrganizerFragment"
+        android:label="fragment_invite_co_organizer"
+        tools:layout="@layout/fragment_invite_co_organizer">
+        <argument
+            android:name="eventId"
+            app:argType="java.util.UUID" />
     </fragment>
 
     <fragment

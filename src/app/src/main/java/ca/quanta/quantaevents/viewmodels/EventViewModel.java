@@ -66,10 +66,35 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
+     * Calls the cancelSelected cloud function, cancelling the lottery invitations to the selected users.
+     *
+     * @param userId UUID to identify the user.
+     * @param deviceId UUID to identify the user's device.
+     * @param eventId UUID of the event to operate on.
+     */
+    public Task<Void> cancelSelected(UUID userId, UUID deviceId, UUID eventId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("cancelSelected")
+                .call(data)
+                .onSuccessTask(callResult -> {
+                    return Tasks.forResult(null);
+                });
+    }
+
+    /**
      * Calls the createEvent cloud function and adds an event to the database.
      *
-     * @param userId                UUID to identify user.
-     * @param deviceId              UUID to identify user's device.
+     * @param userId                UUID to identify the user.
+     * @param deviceId              UUID to identify the user's device.
      * @param registrationStartTime ISO-8601 datetime with offset (UTC preferred).
      * @param registrationEndTime   ISO-8601 datetime with offset (UTC preferred).
      * @param eventTime             ISO-8601 datetime with offset (UTC preferred).
@@ -79,7 +104,8 @@ public class EventViewModel extends ViewModel {
      * @param eventGuidelines       Guidelines (optional).
      * @param geolocation           Whether geolocation is enabled.
      * @param eventCapacity         Entrant capacity.
-     * @param location              Location of the event.
+     * @param locationLat           Lateral location of the event.
+     * @param locationLng           Longitudinal location of the event.
      * @param registrationLimit     Waitlist capacity (optional).
      * @param imageId               UUID identifying the image for the event (optional).
      * @return UUID assigned to the newly created event.
@@ -109,6 +135,7 @@ public class EventViewModel extends ViewModel {
         payload.put("registrationLimit", registrationLimit);
         payload.put("imageId", imageId == null ? null : imageId.toString());
         payload.put("isPrivate", isPrivate);
+
         data.put("data", payload);
 
         return functions
@@ -269,9 +296,9 @@ public class EventViewModel extends ViewModel {
                 .getHttpsCallable("getOrganizerName")
                 .call(data)
                 .onSuccessTask(callResult -> {
-                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
-                        Object name = result == null ? null : result.get("name");
-                        return Tasks.forResult(name == null ? null : name.toString());
+                    Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                    Object name = result == null ? null : result.get("name");
+                    return Tasks.forResult(name == null ? null : name.toString());
                 });
     }
 
@@ -296,9 +323,9 @@ public class EventViewModel extends ViewModel {
                 .getHttpsCallable("getWaitlistCount")
                 .call(data)
                 .onSuccessTask(callResult -> {
-                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
-                        Object count = result == null ? null : result.get("count");
-                        return Tasks.forResult(count instanceof Number ? ((Number) count).intValue() : 0);
+                    Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                    Object count = result == null ? null : result.get("count");
+                    return Tasks.forResult(count instanceof Number ? ((Number) count).intValue() : 0);
                 });
     }
 
@@ -326,10 +353,10 @@ public class EventViewModel extends ViewModel {
                 .getHttpsCallable("checkWaitlist")
                 .call(data)
                 .onSuccessTask(callResult -> {
-                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
-                        Log.d("EventViewModel", "checkWaitlist result=" + result);
-                        Object inWaitlist = result == null ? null : result.get("inWaitlist");
-                        return Tasks.forResult(inWaitlist instanceof Boolean ? (Boolean) inWaitlist : false);
+                    Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                    Log.d("EventViewModel", "checkWaitlist result=" + result);
+                    Object inWaitlist = result == null ? null : result.get("inWaitlist");
+                    return Tasks.forResult(inWaitlist instanceof Boolean ? (Boolean) inWaitlist : false);
                 });
     }
 
@@ -370,8 +397,8 @@ public class EventViewModel extends ViewModel {
                 .getHttpsCallable("joinWaitlist")
                 .call(data)
                 .onSuccessTask(callResult -> {
-                        Log.d("EventViewModel", "joinWaitlist success");
-                        return Tasks.forResult(null);
+                    Log.d("EventViewModel", "joinWaitlist success");
+                    return Tasks.forResult(null);
                 });
     }
 
@@ -399,8 +426,8 @@ public class EventViewModel extends ViewModel {
                 .getHttpsCallable("leaveWaitlist")
                 .call(data)
                 .onSuccessTask(callResult -> {
-                        Log.d("EventViewModel", "leaveWaitlist success");
-                        return Tasks.forResult(null);
+                    Log.d("EventViewModel", "leaveWaitlist success");
+                    return Tasks.forResult(null);
                 });
     }
 
@@ -418,7 +445,8 @@ public class EventViewModel extends ViewModel {
      * @param eventGuidelines       Guidelines (optional).
      * @param geolocation           Whether geolocation is enabled.
      * @param eventCapacity         Entrant capacity.
-     * @param location              Location of the event.
+     * @param locationLat           Latitude of the event.
+     * @param locationLng           Longitude of the event.
      * @param registrationLimit     Waitlist capacity (optional).
      * @param imageId               UUID identifying the image for the event (optional).
      * @return null if successful, an error if unsuccessful.
@@ -449,8 +477,11 @@ public class EventViewModel extends ViewModel {
         payload.put("registrationLimit", registrationLimit);
         payload.put("imageId", imageId == null ? null : imageId.toString());
         payload.put("isPrivate", isPrivate);
+
         data.put("data", payload);
+
         System.out.println(payload);
+
         return functions
                 .getHttpsCallable("updateEvent")
                 .call(data)
@@ -541,6 +572,30 @@ public class EventViewModel extends ViewModel {
                     return Tasks.forResult(externalUsers);
                 });
     }
+
+    /**
+     *
+     * @param userId UUID to identify user.
+     * @param deviceId UUID to identify user's device.
+     * @param eventId UUID to identify event.
+     * @param recipientId UUID to identify recipient.
+     * @return null on success, error on failure
+     */
+    public Task<Void> createCoInvitation(UUID userId, UUID deviceId, UUID eventId, UUID recipientId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        payload.put("invitee", recipientId.toString());
+        data.put("data", payload);
+
+        return functions.getHttpsCallable("createCoInvitation")
+                .call(data)
+                .onSuccessTask(task -> Tasks.forResult(null));
+    }
+
 
     public Task<List<Map.Entry<ExternalUser, LatLng>>> getWaitlistMap(UUID userId, UUID deviceId, UUID eventId) {
         Map<String, Object> data = new HashMap<>();

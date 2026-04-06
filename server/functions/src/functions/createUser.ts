@@ -35,7 +35,7 @@ export async function createUser(request: CallableRequest) {
 					name: name,
 					email: email,
 					phone: phone,
-					entrant: {enteredEvents: [], history: [], undismissedNotifications: [], receiveNotifications: receiveNotifications ?? false},
+					entrant: {enteredEvents: [], history: [], undismissedNotifications: [], receiveNotifications: receiveNotifications ?? false, coOrganizedEvents: []},
 					organizer: { createdEvents: [], sentNotifications: [] },
 					admin: null,
 					notifToken: null,

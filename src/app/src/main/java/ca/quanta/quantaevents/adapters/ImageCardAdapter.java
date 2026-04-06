@@ -90,6 +90,9 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
             return;
         }
 
+        // reset the image resource because the view might have been recycled
+        holder.image.setImageResource(R.drawable.material_symbols_image_rounded);
+
         this.imageModel.getImage(imageId, this.userId, this.deviceId)
                 .addOnSuccessListener(image -> {
                     Object imageData = image.getImageData();
@@ -120,13 +123,13 @@ public class ImageCardAdapter extends RecyclerView.Adapter<ImageCardAdapter.Imag
         holder.buttonRemove.setOnClickListener(view -> {
             int eventPosition = holder.getBindingAdapterPosition();
 
+            // optimistically remove the image
+            this.imageIDs.remove(eventPosition);
+            this.notifyItemRemoved(eventPosition);
+
             this.imageModel.deleteImage(imageId, this.userId, this.deviceId)
-                    .addOnSuccessListener(success -> {
-                        this.imageIDs.remove(eventPosition);
-                        this.notifyItemRemoved(eventPosition);
-                    })
                     .addOnFailureListener(exception -> {
-                        Log.e("ImageCardAdapter", "Failed to delete an image.", exception);
+                        Log.e("ImageCardAdapter", "Failed to delete the image.", exception);
 
                         Toast.makeText(this.parentFragment.requireContext(), "Failed to remove image: " + exception.getMessage(), Toast.LENGTH_LONG).show();
 
