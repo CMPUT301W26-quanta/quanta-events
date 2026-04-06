@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
@@ -19,14 +20,14 @@ import com.google.firebase.functions.FirebaseFunctionsException;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import ca.quanta.quantaevents.R;
-import ca.quanta.quantaevents.adapters.InviteNotificationAdapter;
-import ca.quanta.quantaevents.adapters.LotteryNotificationAdapter;
-import ca.quanta.quantaevents.adapters.MessageNotificationAdapter;
+import ca.quanta.quantaevents.adapters.UndismissedNotificationAdapter;
 import ca.quanta.quantaevents.burger.SmartBurgerState;
 import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentHomeBinding;
+import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.models.ExternalUndismissedNotification;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
@@ -136,36 +137,59 @@ public class HomeFragment extends Fragment implements Tagged {
 
         if (!isAdded() || this.binding == null) return;
 
-        ArrayList<ExternalUndismissedNotification> inviteNotifications = new ArrayList<>();
-        ArrayList<ExternalUndismissedNotification> lotteryNotifications = new ArrayList<>();
-        ArrayList<ExternalUndismissedNotification> messageNotifications = new ArrayList<>();
+        UndismissedNotificationAdapter.AsyncHandler handler = new UndismissedNotificationAdapter.AsyncHandler() {
+            @Override
+            public void getEvent(UUID eventId, Consumer<Event> consumer, Runnable onFail) {
+                MutableLiveData<Void> failObserver = new MutableLiveData<>();
+                MutableLiveData<Event> successObserver = new MutableLiveData<>();
+                failObserver.observe(HomeFragment.this, _void -> onFail.run());
+                successObserver.observe(HomeFragment.this, consumer::accept);
+                eventModel.getEvent(eventId, userId, deviceId)
+                        .addOnSuccessListener(successObserver::postValue)
+                        .addOnFailureListener(exc -> {
+                            failObserver.postValue(null);
+                            Log.e("MessageNotificationAdapter", "Failed to fetch event name.", exc);
 
-        for (ExternalUndismissedNotification notification : notifications) {
-            switch (notification.getKind()) {
-                case "INVITE": inviteNotifications.add(notification); break;
-                case "LOTTERY": lotteryNotifications.add(notification); break;
-                case "MESSAGE": messageNotifications.add(notification); break;
+                            if (isAdded())
+                                ToastManager.show(getContext(), "Failed to fetch event name.", Toast.LENGTH_LONG);
+
+                            if (exc instanceof FirebaseFunctionsException) {
+                                Log.e("MessageNotificationAdapter", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exc).getCode());
+                            }
+                        });
             }
-        }
 
-        InviteNotificationAdapter inviteNotificationAdapter = new InviteNotificationAdapter(inviteNotifications, this, this.eventModel, this.notificationModel, this.userId, this.deviceId);
-        LotteryNotificationAdapter lotteryNotificationAdapter = new LotteryNotificationAdapter(lotteryNotifications, this, this.eventModel, this.notificationModel, this.inviteModel, this.userId, this.deviceId);
-        MessageNotificationAdapter messageNotificationAdapter = new MessageNotificationAdapter(messageNotifications, this, this.eventModel, this.notificationModel, this.userId, this.deviceId);
+            @Override
+            public void dismissed(int position, UUID notificationId) {
+
+            }
+
+            @Override
+            public void accepted(UUID notificationId) {
+
+            }
+
+            @Override
+            public void declined(UUID notificationId) {
+
+            }
+
+            @Override
+            public void goToEvent(UUID eventId) {
+
+            }
+        };
+
+        UndismissedNotificationAdapter adapter = new UndismissedNotificationAdapter(notifications, handler);
 
         // **** set up the notification recycler views
 
-        this.binding.inviteNotificationsRecyclerView.setLayoutManager(new LinearLayoutManager(this.requireContext()));
-        this.binding.inviteNotificationsRecyclerView.setAdapter(inviteNotificationAdapter);
-
-        this.binding.lotteryNotificationsRecyclerView.setLayoutManager(new LinearLayoutManager(this.requireContext()));
-        this.binding.lotteryNotificationsRecyclerView.setAdapter(lotteryNotificationAdapter);
-
-        this.binding.messageNotificationsRecyclerView.setLayoutManager(new LinearLayoutManager(this.requireContext()));
-        this.binding.messageNotificationsRecyclerView.setAdapter(messageNotificationAdapter);
+        binding.undismissedNotificationsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.undismissedNotificationsRecyclerView.setAdapter(adapter);
 
         // **** display toast in case there are none
 
-        if (inviteNotifications.isEmpty() && lotteryNotifications.isEmpty() && messageNotifications.isEmpty()) {
+        if (notifications.isEmpty()) {
             ToastManager.show(this.getContext(), "No notifications to display.", Toast.LENGTH_LONG);
         }
     }

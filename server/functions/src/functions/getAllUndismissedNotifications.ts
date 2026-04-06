@@ -15,11 +15,8 @@ export async function getAllUndismissedNotifications(
 	);
 
 	const userData = await util.verifyUser(userId, deviceId);
-	await util.requireRole(userData, "entrant");
 
-	if (userData.entrant === undefined || userData.entrant === null) {
-		throw new HttpsError("failed-precondition", "User is not an entrant.");
-	}
+	const entrant = util.requireRole(userData, "entrant");
 
 	logger.info(`Get all undismissed notifications of user ${userId}`);
 
@@ -31,7 +28,7 @@ export async function getAllUndismissedNotifications(
 
 	const notifications: ExternalUndismissedNotification[] = [];
 
-	for (const undismissedNotificationId of userData.entrant
+	for (const undismissedNotificationId of entrant.entrant
 		.undismissedNotifications) {
 		const notificationRef = notificationCollection.doc(
 			undismissedNotificationId,

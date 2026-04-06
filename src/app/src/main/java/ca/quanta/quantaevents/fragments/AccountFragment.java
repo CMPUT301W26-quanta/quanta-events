@@ -60,7 +60,6 @@ public class AccountFragment extends Fragment implements Tagged {
             this.deviceId = did;
             maybeLoadUser();
         });
-        SwitchMaterial darkModeSwitch = view.findViewById(R.id.switchDarkMode);
         binding.switchDarkMode.setChecked(ThemeSwitch.isDarkMode(requireContext()));
         binding.switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
             ThemeSwitch.setDarkMode(requireContext(), isChecked);

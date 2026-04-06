@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/profile_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="12dp"
+    android:layout_marginHorizontal="8dp"
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="12dp"
     app:cardElevation="6dp"
@@ -19,30 +18,48 @@
         android:padding="12dp"
         android:gravity="center_vertical">
 
-        <!-- Message -->
-        <TextView
-            android:id="@+id/notification_message"
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Loading message..."
-            android:textSize="16sp"
-            android:textColor="@color/text_color" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <!-- Event Name -->
+            <TextView
+                android:id="@+id/notification_event_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingVertical="2dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_color"
+                android:text="Loading event name..."
+                android:maxLines="1"
+                android:ellipsize="end" />
 
-        <!-- Dismiss icon -->
-        <ImageView
-            android:id="@+id/icon_dismiss"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="12dp"
-            android:src="@drawable/material_symbols_delete" />
+            <!-- Message -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/invite_message"
+                android:textSize="16sp"
+                android:textColor="@color/text_color" />
+        </LinearLayout>
 
         <!-- Event icon -->
         <ImageView
             android:id="@+id/icon_event"
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:layout_marginEnd="12dp"
             android:src="@drawable/material_symbols_event_outline" />
+
+        <!-- Dismiss icon -->
+        <ImageView
+            android:id="@+id/icon_dismiss"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/material_symbols_delete" />
 
     </LinearLayout>
 
