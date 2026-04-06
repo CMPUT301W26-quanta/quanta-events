@@ -4,7 +4,6 @@
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
 import { CallableRequest, HttpsError } from "firebase-functions/https";
-import { v4 as uuidv4 } from "uuid";
 import * as z from "zod";
 import * as util from "../util";
 
@@ -58,46 +57,7 @@ export async function inviteReject(request: CallableRequest): Promise<{}> {
 	// (the list of ppl not selected by the lotto, to the list of ppl selected by it)
 
 	if (eventDoc.rejectedList.length > 0) {
-		// the rejectedList was already randomized when the lottery was
-		// drawn in drawLottery(), so we'll just pick the last user in it
-
-		const userId = eventDoc.rejectedList.at(-1)!;
-
-		await eventRef.update({
-			selectedList: FieldValue.arrayUnion(userId),
-		});
-
-		await eventRef.update({
-			rejectedList: FieldValue.arrayRemove(userId),
-		});
-
-		const notificationId = uuidv4();
-
-		const notificationCollection = db.collection(
-			"notifications",
-		) as NotificationDocCollection;
-		const notificationRef = notificationCollection.doc(notificationId);
-
-		notificationRef.create(
-			util.enforceFull<NotificationDocument>({
-				eventId: data.eventId,
-
-				targetUsers: [userId],
-
-				title: eventDoc.eventName,
-				message: "You've been reconsidered for an event!",
-
-				kind: {
-					kind: "LOTTERY",
-					selected: true,
-				},
-			}),
-		);
-
-		const notification = await notificationRef.get();
-		const notificationDoc = notification.data()!;
-
-		await util.sendNotification(userId, notificationId, notificationDoc);
+		await util.rejectedToSelected(data.eventId);
 	}
 
 	return {};

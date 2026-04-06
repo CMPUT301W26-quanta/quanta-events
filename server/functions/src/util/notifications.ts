@@ -71,7 +71,7 @@ export async function sendNotification(
 		FieldValue.arrayUnion(notificationId),
 	);
 
-	// send an android notification only if the recipient has enabled receiving notifications
+	// send an android notification only if the recipient has enabled receiving push notifications
 
 	if (userDoc.entrant.receiveNotifications) {
 		sendAndroidNotification(

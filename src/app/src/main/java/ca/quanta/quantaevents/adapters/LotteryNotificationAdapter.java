@@ -142,6 +142,11 @@ public class LotteryNotificationAdapter extends RecyclerView.Adapter<LotteryNoti
     }
 
     private void dismissNotification(int notificationPosition, UUID notificationId) {
+        // safety check
+        if (notificationPosition == RecyclerView.NO_POSITION) {
+            return;
+        }
+
         // optimistically remove the notification
         this.notifications.remove(notificationPosition);
         this.notifyItemRemoved(notificationPosition);
