@@ -252,6 +252,11 @@ public class User {
         return phoneNumber;
     }
 
+    /**
+     * Checks if this user is the same as another.
+     * @param o   the reference object with which to compare.
+     * @return True if yes, False if no.
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -259,6 +264,10 @@ public class User {
         return Objects.equals(entrant, user.entrant) && Objects.equals(organizer, user.organizer) && Objects.equals(admin, user.admin) && Objects.equals(userId, user.userId) && Objects.equals(deviceId, user.deviceId) && Objects.equals(name, user.name) && Objects.equals(email, user.email) && Objects.equals(phoneNumber, user.phoneNumber);
     }
 
+    /**
+     * Creates a hashcode for a user.
+     * @return Hashcode representing a user.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(entrant, organizer, admin, userId, deviceId, name, email, phoneNumber);

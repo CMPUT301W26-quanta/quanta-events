@@ -82,12 +82,18 @@ public class EventQRCodeFragment extends Fragment {
         });
     }
 
+    /**
+     * Resumes the QR code scanning process.
+     */
     @Override
     public void onResume() {
         super.onResume();
         binding.qrCodeScanner.resume();
     }
 
+    /**
+     * Pauses the QR code scanning process.
+     */
     @Override
     public void onPause() {
         super.onPause();
