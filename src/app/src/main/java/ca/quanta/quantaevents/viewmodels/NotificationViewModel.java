@@ -35,7 +35,7 @@ public class NotificationViewModel extends ViewModel {
      * @return UUID identifying the newly created notification.
      */
     public Task<UUID> createNotification(UUID userId, UUID deviceId, String message,
-                                         String title, String eventId, Boolean waited,
+                                         String title, UUID eventId, Boolean waited,
                                          Boolean cancelled, Boolean selected, Boolean finale) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
@@ -44,7 +44,7 @@ public class NotificationViewModel extends ViewModel {
         Map<String, Object> payload = new HashMap<>();
         payload.put("message", message);
         payload.put("title", title);
-        payload.put("eventId", eventId);
+        payload.put("eventId", eventId.toString());
         payload.put("waited", waited);
         payload.put("cancelled", cancelled);
         payload.put("selected", selected);

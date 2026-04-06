@@ -2,15 +2,13 @@ package ca.quanta.quantaevents.viewmodels;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.HttpsCallableResult;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -21,8 +19,6 @@ import java.util.UUID;
 
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.models.ExternalUser;
-
-import androidx.annotation.Nullable;
 
 /**
  * View-model for managing event-related data and cloud functions.
@@ -68,9 +64,9 @@ public class EventViewModel extends ViewModel {
     /**
      * Calls the cancelSelected cloud function, cancelling the lottery invitations to the selected users.
      *
-     * @param userId UUID to identify the user.
+     * @param userId   UUID to identify the user.
      * @param deviceId UUID to identify the user's device.
-     * @param eventId UUID of the event to operate on.
+     * @param eventId  UUID of the event to operate on.
      */
     public Task<Void> cancelSelected(UUID userId, UUID deviceId, UUID eventId) {
         Map<String, Object> data = new HashMap<>();
@@ -92,6 +88,7 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the createEvent cloud function and adds an event to the database.
+     *
      * @param userId                UUID to identify the user.
      * @param deviceId              UUID to identify the user's device.
      * @param registrationStartTime ISO-8601 datetime with offset (UTC preferred).
@@ -149,12 +146,13 @@ public class EventViewModel extends ViewModel {
     /**
      * Calls the deleteEvent cloud function and deletes the event (and its image)
      * from the database.
-     * @param eventId UUID to identify the event to delete.
-     * @param userId UUID to identify this user.
+     *
+     * @param eventId  UUID to identify the event to delete.
+     * @param userId   UUID to identify this user.
      * @param deviceId UUID to identify this user's device.
-     * @return True if successful, and error if unsuccessful.
+     * @return null if successful, and error if unsuccessful.
      */
-    public Task<Boolean> deleteEvent(UUID eventId, UUID userId, UUID deviceId) {
+    public Task<Void> deleteEvent(UUID eventId, UUID userId, UUID deviceId) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -166,16 +164,12 @@ public class EventViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("deleteEvent")
                 .call(data)
-                .continueWith(new Continuation<HttpsCallableResult, Boolean>() {
-                    @Override
-                    public Boolean then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                        return true;
-                    }
-                });
+                .onSuccessTask(task -> Tasks.forResult(null));
     }
 
     /**
      * Calls the getEvent cloud function, fetches an event from the database, and maps it to an Event model.
+     *
      * @param eventId  UUID identify the event.
      * @param userId   UUID to identify user.
      * @param deviceId UUID to identify user's device.
@@ -202,6 +196,7 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the getEvents cloud function, filtering events for different fragments.
+     *
      * @param userId    UUID to identify user.
      * @param deviceId  UUID to identify user's device.
      * @param max       Max number of events to return. Set to -1 for no maximum.
@@ -274,6 +269,7 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the getOrganizerName cloud function and fetches the organizer name for an event.
+     *
      * @param userId   UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @param eventId  UUID to identify the event.
@@ -300,6 +296,7 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the getWaitlistCount cloud function to get the number of users on the waitlist of an event.
+     *
      * @param userId   UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @param eventId  UUID to identify event.
@@ -326,6 +323,7 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the checkWaitlist cloud function to check if a user is in waitlist of an event.
+     *
      * @param userId   UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @param eventId  UUID to identify event.
@@ -357,10 +355,11 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the joinWaitlist cloud function to add a user to an event waitlist.
-     * @param userId   UUID to identify user.
-     * @param deviceId UUID to identify user's device.
-     * @param eventId  UUID to identify event.
-     * @param latitude Double identifying the user's latitude.
+     *
+     * @param userId    UUID to identify user.
+     * @param deviceId  UUID to identify user's device.
+     * @param eventId   UUID to identify event.
+     * @param latitude  Double identifying the user's latitude.
      * @param longitude Double identifying the user's longitude.
      * @param accuracyM Double identifying the accuracy of the geolocation.
      * @return null if successful, an error if unsuccessful.
@@ -380,7 +379,7 @@ public class EventViewModel extends ViewModel {
             joinLocation.put("longitude", longitude);
             joinLocation.put("accuracyM", accuracyM);
             payload.put("joinLocation", joinLocation);
-        } else  {
+        } else {
             payload.put("joinLocation", null);
         }
 
@@ -400,6 +399,7 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the leaveWaitlist cloud function to remove a user from an event waitlist.
+     *
      * @param userId   UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @param eventId  UUID to identify event.
@@ -428,6 +428,7 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the updateEvent cloud function to update an event.
+     *
      * @param userId                UUID to identify user.
      * @param deviceId              UUID to identify user's device.
      * @param registrationStartTime ISO-8601 datetime with offset (UTC preferred).
@@ -484,6 +485,7 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the drawLottery cloud function to draw the lottery for an event.
+     *
      * @param userId   UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @param eventId  UUID to identify event.
@@ -504,11 +506,16 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
-     * Calls the createInvitation cloud function, creating and sending an invite.
-     * @param userId UUID to identify user.
+     * * Calls the createInvitation cloud function, creating and sending an invite.
+     *
+     * @param userId   UUID to identify user.
      * @param deviceId UUID to identify user's device.
-     * @param eventId UUID to identify event.
-     * @param invitee UUID to identify invitee.
+     * @param eventId  UUID to identify event.
+     * @param invitee  UUID to identify invitee.
+     * @param userId   UUID to identify user.
+     * @param deviceId UUID to identify user's device.
+     * @param eventId  UUID to identify event.
+     * @param invitee  UUID to identify invitee.
      * @return null on success, error on failure.
      */
     public Task<Void> createInvitation(UUID userId, UUID deviceId, UUID eventId, UUID invitee) {
@@ -528,10 +535,11 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the getWaitlist cloud function and returns users on the requested list.
-     * @param userId    UUID to identify user.
-     * @param deviceId  UUID to identify user's device.
-     * @param eventId   UUID to identify the event.
-     * @param listType  The list to fetch (waitList, cancelledList, finalList, rejectedList, selectedList).
+     *
+     * @param userId   UUID to identify user.
+     * @param deviceId UUID to identify user's device.
+     * @param eventId  UUID to identify the event.
+     * @param listType The list to fetch (waitList, cancelledList, finalList, rejectedList, selectedList).
      * @return List of ExternalUser objects on the requested list.
      */
     public Task<List<ExternalUser>> getWaitlist(UUID userId, UUID deviceId, UUID eventId, String listType) {
@@ -567,9 +575,10 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the createCoInvitation cloud function, creating and sending an invite.
-     * @param userId UUID to identify user.
-     * @param deviceId UUID to identify user's device.
-     * @param eventId UUID to identify event.
+     *
+     * @param userId      UUID to identify user.
+     * @param deviceId    UUID to identify user's device.
+     * @param eventId     UUID to identify event.
      * @param recipientId UUID to identify recipient.
      * @return null on success, error on failure
      */
@@ -590,9 +599,10 @@ public class EventViewModel extends ViewModel {
 
     /**
      * Calls the getWaitListMap cloud function, getting the location of an event's entrants.
-     * @param userId UUID identifying the user.
+     *
+     * @param userId   UUID identifying the user.
      * @param deviceId UUID identifying the user's device.
-     * @param eventId UUID identifying the event.
+     * @param eventId  UUID identifying the event.
      * @return ArrayList of users on the event waitlist and their locations.
      */
     public Task<List<Map.Entry<ExternalUser, LatLng>>> getWaitlistMap(UUID userId, UUID deviceId, UUID eventId) {

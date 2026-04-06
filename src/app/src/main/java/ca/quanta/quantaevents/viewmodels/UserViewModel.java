@@ -1,16 +1,11 @@
 package ca.quanta.quantaevents.viewmodels;
 
-import android.util.Log;
-
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModel;
 
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.HttpsCallableResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +26,7 @@ public class UserViewModel extends ViewModel {
 
     /**
      * Calls the createUser cloud function, creating and adding a user to the database.
+     *
      * @param name             Name of the user.
      * @param email            Email address of the user.
      * @param phone            Phone number of the user.
@@ -53,15 +49,16 @@ public class UserViewModel extends ViewModel {
                 .call(data)
                 .onSuccessTask(callResult -> {
                     // Access return value of the function createUser
-                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
-                        UUID userId = UUID.fromString((String) result.get("userId"));
-                        return Tasks.forResult(userId);
+                    Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                    UUID userId = UUID.fromString((String) result.get("userId"));
+                    return Tasks.forResult(userId);
                 });
     }
 
     /**
      * Calls the getAllUsers cloud function, getting all users stored in the database.
-     * @param userId This user's id (for permissions checking).
+     *
+     * @param userId   This user's id (for permissions checking).
      * @param deviceId This user's device id (for permissions checking).
      * @return List of User Objects.
      */
@@ -71,9 +68,10 @@ public class UserViewModel extends ViewModel {
 
     /**
      * Calls the getAllUsers cloud function, getting all users stored in the database.
-     * @param userId This user's id (for permissions checking).
+     *
+     * @param userId   This user's id (for permissions checking).
      * @param deviceId This user's device id (for permissions checking).
-     * @param search The keyword to search by
+     * @param search   The keyword to search by
      * @return List of User Objects.
      */
     public Task<ArrayList<ExternalUser>> getAllUsers(UUID userId, UUID deviceId, @Nullable String search) {
@@ -87,38 +85,39 @@ public class UserViewModel extends ViewModel {
         data.put("data", payload);
 
         return functions
-               .getHttpsCallable("getAllUsers")
-               .call(data)
-               .onSuccessTask(callResult -> {
-                       List<Map<String, Object>> userObjects = (List<Map<String, Object>>) callResult.getData();
-                       ArrayList<ExternalUser> users = new ArrayList<>();
+                .getHttpsCallable("getAllUsers")
+                .call(data)
+                .onSuccessTask(callResult -> {
+                    List<Map<String, Object>> userObjects = (List<Map<String, Object>>) callResult.getData();
+                    ArrayList<ExternalUser> users = new ArrayList<>();
 
-                       for (Map<String, Object> userObject : userObjects) {
-                           String userIdStr = (String) userObject.get("userId");
-                           String name = Optional.ofNullable(userObject.get("name")).map(val -> (String)val).orElse(null);
-                           String email = Optional.ofNullable(userObject.get("email")).map(val -> (String)val).orElse(null);
-                           String phone = Optional.ofNullable(userObject.get("phone")).map(val -> (String)val).orElse(null);
-                           Boolean isEntrant = (Boolean) userObject.get("isEntrant");
-                           Boolean isOrganizer = (Boolean) userObject.get("isOrganizer");
-                           Boolean isAdmin = (Boolean) userObject.get("isAdmin");
+                    for (Map<String, Object> userObject : userObjects) {
+                        String userIdStr = (String) userObject.get("userId");
+                        String name = Optional.ofNullable(userObject.get("name")).map(val -> (String) val).orElse(null);
+                        String email = Optional.ofNullable(userObject.get("email")).map(val -> (String) val).orElse(null);
+                        String phone = Optional.ofNullable(userObject.get("phone")).map(val -> (String) val).orElse(null);
+                        Boolean isEntrant = (Boolean) userObject.get("isEntrant");
+                        Boolean isOrganizer = (Boolean) userObject.get("isOrganizer");
+                        Boolean isAdmin = (Boolean) userObject.get("isAdmin");
 
-                           // verify that they have a userId, otherwise just skip them
+                        // verify that they have a userId, otherwise just skip them
 
-                           if (userIdStr == null) {
-                               continue;
-                           }
+                        if (userIdStr == null) {
+                            continue;
+                        }
 
-                           UUID userUUID = UUID.fromString(userIdStr);
+                        UUID userUUID = UUID.fromString(userIdStr);
 
-                           users.add(new ExternalUser(userUUID, name, email, phone, isEntrant, isOrganizer, isAdmin));
-                       }
+                        users.add(new ExternalUser(userUUID, name, email, phone, isEntrant, isOrganizer, isAdmin));
+                    }
 
-                       return Tasks.forResult(users);
-               });
+                    return Tasks.forResult(users);
+                });
     }
 
     /**
      * Calls the getUser cloud function, getting user data from the database.
+     *
      * @param userId   UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @return User object containing user's data.
@@ -145,11 +144,12 @@ public class UserViewModel extends ViewModel {
 
     /**
      * Calls the deleteUser cloud function, deleting a user from the database.
-     * @param userId UUID identifying the user.
+     *
+     * @param userId   UUID identifying the user.
      * @param deviceId UUID identifying the user's device.
      * @return True if successful, and error if unsuccessful.
      */
-    public Task<Boolean> deleteUser(UUID userId, UUID deviceId, UUID targetUserId) {
+    public Task<Void> deleteUser(UUID userId, UUID deviceId, UUID targetUserId) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -162,25 +162,26 @@ public class UserViewModel extends ViewModel {
                 .getHttpsCallable("deleteUser")
                 .call(data)
                 .onSuccessTask(callResult -> {
-                        return Tasks.forResult(null);
+                    return Tasks.forResult(null);
                 });
     }
 
     /**
      * Calls the updateUser cloud function, updating existing user details.
-     * @param userId UUID to identify the user.
-     * @param deviceId UUID to verify users device.
-     * @param name new user name (optional).
-     * @param email new user email (optional).
-     * @param phone Updated phone (optional).
+     *
+     * @param userId               UUID to identify the user.
+     * @param deviceId             UUID to verify users device.
+     * @param name                 new user name (optional).
+     * @param email                new user email (optional).
+     * @param phone                Updated phone (optional).
      * @param receiveNotifications Updated notification preference (optional).
      * @return UUID identifying the user's ID.
      */
     public Task<Void> updateUser(UUID userId, UUID deviceId,
-                                   @Nullable String name,
-                                   @Nullable String email,
-                                   @Nullable String phone,
-                                   @Nullable Boolean receiveNotifications) {
+                                 @Nullable String name,
+                                 @Nullable String email,
+                                 @Nullable String phone,
+                                 @Nullable Boolean receiveNotifications) {
 
         // Builds the data map to be sent to the function which contains
         // userId, deviceId and new details to update with.
@@ -204,19 +205,20 @@ public class UserViewModel extends ViewModel {
                 .getHttpsCallable("updateUser")
                 .call(data)
                 .onSuccessTask(callResult -> {
-                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
-                        return Tasks.forResult(null);
+                    Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                    return Tasks.forResult(null);
                 });
     }
 
     /**
      * Calls the updateRoles cloud function, updating the roles of a user.
-     * @param userId UUID to identify the invoker.
-     * @param deviceId UUID to identify the invoker's device.
+     *
+     * @param userId       UUID to identify the invoker.
+     * @param deviceId     UUID to identify the invoker's device.
      * @param targetUserId UUID identifying the user to be updated.
-     * @param isEntrant Boolean that's true if the user should be an entrant.
-     * @param isOrganizer Boolean that's true if the user should be an organizer.
-     * @param isAdmin Boolean that's true if the user should be an admin.
+     * @param isEntrant    Boolean that's true if the user should be an entrant.
+     * @param isOrganizer  Boolean that's true if the user should be an organizer.
+     * @param isAdmin      Boolean that's true if the user should be an admin.
      * @return Void task object.
      */
     public Task<Void> updateRoles(UUID userId, UUID deviceId, UUID targetUserId, Boolean isEntrant,
