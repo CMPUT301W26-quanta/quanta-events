@@ -22,7 +22,7 @@ import java.util.UUID;
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.NotificationAdapter;
 import ca.quanta.quantaevents.databinding.FragmentAdminNotificationHistoryBinding;
-import ca.quanta.quantaevents.models.Notification;
+import ca.quanta.quantaevents.models.ExternalNotification;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.utils.ToastManager;
@@ -68,7 +68,7 @@ public class AdminNotificationHistoryFragment extends Fragment {
 
         // **** set up the back buttons on click listener
 
-        binding.backButton.setOnClickListener(
+        this.binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
         );
     }
@@ -79,7 +79,7 @@ public class AdminNotificationHistoryFragment extends Fragment {
         this.notificationModel.getAllNotifications(this.userId, this.deviceId, profileID)
                 .addOnSuccessListener(this::getAndDisplayNotifications)
                 .addOnFailureListener(exception -> {
-                    if (!isAdded() || binding == null) return;
+                    if (!isAdded() || this.binding == null) return;
                     Log.e("AdminNotificationHistoryFragment", "Failed to fetch notifications.", exception);
 
                     ToastManager.show(getContext(), "Failed to fetch notifications", Toast.LENGTH_LONG);
@@ -90,15 +90,15 @@ public class AdminNotificationHistoryFragment extends Fragment {
                 });
     }
 
-    private void getAndDisplayNotifications(ArrayList<Notification> notifications) {
+    private void getAndDisplayNotifications(ArrayList<ExternalNotification> notifications) {
         // **** use the adapter to display them
-        if (!isAdded() || binding == null) return;
+        if (!isAdded() || this.binding == null) return;
         NotificationAdapter notificationAdapter = new NotificationAdapter(notifications);
 
         // **** set up the notification recycler view
 
-        binding.notificationsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        binding.notificationsRecyclerView.setAdapter(notificationAdapter);
+        this.binding.notificationsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        this.binding.notificationsRecyclerView.setAdapter(notificationAdapter);
 
         // **** display toast in case there are none
 
@@ -110,14 +110,14 @@ public class AdminNotificationHistoryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentAdminNotificationHistoryBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+        this.binding = FragmentAdminNotificationHistoryBinding.inflate(inflater, container, false);
+        return this.binding.getRoot();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         ToastManager.cancel();
-        binding = null;
+        this.binding = null;
     }
 }

@@ -13,6 +13,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
+import ca.quanta.quantaevents.utils.ThemeSwitch;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.functions.FirebaseFunctionsException;
 
 import java.util.UUID;
@@ -49,22 +51,28 @@ public class AccountFragment extends Fragment implements Tagged {
         infoStore.setSubtitle("Change account details");
         infoStore.setIconRes(R.drawable.material_symbols_person_outline);
 
-        sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
-        userModel = new ViewModelProvider(this).get(UserViewModel.class);
+        this.sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
+        this.userModel = new ViewModelProvider(this).get(UserViewModel.class);
+
         // verify and check session
-        sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
-            userId = uid;
-            deviceId = did;
+        this.sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
+            this.userId = uid;
+            this.deviceId = did;
             maybeLoadUser();
         });
-
+        SwitchMaterial darkModeSwitch = view.findViewById(R.id.switchDarkMode);
+        binding.switchDarkMode.setChecked(ThemeSwitch.isDarkMode(requireContext()));
+        binding.switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            ThemeSwitch.setDarkMode(requireContext(), isChecked);
+        });
         // set on click listener for back button
-        binding.deleteButton.setOnClickListener(
+        this.binding.deleteButton.setOnClickListener(
                 v -> {
                     deleteUser();
                 }
         );
-        binding.saveButton.setOnClickListener(
+
+        this.binding.saveButton.setOnClickListener(
                 v -> {
                     updateUser();
                 }
@@ -101,11 +109,6 @@ public class AccountFragment extends Fragment implements Tagged {
         binding.inputEmail.setText(user.getEmail());
 
         binding.inputPhone.setText(user.getPhoneNumber());
-
-        binding.checkEntrant.setChecked(user.isEntrant());
-        binding.checkOrganizer.setChecked(user.isOrganizer());
-
-        binding.checkAdmin.setChecked(user.isAdmin());
 
         User.Entrant entrant = user.getEntrant();
         if (entrant != null) {

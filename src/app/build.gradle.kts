@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     id("androidx.navigation.safeargs")
     id("com.google.gms.google-services")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -74,4 +75,5 @@ dependencies {
     implementation(libs.zxing.android.embedded)
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
 }

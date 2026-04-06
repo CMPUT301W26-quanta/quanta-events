@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import ca.quanta.quantaevents.models.ExternalNotification;
+import ca.quanta.quantaevents.models.ExternalUndismissedNotification;
 import ca.quanta.quantaevents.models.Notification;
 
 /**
@@ -62,7 +64,7 @@ public class NotificationViewModel extends ViewModel {
                 });
     }
 
-    public Task<ArrayList<Notification>> getAllNotifications(UUID userId, UUID deviceId, UUID sentById) {
+    public Task<ArrayList<ExternalNotification>> getAllNotifications(UUID userId, UUID deviceId, UUID sentById) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -76,22 +78,66 @@ public class NotificationViewModel extends ViewModel {
                 .call(data)
                 .onSuccessTask(callResult -> {
                         List<Map<String, Object>> notificationObjects = (List<Map<String, Object>>) callResult.getData();
-                        ArrayList<Notification> notifications = new ArrayList<>();
+                        ArrayList<ExternalNotification> notifications = new ArrayList<>();
 
                         for (Map<String, Object> notificationObject : notificationObjects) {
-                            UUID eventId = UUID.fromString((String) notificationObject.get("eventId"));
-
                             String title = (String) notificationObject.get("title");
                             String message = (String) notificationObject.get("message");
 
-                            Boolean waited = (Boolean) notificationObject.get("waited");
-                            Boolean selected = (Boolean) notificationObject.get("selected");
-                            Boolean cancelled = (Boolean) notificationObject.get("cancelled");
-
-                            notifications.add(new Notification(eventId, title, message, waited, selected, cancelled));
+                            notifications.add(new ExternalNotification(title, message));
                         }
 
                         return Tasks.forResult(notifications);
+                });
+    }
+
+    public Task<ArrayList<ExternalUndismissedNotification>> getAllUndismissedNotifications(UUID userId, UUID deviceId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("getAllUndismissedNotifications")
+                .call(data)
+                .onSuccessTask(callResult -> {
+                   List<Map<String, Object>> notificationObjects = (List<Map<String, Object>>) callResult.getData();
+                   ArrayList<ExternalUndismissedNotification> notifications = new ArrayList<>();
+
+                    for (Map<String, Object> notificationObject : notificationObjects) {
+                        UUID notificationId = UUID.fromString((String) notificationObject.get("notificationId"));
+                        UUID eventId = UUID.fromString((String) notificationObject.get("eventId"));
+
+                        String title = (String) notificationObject.get("title");
+                        String message = (String) notificationObject.get("message");
+
+                        String kind = (String) notificationObject.get("kind");
+                        Boolean lotterySelected = (Boolean) notificationObject.get("lotterySelected");
+
+                        notifications.add(new ExternalUndismissedNotification(notificationId, eventId, title, message, kind, lotterySelected));
+                    }
+
+                    return Tasks.forResult(notifications);
+                });
+    }
+
+    public Task<Void> dismissNotification(UUID userId, UUID deviceId, UUID notificationId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("notificationId", notificationId.toString());
+
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("dismissNotification")
+                .call(data)
+                .onSuccessTask(callResult -> {
+                   return Tasks.forResult(null);
                 });
     }
 }

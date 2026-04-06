@@ -1,70 +1,92 @@
-import { DocumentSnapshot, getFirestore } from "firebase-admin/firestore";
+import { FieldPath, FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getMessaging, Message } from "firebase-admin/messaging";
 import { logger } from "firebase-functions";
 
-export async function sendNotification(
-	targetId: string,
-	title: string,
-	body: string,
+async function sendAndroidNotification(
+	notifToken: string,
+	notificationTitle: string,
+	notificationBody: string,
 ) {
-	const db = getFirestore();
-	const targetDoc = (await db
-		.collection("users")
-		.doc(targetId)
-		.get()) as DocumentSnapshot<UserDocument, UserDocument>;
-
-	if (!targetDoc.exists) {
-		logger.error(
-			`Failed to send notification, user ${targetId} does not exist.`,
-		);
-		return;
-	}
-
-	const target = targetDoc.data() as UserDocument;
-
-	if (target.notifToken === undefined || target.notifToken === null) {
-		logger.error(
-			`Failed to send notification, user ${targetId} does not have a notifToken assigned.`,
-		);
-		return;
-	}
-
 	const message: Message = {
-		token: target.notifToken,
+		token: notifToken,
+
 		notification: {
-			title,
-			body,
+			title: notificationTitle,
+			body: notificationBody,
 		},
-		android: {
-			priority: "high",
-		},
-		apns: {
-			headers: {
-				"apns-priority": "5",
-			},
-		},
+
+		android: { priority: "high" },
+		apns: { headers: { "apns-priority": "5" } },
 	};
 
-	// Send only if receiveNotifications is enabled
-	if (target.entrant?.receiveNotifications) {
-		await getMessaging()
+	await getMessaging()
 		.send(message)
-		.then((_response: string) => {
-			logger.info("Message sent succesfully");
+		.then((res) => {
+			logger.info("Successfully sent a notification");
 		})
-		.catch((error: string) => {
-			logger.error("Message failed to send", error);
+		.catch((err) => {
+			logger.info("Failed to send a notification", err);
 		});
+}
+
+export async function sendNotification(
+	recipientId: string,
+	notificationId: string,
+	notificationDoc: NotificationDocument,
+) {
+	const db = getFirestore();
+
+	const userCollection = db.collection("users") as UserDocCollection;
+	const userRef = userCollection.doc(recipientId);
+	const user = await userRef.get();
+
+	if (!user.exists) {
+		logger.error(
+			`Failed to send a notification; user ${recipientId} not found.`,
+		);
+		return;
+	}
+
+	const userDoc = user.data()!;
+
+	if (userDoc.notifToken === undefined || userDoc.notifToken === null) {
+		logger.error(
+			`Failed to send a notification; user ${recipientId} has no notifToken.`,
+		);
+		return;
+	}
+
+	if (userDoc.entrant === undefined || userDoc.entrant === null) {
+		logger.error(
+			`Failed to send a notification; user ${recipientId} is not an entrant.`,
+		);
+		return;
+	}
+
+	// add the notification to the user's undismissed notifications list,
+	// so that it will appear on their home page
+
+	await userRef.update(
+		new FieldPath("entrant", "undismissedNotifications"),
+		FieldValue.arrayUnion(notificationId),
+	);
+
+	// send an android notification only if the recipient has enabled receiving push notifications
+
+	if (userDoc.entrant.receiveNotifications) {
+		sendAndroidNotification(
+			userDoc.notifToken,
+			notificationDoc.title,
+			notificationDoc.message,
+		);
 	}
 }
 
 export async function sendBatchNotifications(
-	targetIds: string[],
-	title: string,
-	body: string,
+	recipientIds: string[],
+	notificationId: string,
+	notificationDoc: NotificationDocument,
 ) {
-	// Send notification to the recipients
-	for (const targetId of targetIds) {
-		sendNotification(targetId, title, body);
-	}
+	for (const recipientId of recipientIds)
+		sendNotification(recipientId, notificationId, notificationDoc);
 }

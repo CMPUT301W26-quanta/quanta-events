@@ -1,23 +1,21 @@
+import { FieldPath, FieldValue, getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
 import { CallableRequest, HttpsError } from "firebase-functions/https";
+import { v4 as uuidv4 } from "uuid";
 import * as z from "zod";
 import * as util from "../util";
-import { v4 as uuidv4 } from "uuid";
-import {
-	CollectionReference,
-	FieldValue,
-	getFirestore,
-} from "firebase-admin/firestore";
 
 const createNotificationInterface = util.standardForm(
 	z.object({
-		message: z.string(),
-		title: z.string(),
-		eventId: z.uuid(),
-		waited: z.boolean(),
-		cancelled: z.boolean(),
-		selected: z.boolean(),
-		final: z.boolean(),
+		eventId: z.uuid(), // target event id
+
+		title: z.string(), // notification title
+		message: z.string(), // notification body
+
+		waited: z.boolean(), // send to waited
+		cancelled: z.boolean(), // send to cancelled
+		selected: z.boolean(), // send to selected
+		final: z.boolean(), // send to final
 	}),
 );
 
@@ -27,92 +25,101 @@ export async function createNotification(request: CallableRequest) {
 		request,
 	);
 
-	const { message, title, eventId, waited, cancelled, selected, final } = data;
-
 	const userData = await util.verifyUser(userId, deviceId);
 	await util.requireRole(userData, "organizer");
 
 	const notificationId = uuidv4();
 
+	logger.info(
+		`Creating notification ${notificationId} on event ${data.eventId}.`,
+	);
+
 	const db = getFirestore();
 
-	const eventDocuments = db.collection("events") as CollectionReference<
-		EventDocument,
-		EventDocument
-	>;
-	const eventDocument = (await eventDocuments.doc(data.eventId).get()).data();
+	const eventCollection = db.collection("events") as EventDocCollection;
+	const eventRef = eventCollection.doc(data.eventId);
+	const event = await eventRef.get();
 
-	// Store all the recipients in some collection
+	if (!event.exists) {
+		throw new HttpsError("not-found", "The target event does not exist.");
+	}
+
+	const eventDoc = event.data()!;
+
+	if (eventDoc.organizer !== userId) {
+		throw new HttpsError(
+			"permission-denied",
+			"Must be the organiser of the event.",
+		);
+	}
+
+	// create a list of recipient IDs
+
 	const recipients: string[] = [];
-	if (waited) {
-		const waitedList = eventDocument?.waitList as string[];
-		logger.info("This is the waited list", { waitedList });
-		for (const entrantId of waitedList) {
-			if (!recipients.includes(entrantId)) {
-				recipients.push(entrantId);
-			}
-		}
+
+	if (data.waited) {
+		const list = eventDoc?.waitList ?? [];
+		for (const id of list) if (!recipients.includes(id)) recipients.push(id);
 	}
-	if (cancelled) {
-		const cancelledList = eventDocument?.cancelledList as string[];
-		logger.info("This is the cancelled list", { cancelledList });
-		for (const entrantId of cancelledList) {
-			if (!recipients.includes(entrantId)) {
-				recipients.push(entrantId);
-			}
-		}
+
+	if (data.cancelled) {
+		const list = eventDoc?.cancelledList ?? [];
+		for (const id of list) if (!recipients.includes(id)) recipients.push(id);
 	}
-	if (final) {
-		const finalList = eventDocument?.finalList as string[];
-		logger.info("This is the final list", { finalList });
-		for (const entrantId of finalList) {
-			if (!recipients.includes(entrantId)) {
-				recipients.push(entrantId);
-			}
-		}
+
+	if (data.selected) {
+		const list = eventDoc?.selectedList ?? [];
+		for (const id of list) if (!recipients.includes(id)) recipients.push(id);
 	}
-	if (selected) {
-		const selectedList = eventDocument?.selectedList as string[];
-		logger.info("This is the selected list", { selectedList });
-		for (const entrantId of selectedList) {
-			if (!recipients.includes(entrantId)) {
-				recipients.push(entrantId);
-			}
-		}
+
+	if (data.final) {
+		const list = eventDoc?.finalList ?? [];
+		for (const id of list) if (!recipients.includes(id)) recipients.push(id);
 	}
+
+	const notificationCollection = db.collection(
+		"notifications",
+	) as NotificationDocCollection;
+	const notificationRef = notificationCollection.doc(notificationId);
 
 	try {
-		await db
-			.collection("notifications")
-			.doc(notificationId)
-			.create(
-				util.enforceFull<NotificationDocument>({
-					message,
-					title,
-					eventId,
-					kind: {
-						kind: "MESSAGE",
-						waited,
-						cancelled,
-						selected,
-						final,
-					},
-					targetUsers: recipients,
-				}),
-			);
-	} catch (_) {
+		await notificationRef.create(
+			util.enforceFull<NotificationDocument>({
+				eventId: data.eventId,
+
+				targetUsers: recipients,
+
+				title: data.title,
+				message: data.message,
+
+				kind: {
+					kind: "MESSAGE",
+					waited: data.waited,
+					cancelled: data.cancelled,
+					selected: data.selected,
+					final: data.final,
+				},
+			}),
+		);
+	} catch (e) {
+		logger.error("Failed to send notification because it already exists");
 		throw new HttpsError("already-exists", "Notification already exists");
 	}
 
-	util.sendBatchNotifications(recipients, data.title || "", data.message || "");
+	const notification = await notificationRef.get();
+	const notificationDoc = notification.data()!;
 
-	// Store the notification in organizer's sent notifications array
-	await db
-		.collection("users")
-		.doc(userId)
-		.update({
-			"organizer.sentNotifications": FieldValue.arrayUnion(notificationId),
-		});
+	util.sendBatchNotifications(recipients, notificationId, notificationDoc);
+
+	// save the notification to the organizer's sent notifications list
+
+	const userCollection = db.collection("users") as UserDocCollection;
+	const userRef = userCollection.doc(userId);
+
+	await userRef.update(
+		new FieldPath("organizer", "sentNotifications"),
+		FieldValue.arrayUnion(notificationId),
+	);
 
 	return { notificationId };
 }

@@ -81,6 +81,24 @@ public class AdminProfileBrowserFragment extends Fragment {
             // Set name
             binding.profileName.setText(user.getName());
 
+            binding.iconEdit.setOnClickListener(view -> {
+                int profilePosition = this.getBindingAdapterPosition();
+
+                if (profilePosition == RecyclerView.NO_POSITION) {
+                    return;
+                }
+
+                if (this.userId == null || this.deviceId == null) {
+                    Toast.makeText(binding.getRoot().getContext(), "Still loading user. Please try again.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                // Navigate to new screen
+                UUID targetUserId = user.getUserId();
+                NavDirections action = ca.quanta.quantaevents.fragments.AdminProfileBrowserFragmentDirections.actionAdminprofilebrowserFragmentToAdminAccountEditFragment(targetUserId);
+                Navigation.findNavController(view).navigate(action);
+            });
+
             // Setup close button
             binding.iconClose.setOnClickListener(view -> {
                 int profilePosition = this.getBindingAdapterPosition();
@@ -106,24 +124,48 @@ public class AdminProfileBrowserFragment extends Fragment {
                         });
             });
 
-            if (!user.isOrganizer()) {
-                binding.profileCard.setCardBackgroundColor(
-                        ContextCompat.getColor(binding.getRoot().getContext(), R.color.card_background_default)
+            // bc this view might have been recycled, reset its state;
+            // remove the notifications button by default
+
+            this.binding.iconEdit.setVisibility(View.VISIBLE);
+            this.binding.iconClose.setVisibility(View.VISIBLE);
+            this.binding.iconNotifications.setVisibility(View.GONE);
+
+            this.binding.profileCard.setCardBackgroundColor(
+                    ContextCompat.getColor(this.binding.getRoot().getContext(), R.color.card_background_default)
+            );
+
+
+            if (user.isOrganizer()) {
+                // is an organizer, set a different background colour to highlight this fact
+                this.binding.profileCard.setCardBackgroundColor(
+                        ContextCompat.getColor(this.binding.getRoot().getContext(), R.color.card_background_organizer)
                 );
 
-                // not an organizer, remove the notifications button
-                binding.iconNotifications.setVisibility(View.GONE);
-            } else {
-                // is an organizer, set a different background colour to highlight this fact
-                binding.profileCard.setCardBackgroundColor(
-                        ContextCompat.getColor(binding.getRoot().getContext(), R.color.card_background_organizer)
-                );
+                // make the notifications button visible
+
+                this.binding.iconNotifications.setVisibility(View.VISIBLE);
 
                 // add a click listener to the notification button
 
-                binding.iconNotifications.setOnClickListener(view -> {
+                this.binding.iconNotifications.setOnClickListener(view -> {
                     this.listener.onNotificationsButtonClicked(user.getUserId());
                 });
+            }
+
+            if (user.isAdmin() && !user.getUserId().equals(this.userId)) {
+                this.binding.iconEdit.setVisibility(View.GONE);
+                this.binding.iconClose.setVisibility(View.GONE);
+                this.binding.profileCard.setCardBackgroundColor(
+                        ContextCompat.getColor(this.binding.getRoot().getContext(), R.color.card_background_admin)
+                );
+            }
+
+            if (user.isAdmin() && user.getUserId().equals(this.userId)) {
+                this.binding.iconClose.setVisibility(View.GONE);
+                this.binding.profileCard.setCardBackgroundColor(
+                        ContextCompat.getColor(this.binding.getRoot().getContext(), R.color.color_light_red)
+                );
             }
         }
     }
@@ -142,26 +184,17 @@ public class AdminProfileBrowserFragment extends Fragment {
         loader.loadTask(
                 this.userModel.getAllUsers(this.userId, this.deviceId)
                         .addOnSuccessListener(users -> {
-                            // filter out admins
-
-                            if (!isAdded() || binding == null) return;
-                            ArrayList<ExternalUser> nonAdminProfiles = new ArrayList<ExternalUser>();
-
-                            for (ExternalUser user : users) {
-                                if (!user.isAdmin()) {
-                                    nonAdminProfiles.add(user);
-                                }
-                            }
+                            if (!this.isAdded() || this.binding == null) return;
 
                             // use the adapter to display them
 
-                            ProfileAdapter<AdminProfileViewHolder> profilesAdapter = getAdminProfileViewHolderProfileAdapter(nonAdminProfiles);
+                            ProfileAdapter<AdminProfileViewHolder> profilesAdapter = getAdminProfileViewHolderProfileAdapter(users);
 
-                            binding.profilesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                            binding.profilesRecyclerView.setAdapter(profilesAdapter);
+                            this.binding.profilesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                            this.binding.profilesRecyclerView.setAdapter(profilesAdapter);
                         })
                         .addOnFailureListener(exception -> {
-                            if (!isAdded() || binding == null) return;
+                            if (!this.isAdded() || this.binding == null) return;
                             Log.e("AdminProfileBrowserFragment", "Failed to fetch all users.", exception);
 
                             ToastManager.show(getContext(), "Failed to fetch users", Toast.LENGTH_LONG);
@@ -186,7 +219,7 @@ public class AdminProfileBrowserFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //set up the header
+        // set up the header
 
         FragmentInfoStore infoStore = new ViewModelProvider(requireActivity()).get(FragmentInfoStore.class);
         // set title of the page to Event and the subtitle.
@@ -195,7 +228,6 @@ public class AdminProfileBrowserFragment extends Fragment {
         infoStore.setSubtitle("Browse and remove profiles.");
         infoStore.setIconRes(R.drawable.material_symbols_person_shield_outline);
 
-        // set up the view model
         // **** set up the view models
 
         this.userModel = new ViewModelProvider(this.requireActivity()).get(UserViewModel.class);
@@ -218,7 +250,7 @@ public class AdminProfileBrowserFragment extends Fragment {
             }
         });
 
-        // *set up the backbuttons on click listener
+        // *set up the back buttons on click listener
 
         binding.backButton.setOnClickListener(
                 v -> Navigation.findNavController(v).popBackStack()
