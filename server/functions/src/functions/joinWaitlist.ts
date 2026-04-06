@@ -51,10 +51,6 @@ export async function joinWaitlist(request: CallableRequest) {
   const registrationStart = event.registrationStartTime.toDate();
   const registrationEnd = event.registrationEndTime.toDate();
 
-  if (entrantUser.entrant === null) {
-    throw new HttpsError("permission-denied", "User is not an entrant")
-  }
-
   if (entrantUser.entrant.coOrganizedEvents.includes(data.eventId)) {
     throw new HttpsError("permission-denied", "User is a co-organizer for this event")
   }
