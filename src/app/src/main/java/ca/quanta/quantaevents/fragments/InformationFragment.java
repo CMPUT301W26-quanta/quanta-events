@@ -18,6 +18,9 @@ import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentInformationBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
+/**
+ * Fragment for displaying UI for displaying general information about the app.
+ */
 public class InformationFragment extends Fragment implements Tagged {
     private FragmentInformationBinding binding;
 

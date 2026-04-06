@@ -34,8 +34,14 @@ import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
+/**
+ * Displays UI for inviting entrants as co-organizers for an event.
+ */
 public class InviteCoOrganizerFragment extends Fragment {
 
+    /**
+     * View holder for holding profile views.
+     */
     public static class OrganizerProfileViewHolder extends ProfileAdapter.ProfileViewHolder {
         public static class Factory implements ProfileAdapter.ProfileViewHolder.Factory<InviteCoOrganizerFragment.OrganizerProfileViewHolder> {
             private final UUID userId;
@@ -49,6 +55,11 @@ public class InviteCoOrganizerFragment extends Fragment {
                 this.model = model;
             }
 
+            /**
+             * Creates a new organizer profile view holder for handling co-invite UI.
+             * @param parent View group this belongs to.
+             * @return New organizer profile view holder.
+             */
             @Override
             public InviteCoOrganizerFragment.OrganizerProfileViewHolder createNew(ViewGroup parent) {
                 ItemCoProfileCardBinding binding = ItemCoProfileCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
@@ -56,6 +67,9 @@ public class InviteCoOrganizerFragment extends Fragment {
             }
         }
 
+        /**
+         * Interface for invite button functionality.
+         */
         public interface OnInviteButtonClickedListener {
             void onInviteButtonClicked(UUID profileID);
         }
@@ -66,7 +80,14 @@ public class InviteCoOrganizerFragment extends Fragment {
         private final UserViewModel model;
         private final InviteCoOrganizerFragment.OrganizerProfileViewHolder.OnInviteButtonClickedListener listener;
 
-
+        /**
+         * Constructor for an organizer profile view holder.
+         * @param itemView
+         * @param userId
+         * @param deviceId
+         * @param model
+         * @param listener
+         */
         public OrganizerProfileViewHolder(@NonNull View itemView, UUID userId, UUID deviceId, UserViewModel model, InviteCoOrganizerFragment.OrganizerProfileViewHolder.OnInviteButtonClickedListener listener) {
             super(itemView);
             binding = ItemCoProfileCardBinding.bind(itemView);
