@@ -79,13 +79,13 @@ export async function updateRoles(request: CallableRequest) {
 
         const organizerUpdates = eventsSnapshot.docs.map(async (eventDoc) => {
             const event = eventDoc.data();
-    
-            if (event.organizer === targetUserId) {
-                return eventDoc.ref.delete();
-            }
 
             if (event.imageId !== null) {
                 await util.removeImage(event.imageId);
+            }
+    
+            if (event.organizer === targetUserId) {
+                return eventDoc.ref.delete();
             }
     
             return;
