@@ -83,6 +83,10 @@ export async function updateRoles(request: CallableRequest) {
             if (event.organizer === targetUserId) {
                 return eventDoc.ref.delete();
             }
+
+            if (event.imageId !== null) {
+                await util.removeImage(event.imageId);
+            }
     
             return;
 
