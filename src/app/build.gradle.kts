@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.firebase.functions)
     implementation(libs.firebase.firestore)
+    implementation(libs.rules)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Quanta Events</string>
     <string name="information_lottery">To join an event, you first join the waiting list during the registration period.\n\nWhen registration closes, the organizer runs a lottery draw to select participants.\n\nIf you are selected, you will receive a notification and can accept or decline your invitation.\n\nIf you are not selected, you may still be selected later if someone declines or cancels.</string>
+    <string name="invite_message">"You're invited!"</string>
 </resources>
