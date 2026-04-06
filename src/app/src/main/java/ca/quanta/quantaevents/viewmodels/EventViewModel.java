@@ -445,7 +445,8 @@ public class EventViewModel extends ViewModel {
      * @param eventGuidelines       Guidelines (optional).
      * @param geolocation           Whether geolocation is enabled.
      * @param eventCapacity         Entrant capacity.
-     * @param location              Location of the event.
+     * @param locationLat           Latitude of the event.
+     * @param locationLng           Longitude of the event.
      * @param registrationLimit     Waitlist capacity (optional).
      * @param imageId               UUID identifying the image for the event (optional).
      * @return null if successful, an error if unsuccessful.
@@ -476,8 +477,11 @@ public class EventViewModel extends ViewModel {
         payload.put("registrationLimit", registrationLimit);
         payload.put("imageId", imageId == null ? null : imageId.toString());
         payload.put("isPrivate", isPrivate);
+
         data.put("data", payload);
+
         System.out.println(payload);
+
         return functions
                 .getHttpsCallable("updateEvent")
                 .call(data)

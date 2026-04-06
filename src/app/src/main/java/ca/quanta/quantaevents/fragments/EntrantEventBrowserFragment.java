@@ -53,7 +53,7 @@ public class EntrantEventBrowserFragment extends Fragment {
     private boolean hasLoaded = false;
     private String filterFrom = null;
     private String filterTo = null;
-    private String filterCategory = null;
+    private String filterSearch = null;
     private Integer filterCapacity = null;
 
     private final DateTimeFormatter displayFormatter =
@@ -73,7 +73,16 @@ public class EntrantEventBrowserFragment extends Fragment {
 
         // back button click listener
         binding.backButton.setOnClickListener(
-                v -> Navigation.findNavController(v).popBackStack()
+                v -> {
+                    // clear the filters so that they aren't set when we
+                    // return to the event browser
+                    Navigation.findNavController(this.requireView())
+                            .getCurrentBackStackEntry()
+                            .getSavedStateHandle()
+                            .remove("filters");
+
+                    Navigation.findNavController(v).popBackStack();
+                }
         );
         // filter button click listener to navigate to filter fragment
         binding.filterButton.setOnClickListener(
@@ -93,58 +102,45 @@ public class EntrantEventBrowserFragment extends Fragment {
             NavDirections action = EntrantEventBrowserFragmentDirections.actionEventBrowserFragmentToEventDetailsFragment(item.getEventId());
             Navigation.findNavController(requireView()).navigate(action);
         });
+
         binding.eventsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.eventsRecyclerView.setAdapter(adapter);
 
+        // **** create the view models
+
         eventModel = new ViewModelProvider(this).get(EventViewModel.class);
         imageModel = new ViewModelProvider(this).get(ImageViewModel.class);
+
+        // **** create the session store
+
         sessionStore = new ViewModelProvider(requireActivity()).get(SessionStore.class);
+
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
             userId = uid;
             deviceId = did;
+
             if (!hasLoaded) {
                 hasLoaded = true;
 
-                Object savedFilters = Navigation.findNavController(requireView())
+                Navigation.findNavController(this.requireView())
                         .getCurrentBackStackEntry()
                         .getSavedStateHandle()
-                        .get("filters");
-                if (savedFilters != null) {
-                    Bundle filters = (Bundle) savedFilters;
-                    filterFrom = filters.getString("from");
-                    filterTo = filters.getString("to");
-                    filterCategory = filters.getString("category");
-                    filterCapacity = filters.getInt("capacity");
+                        .getLiveData("filters")
+                        .observe(getViewLifecycleOwner(), result -> {
+                            if (result == null) return;
+                            Bundle filters = (Bundle) result;
 
-                    Navigation.findNavController(requireView())
-                            .getCurrentBackStackEntry()
-                            .getSavedStateHandle()
-                            .remove("filters");
-                }
+                            this.filterFrom = filters.containsKey("from") ? filters.getString("from") : null;
+                            this.filterTo = filters.containsKey("to") ? filters.getString("to") : null;
+                            this.filterSearch = filters.containsKey("search") ? filters.getString("search") : null;
+                            this.filterCapacity = filters.containsKey("capacity") ? filters.getInt("capacity") : null;
+
+                            loadAvailableEvents();
+                        });
 
                 maybeLoadAllEvents();
             }
         });
-        Navigation.findNavController(requireView())
-                .getCurrentBackStackEntry()
-                .getSavedStateHandle()
-                .getLiveData("filters")
-                .observe(getViewLifecycleOwner(), result -> {
-                    if (result == null) return;
-                    Bundle filters = (Bundle) result;
-                    filterFrom = filters.getString("from");
-                    filterTo = filters.getString("to");
-                    filterCategory = filters.getString("category");
-                    filterCapacity = filters.getInt("capacity");
-
-                    Navigation.findNavController(requireView())
-                            .getCurrentBackStackEntry()
-                            .getSavedStateHandle()
-                            .remove("filters");
-
-                    loadAvailableEvents();
-                });
-
     }
 
     @Override
@@ -185,6 +181,7 @@ public class EntrantEventBrowserFragment extends Fragment {
             Log.d("EntrantEventBrowser", "Session missing: userId/deviceId null");
             return;
         }
+
         Log.d("EntrantEventBrowser", "Loading available events for user " + userId + deviceId);
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(
@@ -196,7 +193,7 @@ public class EntrantEventBrowserFragment extends Fragment {
                             EventViewModel.Fetch.AVAILABLE,
                             filterFrom,
                             filterTo,
-                            filterCategory,
+                            filterSearch,
                             filterCapacity,
                             EventViewModel.SortBy.REGISTRATION_START)
                     .addOnSuccessListener(events -> {
