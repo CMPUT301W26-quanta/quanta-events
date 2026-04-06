@@ -2,7 +2,7 @@ import { logger } from "firebase-functions";
 import { CallableRequest } from "firebase-functions/https";
 import * as z from "zod";
 import * as util from "../util";
-import { getFirestore, CollectionReference } from "firebase-admin/firestore";
+import { getFirestore, CollectionReference, FieldValue } from "firebase-admin/firestore";
 
 const updateRolesInterface = util.standardForm(
     z.object({
@@ -37,12 +37,39 @@ export async function updateRoles(request: CallableRequest) {
     let currentOrganizer = userDoc?.organizer;
     let currentAdmin = userDoc?.admin;
 
+    const eventsSnapshot = await db.collection("events").get();
+
     // Granted entrant permission
     if (isEntrant && currentEntrant == null) {
         userDoc!.entrant = {enteredEvents: [], history: [], undismissedNotifications: [], receiveNotifications: true};  // Reset and make true as default
     }
     // Banned from being entrant
     else if (!isEntrant && currentEntrant !== null) {
+
+        const entrantUpdates = eventsSnapshot.docs.map(async (eventDoc) => {
+
+            const event = eventDoc.data();
+    
+            const isInAnyList =
+                event.waitList?.includes(targetUserId) ||
+                event.finalList?.includes(targetUserId) ||
+                event.cancelledList?.includes(targetUserId) ||
+                event.rejectedList?.includes(targetUserId) ||
+                event.selectedList?.includes(targetUserId);
+    
+            if (!isInAnyList) return;
+    
+            return eventDoc.ref.update({
+                waitList: FieldValue.arrayRemove(targetUserId),
+                finalList: FieldValue.arrayRemove(targetUserId),
+                cancelledList: FieldValue.arrayRemove(targetUserId),
+                rejectedList: FieldValue.arrayRemove(targetUserId),
+                selectedList: FieldValue.arrayRemove(targetUserId),
+            });
+        });
+
+        await Promise.all(entrantUpdates);
+
         userDoc!.entrant = null;
     }
 
@@ -50,6 +77,24 @@ export async function updateRoles(request: CallableRequest) {
         userDoc!.organizer = { createdEvents: [], sentNotifications: [] };
     }
     else if (!isOrganizer && currentOrganizer !== null) {
+
+        const organizerUpdates = eventsSnapshot.docs.map(async (eventDoc) => {
+            const event = eventDoc.data();
+
+            if (event.imageId !== null) {
+                await util.removeImage(event.imageId);
+            }
+    
+            if (event.organizer === targetUserId) {
+                return eventDoc.ref.delete();
+            }
+    
+            return;
+
+        });
+
+        await Promise.all(organizerUpdates);
+
         userDoc!.organizer = null;
     }
 

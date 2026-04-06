@@ -45,7 +45,9 @@ export async function deleteUser(request: CallableRequest) {
 		const isInAnyList =
 			event.waitList?.includes(target) ||
 			event.finalList?.includes(target) ||
-			event.cancelledList?.includes(target);
+			event.cancelledList?.includes(target) ||
+			event.rejectedList?.includes(target) ||
+			event.selectedList?.includes(target);
 
 		if (!isInAnyList) return;
 
@@ -53,6 +55,8 @@ export async function deleteUser(request: CallableRequest) {
 			waitList: FieldValue.arrayRemove(target),
 			finalList: FieldValue.arrayRemove(target),
 			cancelledList: FieldValue.arrayRemove(target),
+			rejectedList: FieldValue.arrayRemove(target),
+			selectedList: FieldValue.arrayRemove(target),
 		});
 	});
 
