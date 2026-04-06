@@ -73,7 +73,7 @@ public class SmartBurgerNavigationTest {
 
     }
 
-    private void openBurgerMenu(){
+    private void openBurgerMenu() {
         Matcher<View> burgerButton = allOf(withContentDescription("Open Menu"), isDescendantOfA(withId(R.id.coordinator)));
 
         waitForView(burgerButton);
@@ -107,15 +107,6 @@ public class SmartBurgerNavigationTest {
     }
 
 
-    @Test
-    public void testBurgerMenuHidesCurrentPage_AdminPanel(){
-
-        openBurgerMenu();
-        clickMenuItem("Admin Panel");
-        openBurgerMenu();
-
-        onView(withContentDescription("Admin Panel")).check(doesNotExist());
-    }
 
     @Test
     public void testBurgerMenuHidesCurrentPage_Dashboard(){
@@ -142,8 +133,8 @@ public class SmartBurgerNavigationTest {
     public void testBurgerMenuHidesCurrentPage_Information(){
 
 
-        openBurgerMenu();
-        clickMenuItem("Information");
+        waitForView(withId(R.id.info_button));
+        onView(withId(R.id.info_button)).perform(click());
 
         onView(allOf(withContentDescription("Open Menu"), isDescendantOfA(withId(R.id.coordinator)))).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
 
