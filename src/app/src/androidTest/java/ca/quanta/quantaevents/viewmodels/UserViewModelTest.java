@@ -12,27 +12,9 @@ import org.junit.Test;
 import java.util.UUID;
 
 public class UserViewModelTest {
-    static class UUIDHolder {
-        UUID uuid;
-
-        UUIDHolder(UUID uuid) {
-            this.uuid = uuid;
-        }
-
-        public void setUuid(UUID uuid) {
-            this.uuid = uuid;
-        }
-
-        public UUID getUuid() {
-            return uuid;
-        }
-    }
-
-
     private static final String NAME = "INSTRUMENTED TEST USER";
     private static final String EMAIL = "instrumented.user@gmail.com";
     private static final String PHONE = "1234567890";
-
     private static final UUID DEVICE_ID = new UUID(0, 0);
 
     UserViewModel users;
