@@ -121,6 +121,7 @@ export async function getEvents(
 					name: "eventDescription",
 					getFn: (data) => data.eventDescription,
 				},
+				{ name: "eventCategory", getFn: (data) => data.eventCategory ?? "" },
 			],
 		})
 			.search(filter.search)

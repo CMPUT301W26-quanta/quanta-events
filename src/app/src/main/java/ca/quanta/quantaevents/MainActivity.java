@@ -42,7 +42,6 @@ import ca.quanta.quantaevents.viewmodels.UserViewModel;
  */
 
 public class MainActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
