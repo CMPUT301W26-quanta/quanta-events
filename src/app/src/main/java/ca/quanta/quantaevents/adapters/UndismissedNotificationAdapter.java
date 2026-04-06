@@ -48,18 +48,25 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
         void dismissed(int position, UUID notificationId);
 
         /**
-         * Accepts the invite with this given notification id
+         * Accepts the invite with this given event id
          *
          * @param eventId UUID of this event.
          */
         void accepted(UUID eventId);
 
         /**
-         * Declines the invite with this given notification id
+         * Declines the invite with this given event id
          *
          * @param eventId UUID of this event.
          */
         void declined(UUID eventId);
+
+        /**
+         * Accepts the co-organizer invite with this given event id
+         *
+         * @param eventId
+         */
+        void acceptedCoInvite(UUID eventId);
 
         /**
          * Should navigate to the event details of the given event
@@ -86,6 +93,56 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
          * @param position     Position of this notification
          */
         public abstract void bind(ExternalUndismissedNotification notification);
+    }
+
+    /**
+     * An {@link ViewHolder} for COINVITE type {@link ExternalUndismissedNotification}
+     */
+    public static class CoInviteViewHolder extends ViewHolder {
+        private final ItemLotteryNotificationCardBinding binding;
+        private final AsyncHandler handler;
+
+        private CoInviteViewHolder(ItemLotteryNotificationCardBinding binding, AsyncHandler handler) {
+            super(binding.getRoot());
+            this.binding = binding;
+            this.handler = handler;
+        }
+
+        public static CoInviteViewHolder newInstance(ViewGroup parent, AsyncHandler handler) {
+            ItemLotteryNotificationCardBinding binding = ItemLotteryNotificationCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new CoInviteViewHolder(binding, handler);
+        }
+
+        @Override
+        public void bind(ExternalUndismissedNotification notification) {
+            handler.getEvent(
+                    notification.getEventId(),
+                    event -> {
+                        binding.notificationEventName.setText(event.getEventName());
+                    },
+                    () -> {
+                        binding.notificationEventName.setText("Unknown Event Name");
+                    }
+            );
+
+            binding.iconDismiss.setVisibility(View.GONE);
+
+            binding.notificationState.setText("Co-Organize this event?");
+
+            binding.iconAccept.setOnClickListener(_v -> {
+                int position = getBindingAdapterPosition();
+                if (position != NO_POSITION) {
+                    handler.acceptedCoInvite(notification.getEventId());
+                    handler.dismissed(position, notification.getNotificationId());
+                }
+
+            });
+            binding.iconDecline.setOnClickListener(_v -> {
+                int position = getBindingAdapterPosition();
+                if (position != NO_POSITION)
+                    handler.dismissed(position, notification.getNotificationId());
+            });
+        }
     }
 
     /**
@@ -276,6 +333,8 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
                 return LotteryViewHolder.newInstance(parent, handler);
             case 2:
                 return InviteViewHolder.newInstance(parent, handler);
+            case 3:
+                return CoInviteViewHolder.newInstance(parent, handler);
             default:
                 return BlankViewHolder.newInstance(parent);
         }
@@ -302,6 +361,8 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
                 return 1;
             case "INVITE":
                 return 2;
+            case "COINVITE":
+                return 3;
             default:
                 return -1;
         }

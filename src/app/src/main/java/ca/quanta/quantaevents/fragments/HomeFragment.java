@@ -217,6 +217,25 @@ public class HomeFragment extends Fragment implements Tagged {
             }
 
             @Override
+            public void acceptedCoInvite(UUID eventId) {
+                inviteModel.coInviteAccept(userId, deviceId, eventId)
+                        .addOnSuccessListener(x -> {
+                            if (isAdded())
+                                ToastManager.show(getContext(), "Successfully accepted co-organizing invitation.", Toast.LENGTH_LONG);
+                        })
+                        .addOnFailureListener(exc -> {
+                            Log.e("HomeFragment", "Failed to accept co-organizing invite.", exc);
+
+                            if (isAdded())
+                                ToastManager.show(getContext(), "Failed to accept co-organizing invite.", Toast.LENGTH_LONG);
+
+                            if (exc instanceof FirebaseFunctionsException) {
+                                Log.e("HomeFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exc).getCode());
+                            }
+                        });
+            }
+
+            @Override
             public void goToEvent(UUID eventId) {
                 NavDirections action = ca.quanta.quantaevents.fragments.HomeFragmentDirections.actionHomeFragmentToEventDetailsFragment(eventId);
                 Navigation.findNavController(binding.getRoot()).navigate(action);
