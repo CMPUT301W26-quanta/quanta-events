@@ -1,3 +1,4 @@
+export * from "./functions/cancelSelected";
 export * from "./functions/checkWaitlist";
 export * from "./functions/createComment";
 export * from "./functions/createEvent";

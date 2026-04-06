@@ -124,12 +124,17 @@ public class AdminProfileBrowserFragment extends Fragment {
                         });
             });
 
+            // bc this view might have been recycled, reset its state;
+            // remove the notifications button by default
+
+            this.binding.iconEdit.setVisibility(View.VISIBLE);
+            this.binding.iconClose.setVisibility(View.VISIBLE);
+            this.binding.iconNotifications.setVisibility(View.GONE);
+
             this.binding.profileCard.setCardBackgroundColor(
                     ContextCompat.getColor(this.binding.getRoot().getContext(), R.color.card_background_default)
             );
 
-            // remove the notifications button by default
-            this.binding.iconNotifications.setVisibility(View.GONE);
 
             if (user.isOrganizer()) {
                 // is an organizer, set a different background colour to highlight this fact
@@ -148,11 +153,18 @@ public class AdminProfileBrowserFragment extends Fragment {
                 });
             }
 
-            if (user.isAdmin()) {
+            if (user.isAdmin() && !user.getUserId().equals(this.userId)) {
                 this.binding.iconEdit.setVisibility(View.GONE);
                 this.binding.iconClose.setVisibility(View.GONE);
                 this.binding.profileCard.setCardBackgroundColor(
                         ContextCompat.getColor(this.binding.getRoot().getContext(), R.color.card_background_admin)
+                );
+            }
+
+            if (user.isAdmin() && user.getUserId().equals(this.userId)) {
+                this.binding.iconClose.setVisibility(View.GONE);
+                this.binding.profileCard.setCardBackgroundColor(
+                        ContextCompat.getColor(this.binding.getRoot().getContext(), R.color.color_light_red)
                 );
             }
         }
