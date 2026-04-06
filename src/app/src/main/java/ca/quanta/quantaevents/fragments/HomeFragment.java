@@ -119,12 +119,14 @@ public class HomeFragment extends Fragment implements Tagged {
     }
 
     private void loadNotifications() {
-        notificationModel.getAllUndismissedNotifications(this.userId, this.deviceId)
+        this.notificationModel.getAllUndismissedNotifications(this.userId, this.deviceId)
                 .addOnSuccessListener(this::getAndDisplayNotifications)
                 .addOnFailureListener(exception -> {
+                    if (!this.isAdded() || this.binding == null) return;
+
                     Log.e("HomeFragment", "Failed to fetch notifications.", exception);
 
-                    Toast.makeText(getContext(), "Failed to fetch notifications." + exception.getMessage(), Toast.LENGTH_LONG).show();
+                    ToastManager.show(this.getContext(), "Failed to fetch notifications." + exception.getMessage(), Toast.LENGTH_LONG);
 
                     if (exception instanceof FirebaseFunctionsException) {
                         Log.e("HomeFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
@@ -133,9 +135,9 @@ public class HomeFragment extends Fragment implements Tagged {
     }
 
     private void getAndDisplayNotifications(ArrayList<ExternalUndismissedNotification> notifications) {
-        // **** use adapters to display them
+        if (!this.isAdded() || this.binding == null) return;
 
-        if (!isAdded() || this.binding == null) return;
+        // **** use adapters to display them
 
         ArrayList<ExternalUndismissedNotification> inviteNotifications = new ArrayList<>();
         ArrayList<ExternalUndismissedNotification> lotteryNotifications = new ArrayList<>();

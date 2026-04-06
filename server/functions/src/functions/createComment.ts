@@ -9,34 +9,43 @@ const createCommentInterface = util.standardForm(
 	z.object({
 		eventId: z.uuid(),
 		message: z.string(),
-		postTime: z.string()
+		postTime: z.string(),
 	}),
 );
 
 export async function createComment(request: CallableRequest): Promise<string> {
-	const payload = util.parseInterface(createCommentInterface, request);
-	await util.verifyUser(payload.userId, payload.deviceId);
+	const { userId, deviceId, data } = util.parseInterface(
+		createCommentInterface,
+		request,
+	);
+	await util.verifyUser(userId, deviceId);
 
 	const commentId = uuidv4();
 
-	logger.info(`Creating comment ${commentId} on event ${payload.data.eventId}`);
+	logger.info(`Creating comment ${commentId} on event ${data.eventId}`);
 
 	const db = getFirestore();
 
-	const eventRef = db.collection("events").doc(payload.data.eventId);
+	const eventCollection = db.collection("events") as EventDocCollection;
+	const eventRef = eventCollection.doc(data.eventId);
 	const event = await eventRef.get();
 
 	if (!event.exists) {
 		throw new HttpsError("not-found", "Event not found");
 	}
 
-	const commentRef = await eventRef.collection("comments").doc(commentId);
+	const commentCollection = eventRef.collection(
+		"comments",
+	) as CommentDocCollection;
+	const commentRef = commentCollection.doc(commentId);
 
-	commentRef.create({
-		senderId: payload.userId,
-		message: payload.data.message,
-		postTime: payload.data.postTime
-	});
+	commentRef.create(
+		util.enforceFull<CommentDocument>({
+			senderId: userId,
+			message: data.message,
+			postTime: data.postTime,
+		}),
+	);
 
 	return commentId;
 }

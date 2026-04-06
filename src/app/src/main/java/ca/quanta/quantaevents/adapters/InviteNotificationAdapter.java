@@ -89,6 +89,11 @@ public class InviteNotificationAdapter extends RecyclerView.Adapter<InviteNotifi
         holder.buttonDismiss.setOnClickListener(v -> {
             int notificationPosition = holder.getBindingAdapterPosition();
 
+            // safety check
+            if (notificationPosition == RecyclerView.NO_POSITION) {
+                return;
+            }
+
             // optimistically remove the notification
             this.notifications.remove(notificationPosition);
             this.notifyItemRemoved(notificationPosition);

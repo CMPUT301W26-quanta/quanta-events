@@ -66,10 +66,35 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
+     * Calls the cancelSelected cloud function, cancelling the lottery invitations to the selected users.
+     *
+     * @param userId UUID to identify the user.
+     * @param deviceId UUID to identify the user's device.
+     * @param eventId UUID of the event to operate on.
+     */
+    public Task<Void> cancelSelected(UUID userId, UUID deviceId, UUID eventId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("cancelSelected")
+                .call(data)
+                .onSuccessTask(callResult -> {
+                    return Tasks.forResult(null);
+                });
+    }
+
+    /**
      * Calls the createEvent cloud function and adds an event to the database.
      *
-     * @param userId                UUID to identify user.
-     * @param deviceId              UUID to identify user's device.
+     * @param userId                UUID to identify the user.
+     * @param deviceId              UUID to identify the user's device.
      * @param registrationStartTime ISO-8601 datetime with offset (UTC preferred).
      * @param registrationEndTime   ISO-8601 datetime with offset (UTC preferred).
      * @param eventTime             ISO-8601 datetime with offset (UTC preferred).
@@ -79,7 +104,8 @@ public class EventViewModel extends ViewModel {
      * @param eventGuidelines       Guidelines (optional).
      * @param geolocation           Whether geolocation is enabled.
      * @param eventCapacity         Entrant capacity.
-     * @param location              Location of the event.
+     * @param locationLat           Lateral location of the event.
+     * @param locationLng           Longitudinal location of the event.
      * @param registrationLimit     Waitlist capacity (optional).
      * @param imageId               UUID identifying the image for the event (optional).
      * @return UUID assigned to the newly created event.
@@ -109,6 +135,7 @@ public class EventViewModel extends ViewModel {
         payload.put("registrationLimit", registrationLimit);
         payload.put("imageId", imageId == null ? null : imageId.toString());
         payload.put("isPrivate", isPrivate);
+
         data.put("data", payload);
 
         return functions
