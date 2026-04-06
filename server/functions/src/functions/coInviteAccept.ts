@@ -31,8 +31,9 @@ export async function coInviteAccept(request: CallableRequest): Promise<{}> {
     const userRef = userCollection.doc(userId);
     const user = await userRef.get();
 
-    if (!user.exists) {
-		throw new HttpsError("not-found", "The user does not exist.");
+    // Check for existence of entrant
+    if (user.data()?.entrant === null) {
+		throw new HttpsError("not-found", "The user is not an entrant.");
 	}
     else {
 
