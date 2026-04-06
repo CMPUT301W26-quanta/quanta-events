@@ -7,15 +7,22 @@ import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
+import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+
+import static org.hamcrest.CoreMatchers.allOf;
+
+import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +38,13 @@ public class CommentsUITesting {
 
     @Before
     public void navigateToEventDetails(){
+
+        Matcher<View> burgerButton = allOf(withContentDescription("Open Menu"), isDescendantOfA(withId(R.id.coordinator)));
+
+        waitForView(burgerButton);
+        onView(burgerButton).perform(click());
+        clickMenuItem("Event List");
+
         onView(withId(R.id.events_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
 
 
@@ -75,6 +89,29 @@ public class CommentsUITesting {
         onView(withId(R.id.comment_text)).check(matches(withText("")));
     }
 
+    private void waitForView(Matcher<View> matcher){
+
+        long end = System.currentTimeMillis() + 5000;
+        while (System.currentTimeMillis() < end){
+            try {
+                onView(matcher).check(matches(isDisplayed()));
+                return;
+            } catch (Throwable e) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ignored) {}
+            }
+        }
+        onView(matcher).check(matches(isDisplayed()));
+
+    }
+
+    private void clickMenuItem(String label){
+        Matcher<View> item = allOf(withContentDescription(label), isDescendantOfA(withId(R.id.coordinator)));
+
+        waitForView(item);
+        onView(item).perform(click());
+    }
 
 
 }

@@ -77,4 +77,10 @@ dependencies {
     implementation(libs.zxing.android.embedded)
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
+
+
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
+    androidTestImplementation("org.hamcrest:hamcrest:2.2")
 }
