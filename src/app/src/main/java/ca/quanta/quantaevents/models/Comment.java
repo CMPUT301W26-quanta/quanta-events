@@ -11,14 +11,13 @@ public class Comment {
 
     String senderName;
 
-    public Comment() {}
-
     /**
      * Constructor for a Comment object.
-     * @param commentId The ID of the comment.
-     * @param senderId ID of a user who made the comment.
-     * @param message The content of the comment.
-     * @param postTime The time at which the comment was made.
+     *
+     * @param commentId  The ID of the comment.
+     * @param senderId   ID of a user who made the comment.
+     * @param message    The content of the comment.
+     * @param postTime   The time at which the comment was made.
      * @param senderName The name of the user who made the comment.
      */
     public Comment(UUID commentId, UUID senderId, String message, String postTime, String senderName) {
@@ -33,38 +32,19 @@ public class Comment {
         return this.commentId;
     }
 
-    public void setCommentId(UUID commentId) {
-        this.commentId = commentId;
-    }
-
     public UUID getSenderId() {
         return senderId;
-    }
-
-    public void setSenderId(UUID senderId) {
-        this.senderId = senderId;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     public String getPostTime() {
         return this.postTime;
     }
 
-    public void setPostTime(String postTime) {
-        this.postTime = postTime;
-    }
-
     public String getSenderName() {
         return this.senderName;
-    }
-    public void setSenderName(String senderName) {
-        this.senderName = senderName;
     }
 }
