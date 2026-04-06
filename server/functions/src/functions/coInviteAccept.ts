@@ -1,4 +1,4 @@
-import { getFirestore } from "firebase-admin/firestore";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
 import { CallableRequest, HttpsError } from "firebase-functions/https";
 import * as z from "zod";
@@ -27,9 +27,14 @@ export async function coInviteAccept(request: CallableRequest): Promise<{}> {
         throw new HttpsError("not-found", "The event does not exist.");
     }
 
-    // const eventDoc = event.data()!;
+    await db
+        .collection("users")
+        .doc(userId)
+        .update({
+          "entrant.coOrganizedEvents": FieldValue.arrayUnion(data.eventId),
+        });
 
-    logger.info("Do something");
+    logger.info("User became co-organizer successfully");
 
     return {};
 }
