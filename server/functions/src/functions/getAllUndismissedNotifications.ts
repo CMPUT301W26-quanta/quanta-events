@@ -1,6 +1,6 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
-import { CallableRequest, HttpsError } from "firebase-functions/https";
+import { CallableRequest } from "firebase-functions/https";
 import z from "zod";
 import * as util from "../util";
 
