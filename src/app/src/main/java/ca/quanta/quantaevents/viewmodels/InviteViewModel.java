@@ -64,4 +64,53 @@ public class InviteViewModel extends ViewModel {
                     return Tasks.forResult(null);
                 });
     }
+
+    /**
+     * Calls the coInviteAccept cloud function, assigning a user as co-organizer for an event
+     * @param userId UUID identifying the user.
+     * @param deviceId UUID identifying user's device.
+     * @param eventId UUID identifying the event.
+     * @return Void task.
+     */
+    public Task<Void> coInviteAccept(UUID userId, UUID deviceId, UUID eventId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("coInviteAccept")
+                .call(data)
+                .onSuccessTask(callResult -> {
+                    return Tasks.forResult(null);
+                });
+    }
+
+    /**
+     * Calls the coInviteReject cloud function, cancelling a co-organizer invite.
+     * @param userId UUID identifying user.
+     * @param deviceId UUID identifying user's device.
+     * @param eventId UUID identifying the event.
+     * @return Void task.
+     */
+    public Task<Void> coInviteReject(UUID userId, UUID deviceId, UUID eventId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId.toString());
+        data.put("deviceId", deviceId.toString());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("eventId", eventId.toString());
+        data.put("data", payload);
+
+        return functions
+                .getHttpsCallable("coInviteReject")
+                .call(data)
+                .onSuccessTask(callResult -> {
+                    return Tasks.forResult(null);
+                });
+    }
+
 }

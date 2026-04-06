@@ -118,6 +118,13 @@ public class EventManagerFragment extends Fragment {
                 }
         );
 
+        binding.inviteCoOrganizerButton.setOnClickListener(
+                v -> {
+                    NavDirections action = EventManagerFragmentDirections.actionEventManagerFragmentToInviteCoOrganizerFragment(eventId);
+                    Navigation.findNavController(v).navigate(action);
+                }
+        );
+
         if (this.isDrawn) {
             // disable draw lottery button
             this.binding.drawLotteryButton.setEnabled(false);

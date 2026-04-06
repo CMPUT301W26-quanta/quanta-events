@@ -97,6 +97,21 @@
                 app:strokeWidth="2dp"/>
 
             <Button
+                android:id="@+id/invite_co_organizer_button"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="20dp"
+                android:backgroundTint="@color/color_light_purple"
+                android:text="Invite Co-Organizers"
+                android:textColor="@color/text_color"
+                android:textSize="16sp"
+                android:textAlignment="center"
+                app:cornerRadius="12dp"
+                app:strokeColor="@color/border"
+                app:strokeWidth="2dp"/>
+
+            <Button
                 android:id="@+id/draw_lottery_button"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
