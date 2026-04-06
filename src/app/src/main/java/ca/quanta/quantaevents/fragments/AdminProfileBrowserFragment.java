@@ -34,13 +34,32 @@ import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
+/**
+ * Fragment for displaying UI for displaying user profiles to admins.
+ */
 public class AdminProfileBrowserFragment extends Fragment {
+
+    /**
+     * View holder for holding profile views.
+     */
     public static class AdminProfileViewHolder extends ProfileAdapter.ProfileViewHolder {
+
+        /**
+         * Factory class for creating profile view holders.
+         */
         public static class Factory implements ProfileAdapter.ProfileViewHolder.Factory<AdminProfileViewHolder> {
             private final UUID userId;
             private final UUID deviceId;
             UserViewModel model;
             private final OnNotificationsButtonClickedListener listener;
+
+            /**
+             * Constructor for a factory.
+             * @param userId UUID identifying user.
+             * @param deviceId UUID identifying user's device.
+             * @param model User view model to allow for the calling of cloud functions.
+             * @param listener Click listener for the notification button on a profile view.
+             */
             public Factory(UUID userId, UUID deviceId, UserViewModel model, OnNotificationsButtonClickedListener listener) {
                 this.userId = userId;
                 this.deviceId = deviceId;
@@ -55,6 +74,9 @@ public class AdminProfileBrowserFragment extends Fragment {
             }
         }
 
+        /**
+         * Interface for notification button functionality.
+         */
         public interface OnNotificationsButtonClickedListener {
             void onNotificationsButtonClicked(UUID profileID);
         }
@@ -65,7 +87,14 @@ public class AdminProfileBrowserFragment extends Fragment {
         private final UserViewModel model;
         private final OnNotificationsButtonClickedListener listener;
 
-
+        /**
+         * Constructor for an admin profile view holder.
+         * @param itemView Root view for the view holder.
+         * @param userId UUID identifying user.
+         * @param deviceId UUID for identifying user's device.
+         * @param model User view model to allow for the calling of cloud functions.
+         * @param listener Click listener for the notification button on a profile view.
+         */
         public AdminProfileViewHolder(@NonNull View itemView, UUID userId, UUID deviceId, UserViewModel model, OnNotificationsButtonClickedListener listener) {
             super(itemView);
             binding = ItemProfileCardBinding.bind(itemView);
@@ -178,7 +207,9 @@ public class AdminProfileBrowserFragment extends Fragment {
     private UUID deviceId;
     private boolean hasLoaded = false;
 
-    // lists all profiles to show to admin and adds them to the array
+    /**
+     * Lists and displays all profiles to show to admin.
+     */
     private void listProfiles() {
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(

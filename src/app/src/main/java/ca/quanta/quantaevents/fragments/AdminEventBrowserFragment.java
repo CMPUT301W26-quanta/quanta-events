@@ -41,6 +41,9 @@ import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
+/**
+ * Fragment for displaying UI for displaying events to admins.
+ */
 public class AdminEventBrowserFragment extends Fragment {
     private FragmentAdminEventBrowserBinding binding;
     private EventCardAdapter adapter;
@@ -102,8 +105,9 @@ public class AdminEventBrowserFragment extends Fragment {
         return binding.getRoot();
     }
 
-    // loads all events past and ongoing for admin to view and moderate them.
-
+    /**
+     * Loads all past and current events for admins.
+     */
     private void loadAllEvents() {
         if (userId == null || deviceId == null) {
             Log.d("AdminEventBrowser", "Session missing: userId/deviceId null");
@@ -155,8 +159,11 @@ public class AdminEventBrowserFragment extends Fragment {
         adapter = null;
     }
 
-    // binds the event list to the view
-    // The following function is from OpenAI, ChatGPT, "bindEventList implementation under AdminEventBrowser", 2026-03-12
+    /**
+     * The following function is from OpenAI, ChatGPT, "bindEventList implementation under AdminEventBrowser", 2026-03-12
+     * Binds the event list to the view.
+     * @param events
+     */
     private void bindEventList(List<Event> events) {
         if (!isAdded() || binding == null || adapter == null) return;
         if (events == null) {
@@ -211,6 +218,11 @@ public class AdminEventBrowserFragment extends Fragment {
         }
     }
 
+    /**
+     * Fetches an image and attaches it to an event.
+     * @param eventId UUID identifying event.
+     * @param imageId UUID identifying image.
+     */
     private void fetchAndAttachImage(UUID eventId, UUID imageId) {
         imageModel.getImage(imageId, userId, deviceId)
                 .addOnSuccessListener(data -> {
@@ -223,6 +235,13 @@ public class AdminEventBrowserFragment extends Fragment {
                     }
                 });
     }
+
+    /**
+     * Converts a value to a string.
+     * @param value Value to be converted.
+     * @param fallback Default string in case conversion fails.
+     * @return Converted string.
+     */
     private static String stringValue(Object value, String fallback) {
         if (value == null) {
             return fallback;
@@ -231,6 +250,11 @@ public class AdminEventBrowserFragment extends Fragment {
         return result.isEmpty() ? fallback : result;
     }
 
+    /**
+     * Formats zoned date time as a string.
+     * @param value Date time to be formatted.
+     * @return String representation of date time.
+     */
     private String formatLocalTime(@Nullable ZonedDateTime value) {
         if (value == null) {
             return "TBD";
@@ -239,6 +263,11 @@ public class AdminEventBrowserFragment extends Fragment {
         return local.format(displayFormatter);
     }
 
+    /**
+     * Decodes a base64 representation of an image to a bitmap.
+     * @param base64 String representing image data.
+     * @return Bitmap of image data if successful, null otherwise.
+     */
     private static Bitmap decodeBase64ToBitmap(String base64) {
         try {
             byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
@@ -248,6 +277,11 @@ public class AdminEventBrowserFragment extends Fragment {
         }
     }
 
+    /**
+     * Checks if a user is not found.
+     * @param ex Exception to be checked.
+     * @return true if the exception is a not found error, false otherwise.
+     */
     private boolean isUserNotFound(Exception ex) {
         if (ex instanceof FirebaseFunctionsException) {
             FirebaseFunctionsException.Code code = ((FirebaseFunctionsException) ex).getCode();
@@ -256,6 +290,9 @@ public class AdminEventBrowserFragment extends Fragment {
         return false;
     }
 
+    /**
+     * Clears the session and redirects to registration fragment if the user does not exist.
+     */
     private void handleMissingUser() {
         sessionStore.clearSession();
         if (isAdded()) {

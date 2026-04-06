@@ -28,6 +28,9 @@ import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.NotificationViewModel;
 
+/**
+ * Fragment for displaying UI for displaying notification history of a user to admins.
+ */
 public class AdminNotificationHistoryFragment extends Fragment {
     private FragmentAdminNotificationHistoryBinding binding;
     private NotificationViewModel notificationModel;
@@ -73,6 +76,10 @@ public class AdminNotificationHistoryFragment extends Fragment {
         );
     }
 
+    /**
+     * Gets notifications from the server to be displayed.
+     * @param profileID UUID identifying user whose past notifications are to be displayed.
+     */
     private void listNotifications(UUID profileID) {
         // display the notifications belonging to the profile
 
@@ -90,6 +97,10 @@ public class AdminNotificationHistoryFragment extends Fragment {
                 });
     }
 
+    /**
+     * Fetches and displays past notifications of a user.
+     * @param notifications ArrayList of external notifications to be displayed.
+     */
     private void getAndDisplayNotifications(ArrayList<ExternalNotification> notifications) {
         // **** use the adapter to display them
         if (!isAdded() || this.binding == null) return;

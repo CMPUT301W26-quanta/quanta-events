@@ -23,6 +23,9 @@ import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
+/**
+ * Fragment for displaying UI for admins to edit other account roles.
+ */
 public class AdminAccountEditFragment extends Fragment {
 
     private UUID userId;

@@ -29,6 +29,9 @@ import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
+/**
+ * Fragment for displaying UI for editing your own account.
+ */
 public class AccountFragment extends Fragment implements Tagged {
     private FragmentAccountBinding binding;
     private SessionStore sessionStore;
@@ -86,6 +89,9 @@ public class AccountFragment extends Fragment implements Tagged {
         return binding.getRoot();
     }
 
+    /**
+     * Tries to load a user and populates fields if successful.
+     */
     private void maybeLoadUser() {
         if (userId == null || deviceId == null) {
             return;
@@ -99,7 +105,10 @@ public class AccountFragment extends Fragment implements Tagged {
                 }).addOnCanceledListener(this::handleMissingUser);
     }
 
-    // set input fields to the data fetched from server.
+    /**
+     * Sets input fields to the data fetched from the server.
+     * @param user User whose data is used to populate input fields.
+     */
     private void populateFields(@NonNull User user) {
         if (!isAdded() || binding == null) return;
         System.out.println(user);
@@ -115,6 +124,11 @@ public class AccountFragment extends Fragment implements Tagged {
         }
     }
 
+    /**
+     * Checks if a user is not found.
+     * @param ex Exception to be checked.
+     * @return true if argument is a not found exception, false otherwise.
+     */
     private boolean isUserNotFound(Exception ex) {
         if (ex instanceof FirebaseFunctionsException) {
             FirebaseFunctionsException.Code code = ((FirebaseFunctionsException) ex).getCode();
@@ -124,8 +138,9 @@ public class AccountFragment extends Fragment implements Tagged {
         }
     }
 
-    // deelte user from database and clear the shared preferences
-    // and redirect to welcome fragment
+    /**
+     * Deletes a user from the database and redirects to register fragment.
+     */
     private void deleteUser() {
         if (userId == null || deviceId == null) {
             return;
@@ -152,8 +167,9 @@ public class AccountFragment extends Fragment implements Tagged {
         );
     }
 
-    // update user details in database and
-    // redirect to home fragment if successful
+    /**
+     * Updates user details in the database and redirects to home fragment on success.
+     */
     private void updateUser() {
         if (userId == null || deviceId == null) {
             return;
@@ -203,6 +219,9 @@ public class AccountFragment extends Fragment implements Tagged {
         );
     }
 
+    /**
+     * Clears the session and redirects to registration fragment if the user does not exist.
+     */
     private void handleMissingUser() {
         sessionStore.clearSession();
         System.out.println("MISSING USER");
