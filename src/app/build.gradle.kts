@@ -76,4 +76,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("com.google.android.gms:play-services-maps:19.0.0")
+
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
+    androidTestImplementation("org.hamcrest:hamcrest:2.2")
 }
