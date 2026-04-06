@@ -63,6 +63,8 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-functions:21.1.0")
+    androidTestImplementation ("androidx.test.espresso:espresso-contrib:3.5.1")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
@@ -70,6 +72,7 @@ dependencies {
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
     testRuntimeOnly(libs.junit.platform.launcher)
+
 
     implementation(libs.zxing.android.embedded)
     implementation("com.google.android.gms:play-services-location:21.3.0")
