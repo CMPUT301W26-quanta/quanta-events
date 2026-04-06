@@ -1,6 +1,7 @@
 package ca.quanta.quantaevents.adapters;
 
-import android.util.Log;
+import static androidx.recyclerview.widget.RecyclerView.NO_POSITION;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,16 +50,16 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
         /**
          * Accepts the invite with this given notification id
          *
-         * @param notificationId UUID of this notification.
+         * @param eventId UUID of this event.
          */
-        void accepted(UUID notificationId);
+        void accepted(UUID eventId);
 
         /**
          * Declines the invite with this given notification id
          *
-         * @param notificationId UUID of this notification.
+         * @param eventId UUID of this event.
          */
-        void declined(UUID notificationId);
+        void declined(UUID eventId);
 
         /**
          * Should navigate to the event details of the given event
@@ -66,6 +67,8 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
          * @param eventId UUID of the event to navigate to.
          */
         void goToEvent(UUID eventId);
+
+        void setAdapter(UndismissedNotificationAdapter adapter);
     }
 
     /**
@@ -82,7 +85,7 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
          * @param notification The notification to bind
          * @param position     Position of this notification
          */
-        public abstract void bind(ExternalUndismissedNotification notification, int position);
+        public abstract void bind(ExternalUndismissedNotification notification);
     }
 
     /**
@@ -104,7 +107,7 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
         }
 
         @Override
-        public void bind(ExternalUndismissedNotification notification, int position) {
+        public void bind(ExternalUndismissedNotification notification) {
             handler.getEvent(
                     notification.getEventId(),
                     event -> {
@@ -114,7 +117,12 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
                         binding.notificationEventName.setText("Unknown Event Name");
                     }
             );
-            binding.iconDismiss.setOnClickListener(_v -> handler.dismissed(position, notification.getNotificationId()));
+
+            binding.iconDismiss.setOnClickListener(_v -> {
+                int position = getBindingAdapterPosition();
+                if (position != NO_POSITION)
+                    handler.dismissed(position, notification.getNotificationId());
+            });
             binding.iconEvent.setOnClickListener(_v -> handler.goToEvent(notification.getEventId()));
         }
     }
@@ -138,7 +146,7 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
         }
 
         @Override
-        public void bind(ExternalUndismissedNotification notification, int position) {
+        public void bind(ExternalUndismissedNotification notification) {
             handler.getEvent(
                     notification.getEventId(),
                     event -> {
@@ -155,12 +163,19 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
                 binding.notificationState.setText("Join this event?");
 
                 binding.iconAccept.setOnClickListener(_v -> {
-                    handler.accepted(notification.getNotificationId());
-                    handler.dismissed(position, notification.getNotificationId());
+                    int position = getBindingAdapterPosition();
+                    if (position != NO_POSITION) {
+                        handler.accepted(notification.getEventId());
+                        handler.dismissed(position, notification.getNotificationId());
+                    }
+
                 });
                 binding.iconDecline.setOnClickListener(_v -> {
-                    handler.declined(notification.getNotificationId());
-                    handler.dismissed(position, notification.getNotificationId());
+                    int position = getBindingAdapterPosition();
+                    if (position != NO_POSITION) {
+                        handler.declined(notification.getEventId());
+                        handler.dismissed(position, notification.getNotificationId());
+                    }
                 });
             } else {
                 binding.iconAccept.setVisibility(View.GONE);
@@ -168,7 +183,11 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
 
                 binding.notificationState.setText("Lottery lost...");
 
-                binding.iconDismiss.setOnClickListener(_v -> handler.dismissed(position, notification.getNotificationId()));
+                binding.iconDismiss.setOnClickListener(_v -> {
+                    int position = getBindingAdapterPosition();
+                    if (position != NO_POSITION)
+                        handler.dismissed(position, notification.getNotificationId());
+                });
             }
 
             binding.iconEvent.setOnClickListener(_v -> handler.goToEvent(notification.getEventId()));
@@ -194,7 +213,7 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
         }
 
         @Override
-        public void bind(ExternalUndismissedNotification notification, int position) {
+        public void bind(ExternalUndismissedNotification notification) {
             binding.notificationTitle.setText(notification.getTitle());
             binding.notificationMessage.setText(notification.getMessage());
             handler.getEvent(
@@ -205,7 +224,11 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
                     () -> {
                         binding.notificationEventName.setText("Unknown Event Name");
                     });
-            binding.iconDismiss.setOnClickListener(_v -> handler.dismissed(position, notification.getNotificationId()));
+            binding.iconDismiss.setOnClickListener(_v -> {
+                int position = getBindingAdapterPosition();
+                if (position != NO_POSITION)
+                    handler.dismissed(position, notification.getNotificationId());
+            });
             binding.iconEvent.setOnClickListener(_v -> handler.goToEvent(notification.getEventId()));
         }
     }
@@ -224,7 +247,7 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
         }
 
         @Override
-        public void bind(ExternalUndismissedNotification notification, int position) {
+        public void bind(ExternalUndismissedNotification notification) {
         }
     }
 
@@ -239,8 +262,8 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
      */
     public UndismissedNotificationAdapter(List<ExternalUndismissedNotification> notifications, AsyncHandler handler) {
         this.notifications = notifications;
+        handler.setAdapter(this);
         this.handler = handler;
-        Log.d("HANDLER", handler.toString());
     }
 
     @NonNull
@@ -248,37 +271,30 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
             case 0:
-                Log.d("VIEWHOLDER", "MESSAGE");
                 return MessageViewHolder.newInstance(parent, handler);
             case 1:
-                Log.d("VIEWHOLDER", "LOTTERY");
                 return LotteryViewHolder.newInstance(parent, handler);
             case 2:
-                Log.d("VIEWHOLDER", "INVITE");
                 return InviteViewHolder.newInstance(parent, handler);
             default:
-                Log.d("VIEWHOLDER", "BLANK");
                 return BlankViewHolder.newInstance(parent);
         }
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Log.d("BIND", holder.getClass().getName());
         ExternalUndismissedNotification notification = notifications.get(position);
-        holder.bind(notification, position);
+        holder.bind(notification);
     }
 
     @Override
     public int getItemCount() {
-        Log.d("SIZE", String.valueOf(this.notifications.size()));
         return this.notifications.size();
     }
 
     @Override
     public int getItemViewType(int position) {
         ExternalUndismissedNotification notification = notifications.get(position);
-        Log.d("GET TYPE", notification.getKind());
         switch (notification.getKind()) {
             case "MESSAGE":
                 return 0;

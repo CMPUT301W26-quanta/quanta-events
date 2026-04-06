@@ -138,6 +138,8 @@ public class HomeFragment extends Fragment implements Tagged {
         if (!isAdded() || this.binding == null) return;
 
         UndismissedNotificationAdapter.AsyncHandler handler = new UndismissedNotificationAdapter.AsyncHandler() {
+            UndismissedNotificationAdapter adapter = null;
+
             @Override
             public void getEvent(UUID eventId, Consumer<Event> consumer, Runnable onFail) {
                 MutableLiveData<Void> failObserver = new MutableLiveData<>();
@@ -148,35 +150,81 @@ public class HomeFragment extends Fragment implements Tagged {
                         .addOnSuccessListener(successObserver::postValue)
                         .addOnFailureListener(exc -> {
                             failObserver.postValue(null);
-                            Log.e("MessageNotificationAdapter", "Failed to fetch event name.", exc);
+                            Log.e("HomeFragment", "Failed to fetch event name.", exc);
 
                             if (isAdded())
                                 ToastManager.show(getContext(), "Failed to fetch event name.", Toast.LENGTH_LONG);
 
                             if (exc instanceof FirebaseFunctionsException) {
-                                Log.e("MessageNotificationAdapter", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exc).getCode());
+                                Log.e("HomeFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exc).getCode());
                             }
                         });
             }
 
             @Override
             public void dismissed(int position, UUID notificationId) {
+                notifications.remove(position);
+                if (adapter != null) adapter.notifyItemRemoved(position);
+                notificationModel.dismissNotification(userId, deviceId, notificationId)
+                        .addOnFailureListener(exc -> {
+                            Log.e("HomeFragment", "Failed to dismiss notification.", exc);
 
+                            if (isAdded())
+                                ToastManager.show(getContext(), "Failed to dismiss notification.", Toast.LENGTH_LONG);
+
+                            if (exc instanceof FirebaseFunctionsException) {
+                                Log.e("HomeFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exc).getCode());
+                            }
+                        });
             }
 
             @Override
-            public void accepted(UUID notificationId) {
+            public void accepted(UUID eventId) {
+                inviteModel.inviteAccept(userId, deviceId, eventId)
+                        .addOnSuccessListener(x -> {
+                            if (isAdded())
+                                ToastManager.show(getContext(), "Successfully accepted invitation.", Toast.LENGTH_LONG);
+                        })
+                        .addOnFailureListener(exc -> {
+                            Log.e("HomeFragment", "Failed to accept invite..", exc);
 
+                            if (isAdded())
+                                ToastManager.show(getContext(), "Failed to accept invite.", Toast.LENGTH_LONG);
+
+                            if (exc instanceof FirebaseFunctionsException) {
+                                Log.e("HomeFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exc).getCode());
+                            }
+                        });
             }
 
             @Override
-            public void declined(UUID notificationId) {
+            public void declined(UUID eventId) {
+                inviteModel.inviteReject(userId, deviceId, eventId)
+                        .addOnSuccessListener(x -> {
+                            if (isAdded())
+                                ToastManager.show(getContext(), "Successfully rejected invitation.", Toast.LENGTH_LONG);
+                        })
+                        .addOnFailureListener(exc -> {
+                            Log.e("HomeFragment", "Failed to reject invite..", exc);
 
+                            if (isAdded())
+                                ToastManager.show(getContext(), "Failed to reject invite.", Toast.LENGTH_LONG);
+
+                            if (exc instanceof FirebaseFunctionsException) {
+                                Log.e("HomeFragment", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exc).getCode());
+                            }
+                        });
             }
 
             @Override
             public void goToEvent(UUID eventId) {
+                NavDirections action = ca.quanta.quantaevents.fragments.HomeFragmentDirections.actionHomeFragmentToEventDetailsFragment(eventId);
+                Navigation.findNavController(binding.getRoot()).navigate(action);
+            }
 
+            @Override
+            public void setAdapter(UndismissedNotificationAdapter adapter) {
+                this.adapter = adapter;
             }
         };
 
