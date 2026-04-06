@@ -1,14 +1,19 @@
 package ca.quanta.quantaevents.viewmodels;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class EventViewModelTest {
-    private static final UUID EVENT_ID = UUID.randomUUID();
-    private static final UUID ORGANIZER_ID = UUID.randomUUID();
     private static final String START = "2027-03-14T22:00:00.000Z";
     private static final String END = "2027-04-20T22:00:00.000Z";
     private static final String EVENT_TIME = "2027-05-26T22:00:00.000Z";
@@ -24,7 +29,6 @@ public class EventViewModelTest {
     private static final Integer CAPACITY = 10;
 
     private static final UUIDHolder userHolder = new UUIDHolder(null);
-    private static final UUIDHolder eventHolder = new UUIDHolder(null);
 
     private static final String USER_NAME = "INSTRUMENTED TEST USER";
     private static final String USER_EMAIL = "instrumented.user@gmail.com";
@@ -46,10 +50,14 @@ public class EventViewModelTest {
     public static void deleteTestDependencies() throws InterruptedException {
         TaskHandler.handle(new UserViewModel().deleteUser(userHolder.getUuid(), USER_DEVICE_ID, userHolder.getUuid()), _void -> {
         });
+
+        // Deleting account should delete event
     }
 
     @Test
-    public void CreateEventTest() throws InterruptedException {
+    public void MainEventTest() throws InterruptedException {
+        UUIDHolder holder = new UUIDHolder(null);
+
         TaskHandler.handle(
                 events.createEvent(
                         userHolder.getUuid(),
@@ -68,9 +76,39 @@ public class EventViewModelTest {
                         REG_LIMIT,
                         null,
                         true),
-                event -> {
+                holder::setUuid
+        );
 
+        TaskHandler.handle(
+                events.getEvent(holder.getUuid(), userHolder.getUuid(), USER_DEVICE_ID),
+                event -> {
+                    assertEquals(holder.getUuid(), event.getEventId());
+                    assertNotNull(event.getOrganizerId());
+                    assertEquals(userHolder.getUuid(), event.getOrganizerId());
+                    assertNotNull(event.getWaitList());
+                    assertEquals(new ArrayList<>(), event.getWaitList());
+                    assertNotNull(event.getCancelledList());
+                    assertEquals(new ArrayList<>(), event.getCancelledList());
+                    assertNotNull(event.getCommentsList());
+                    assertEquals(new ArrayList<>(), event.getCommentsList());
+                    assertNotNull(event.getFinalList());
+                    assertEquals(new ArrayList<>(), event.getFinalList());
+                    assertEquals(ZonedDateTime.parse(START), event.getRegistrationStartTime());
+                    assertEquals(ZonedDateTime.parse(END), event.getRegistrationEndTime());
+                    assertEquals(ZonedDateTime.parse(EVENT_TIME), event.getEventTime());
+                    assertEquals(NAME, event.getEventName());
+                    assertEquals(DESCRIPTION, event.getEventDescription());
+                    assertEquals(LOCATIONLAT, event.getLocationLat());
+                    assertEquals(LOCATIONLNG, event.getLocationLng());
+                    assertEquals(CATEGORY, event.getEventCategory());
+                    assertEquals(GUIDELINES, event.getEventGuidelines());
+                    assertFalse(event.isGeolocationEnabled());
+                    assertEquals(CAPACITY, event.getEventCapacity());
+                    assertEquals(REG_LIMIT, event.getRegistrationLimit());
+                    assertNull(event.getImageId());
                 }
         );
+        
+        // Can't delete test event, we aren't admin
     }
 }

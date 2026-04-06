@@ -3,7 +3,7 @@ package ca.quanta.quantaevents.viewmodels;
 import java.util.UUID;
 
 public class UUIDHolder {
-    UUID uuid;
+    private UUID uuid;
 
     UUIDHolder(UUID uuid) {
         this.uuid = uuid;
