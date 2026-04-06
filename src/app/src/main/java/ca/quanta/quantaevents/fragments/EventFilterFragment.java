@@ -89,8 +89,8 @@ public class EventFilterFragment extends Fragment {
     }
 
     private void populateFilterFields(Bundle filters) {
-        String from = filters.containsKey("from") ? filters.getString("from"): null;
-        String to = filters.containsKey("to") ? filters.getString("to"): null;
+        String from = filters.containsKey("from") ? filters.getString("from") : null;
+        String to = filters.containsKey("to") ? filters.getString("to") : null;
         String search = filters.containsKey("search") ? filters.getString("search") : null;
         Integer capacity = filters.containsKey("capacity") ? filters.getInt("capacity") : null;
 
