@@ -22,6 +22,9 @@ import ca.quanta.quantaevents.fragments.EventDetailsFragment;
 import ca.quanta.quantaevents.models.Comment;
 import ca.quanta.quantaevents.viewmodels.CommentViewModel;
 
+/**
+ * Adapter for handling comment cards.
+ */
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder> {
     List<Comment> list;
 
@@ -35,6 +38,17 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
     private boolean isOrganizer;
     private boolean isAdmin;
 
+    /**
+     * Constructor for this class.
+     * @param list List of comment objects.
+     * @param parentFragment Fragment which displays comments.
+     * @param commentModel Comment object.
+     * @param eventId UUID identifying event the comments are for.
+     * @param userId UUID identifying user who wrote comment.
+     * @param deviceId UUID identifying user's device.
+     * @param isOrganizer Boolean that's true if the user is an organizer.
+     * @param isAdmin Boolean that's true if the user is an admin.
+     */
     public CommentAdapter(
             List<Comment> list,
             EventDetailsFragment parentFragment,
@@ -57,6 +71,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         this.isAdmin = isAdmin;
     }
 
+    /**
+     * Inflates comment card layout.
+     * @param parent   The ViewGroup into which the new View will be added after it is bound to
+     *                 an adapter position.
+     * @param viewType The view type of the new View.
+     * @return View holder holding an inflated comment view.
+     */
     @NonNull
     @Override
     public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -64,6 +85,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         return new MyHolder(view);
     }
 
+    /**
+     * Sets the values for a comment cards and handles their deletion.
+     * @param holder   The ViewHolder which should be updated to represent the contents of the
+     *                 item at the given position in the data set.
+     * @param position The position of the item within the adapter's data set.
+     */
     @Override
     public void onBindViewHolder(@NonNull MyHolder holder, int position) {
         final Comment thisComment = list.get(position);
@@ -104,16 +131,27 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         });
     }
 
+    /**
+     * Gets the size of the comment list.
+     * @return Integer size of the list.
+     */
     @Override
     public int getItemCount(){
         return list.size();
     }
 
+    /**
+     * Add a comment to the comment list.
+     * @param comment Comment to be added.
+     */
     public void addComment(Comment comment){
         this.list.add(comment);
         this.notifyItemInserted(this.list.size()-1);
     }
 
+    /**
+     * View holder for displaying a comment card.
+     */
     class MyHolder extends RecyclerView.ViewHolder {
 
         TextView name, comment, time;

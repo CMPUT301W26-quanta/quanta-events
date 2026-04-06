@@ -356,9 +356,12 @@ public class EventViewModel extends ViewModel {
     /**
      * Calls the joinWaitlist cloud function to add a user to an event waitlist.
      *
-     * @param userId   UUID to identify user.
-     * @param deviceId UUID to identify user's device.
-     * @param eventId  UUID to identify event.
+     * @param userId    UUID to identify user.
+     * @param deviceId  UUID to identify user's device.
+     * @param eventId   UUID to identify event.
+     * @param latitude  Double identifying the user's latitude.
+     * @param longitude Double identifying the user's longitude.
+     * @param accuracyM Double identifying the accuracy of the geolocation.
      * @return null if successful, an error if unsuccessful.
      */
     public Task<Void> joinWaitlist(UUID userId, UUID deviceId, UUID eventId,
@@ -503,12 +506,17 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
+     * * Calls the createInvitation cloud function, creating and sending an invite.
      *
      * @param userId   UUID to identify user.
      * @param deviceId UUID to identify user's device.
      * @param eventId  UUID to identify event.
      * @param invitee  UUID to identify invitee.
-     * @return null on success, error on failure
+     * @param userId   UUID to identify user.
+     * @param deviceId UUID to identify user's device.
+     * @param eventId  UUID to identify event.
+     * @param invitee  UUID to identify invitee.
+     * @return null on success, error on failure.
      */
     public Task<Void> createInvitation(UUID userId, UUID deviceId, UUID eventId, UUID invitee) {
         Map<String, Object> data = new HashMap<>();
@@ -566,6 +574,7 @@ public class EventViewModel extends ViewModel {
     }
 
     /**
+     * Calls the createCoInvitation cloud function, creating and sending an invite.
      *
      * @param userId      UUID to identify user.
      * @param deviceId    UUID to identify user's device.
@@ -588,7 +597,14 @@ public class EventViewModel extends ViewModel {
                 .onSuccessTask(task -> Tasks.forResult(null));
     }
 
-
+    /**
+     * Calls the getWaitListMap cloud function, getting the location of an event's entrants.
+     *
+     * @param userId   UUID identifying the user.
+     * @param deviceId UUID identifying the user's device.
+     * @param eventId  UUID identifying the event.
+     * @return ArrayList of users on the event waitlist and their locations.
+     */
     public Task<List<Map.Entry<ExternalUser, LatLng>>> getWaitlistMap(UUID userId, UUID deviceId, UUID eventId) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());

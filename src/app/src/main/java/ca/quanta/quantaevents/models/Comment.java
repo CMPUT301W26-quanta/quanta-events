@@ -2,6 +2,9 @@ package ca.quanta.quantaevents.models;
 
 import java.util.UUID;
 
+/**
+ * Class which defines a comment.
+ */
 public class Comment {
     private UUID commentId;
     private UUID senderId;
@@ -28,22 +31,48 @@ public class Comment {
         this.senderName = senderName;
     }
 
+    /**
+     * Gets the ID of a comment.
+     *
+     * @return UUID identifying the comment.
+     */
     public UUID getCommentId() {
         return this.commentId;
     }
 
+    /**
+     * Gets the ID of the commenter.
+     *
+     * @return UUID identifying commenter.
+     */
     public UUID getSenderId() {
         return senderId;
     }
+
+    /**
+     * Gets the comment's message.
+     *
+     * @return String representing comment message.
+     */
 
     public String getMessage() {
         return message;
     }
 
+    /**
+     * Gets the time the comment was posted.
+     *
+     * @return String representing time comment was posted.
+     */
     public String getPostTime() {
         return this.postTime;
     }
 
+    /**
+     * Gets the name of the commenter.
+     *
+     * @return String representing name of the commenter.
+     */
     public String getSenderName() {
         return this.senderName;
     }

@@ -35,6 +35,9 @@ import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 
+/**
+ * Fragment for displaying UI for displaying the locations of an event's entrants.
+ */
 public class EventWaitingListMapFragment extends Fragment implements OnMapReadyCallback {
     private static final String TAG = "WaitlistMapFragment";
     private FragmentEventWaitlistMapBinding binding;
@@ -86,6 +89,10 @@ public class EventWaitingListMapFragment extends Fragment implements OnMapReadyC
         }
     }
 
+    /**
+     * Sets up the map.
+     * @param map The map object to be setup.
+     */
     @Override
     public void onMapReady(GoogleMap map) {
         if (map == null) {

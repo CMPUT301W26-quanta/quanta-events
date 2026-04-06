@@ -35,6 +35,13 @@ public class ExternalUser {
         this.isAdmin = isAdmin;
     }
 
+    /**
+     * Constructor for an external user when no role booleans are provided.
+     * @param userId UUID identifying user.
+     * @param name Name of user.
+     * @param email Email of user.
+     * @param phone User's phone number.
+     */
     public ExternalUser(UUID userId, String name,String email, String phone) {
         this.userId = userId;
         this.name = name;

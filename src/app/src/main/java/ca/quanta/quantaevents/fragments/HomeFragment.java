@@ -37,6 +37,9 @@ import ca.quanta.quantaevents.viewmodels.InviteViewModel;
 import ca.quanta.quantaevents.viewmodels.NotificationViewModel;
 import ca.quanta.quantaevents.viewmodels.UserViewModel;
 
+/**
+ * Fragment for displaying UI for displaying notifications to the user.
+ */
 public class HomeFragment extends Fragment implements Tagged {
     private FragmentHomeBinding binding;
     private SessionStore sessionStore;
@@ -140,6 +143,12 @@ public class HomeFragment extends Fragment implements Tagged {
         UndismissedNotificationAdapter.AsyncHandler handler = new UndismissedNotificationAdapter.AsyncHandler() {
             UndismissedNotificationAdapter adapter = null;
 
+            /**
+             * Gets an event and its data.
+             * @param eventId  UUID of the event to fetch
+             * @param consumer Consumes the fetched event
+             * @param onFail   On failure to fetch the event, this is called instead
+             */
             @Override
             public void getEvent(UUID eventId, Consumer<Event> consumer, Runnable onFail) {
                 MutableLiveData<Void> failObserver = new MutableLiveData<>();
@@ -161,6 +170,11 @@ public class HomeFragment extends Fragment implements Tagged {
                         });
             }
 
+            /**
+             * Dismisses a notification and removes it from the home menu.
+             * @param position       The position of this notification in the list.
+             * @param notificationId UUID of this notification.
+             */
             @Override
             public void dismissed(int position, UUID notificationId) {
                 notifications.remove(position);
@@ -178,6 +192,10 @@ public class HomeFragment extends Fragment implements Tagged {
                         });
             }
 
+            /**
+             * Accepts an invite notification and moves the user to an event's final list.
+             * @param eventId UUID of this event.
+             */
             @Override
             public void accepted(UUID eventId) {
                 inviteModel.inviteAccept(userId, deviceId, eventId)
@@ -197,6 +215,10 @@ public class HomeFragment extends Fragment implements Tagged {
                         });
             }
 
+            /**
+             * Cancels an invite and moves the user to the event's cancelled list.
+             * @param eventId UUID of this event.
+             */
             @Override
             public void declined(UUID eventId) {
                 inviteModel.inviteReject(userId, deviceId, eventId)
@@ -216,6 +238,10 @@ public class HomeFragment extends Fragment implements Tagged {
                         });
             }
 
+            /**
+             * Accepts a co-organizer invite notification and assigns the user as co-organizer for and event.
+             * @param eventId UUID identifying event for user to co-organize.
+             */
             @Override
             public void acceptedCoInvite(UUID eventId) {
                 inviteModel.coInviteAccept(userId, deviceId, eventId)
@@ -235,12 +261,20 @@ public class HomeFragment extends Fragment implements Tagged {
                         });
             }
 
+            /**
+             * Navigates to the details page for an event.
+             * @param eventId UUID of the event to navigate to.
+             */
             @Override
             public void goToEvent(UUID eventId) {
                 NavDirections action = ca.quanta.quantaevents.fragments.HomeFragmentDirections.actionHomeFragmentToEventDetailsFragment(eventId);
                 Navigation.findNavController(binding.getRoot()).navigate(action);
             }
 
+            /**
+             * Sets the adapter to an undismissed notification adapter.
+             * @param adapter The adapter to use.
+             */
             @Override
             public void setAdapter(UndismissedNotificationAdapter adapter) {
                 this.adapter = adapter;

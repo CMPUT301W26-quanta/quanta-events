@@ -61,6 +61,11 @@ public class CommentsUITesting {
 
         openBurgerMenu();
 
+        Matcher<View> item = allOf(withContentDescription("Event List"), isDescendantOfA(withId(R.id.coordinator)));
+
+
+        waitForView(item);
+
         clickMenuItem("Event List");
 
 

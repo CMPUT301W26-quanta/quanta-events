@@ -41,6 +41,9 @@ import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
+/**
+ * Fragment for displaying UI for displaying entrant event history.
+ */
 public class EntrantEventHistoryFragment extends Fragment {
     private FragmentEntrantEventHistoryBinding binding;
     private EventCardAdapter adapter;

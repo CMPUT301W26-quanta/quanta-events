@@ -27,6 +27,9 @@ import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
+/**
+ * Fragment for displaying UI for displaying images to admins.
+ */
 public class AdminImageBrowserFragment extends Fragment {
     private FragmentAdminImageBrowserBinding binding;
 
@@ -36,6 +39,9 @@ public class AdminImageBrowserFragment extends Fragment {
     private UUID userId;
     private UUID deviceId;
 
+    /**
+     * Lists and displays image cards for admin viewing.
+     */
     private void listImageCards() {
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
         loader.loadTask(

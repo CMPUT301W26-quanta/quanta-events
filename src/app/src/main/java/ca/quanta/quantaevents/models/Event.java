@@ -95,6 +95,11 @@ public class Event {
         this.isPrivate = false;
     }
 
+    /**
+     * Constructor for an event given a map of event data.
+     * @param eventId UUID identifying the event.
+     * @param data Map of event data.
+     */
     public Event(UUID eventId, Map<String, Object> data){
         this.eventId = eventId;
         this.organizerId = data.get("organizer") == null ? null : UUID.fromString((String) data.get("organizer"));
@@ -123,6 +128,10 @@ public class Event {
                 .orElse(false);
     }
 
+    /**
+     * Constructor for an event given a map of data and no event ID.
+     * @param data Map of event data.
+     */
     public Event(Map<String, Object> data) {
         this.eventId = UUID.fromString((String) data.get("eventId"));
         this.organizerId = data.get("organizer") == null ? null : UUID.fromString((String) data.get("organizer"));

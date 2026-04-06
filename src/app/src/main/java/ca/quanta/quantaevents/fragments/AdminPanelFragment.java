@@ -20,6 +20,9 @@ import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentAdminPanelBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
+/**
+ * Fragment for displaying UI for taking actions as an admin.
+ */
 public class AdminPanelFragment extends Fragment implements Tagged {
     private FragmentAdminPanelBinding binding;
 

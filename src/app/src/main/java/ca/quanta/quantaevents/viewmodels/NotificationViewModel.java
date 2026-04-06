@@ -23,7 +23,6 @@ public class NotificationViewModel extends ViewModel {
 
     /**
      * Calls the createNotification cloud function, creating and sending a notification.
-     *
      * @param userId    UUID identifying sender.
      * @param deviceId  UUID identifying sender's device.
      * @param message   Notification message.
@@ -61,6 +60,13 @@ public class NotificationViewModel extends ViewModel {
                 });
     }
 
+    /**
+     * Calls the getAllNotifications cloud function, getting all notifications send by a user.
+     * @param userId UUID identifying the invoker.
+     * @param deviceId UUID identifying the invoker's device.
+     * @param sentById UUID identifying the target user.
+     * @return ArrayList of external notifications sent by a user.
+     */
     public Task<ArrayList<ExternalNotification>> getAllNotifications(UUID userId, UUID deviceId, UUID sentById) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
@@ -88,6 +94,12 @@ public class NotificationViewModel extends ViewModel {
                 });
     }
 
+    /**
+     * Calls the getAllUndismissedNotifications cloud function, getting all undismissed notifications sent to a user.
+     * @param userId UUID identifying the user.
+     * @param deviceId UUID identifying the user's device.
+     * @return ArrayList of undismissed external notifications sent to the user.
+     */
     public Task<ArrayList<ExternalUndismissedNotification>> getAllUndismissedNotifications(UUID userId, UUID deviceId) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
@@ -120,6 +132,13 @@ public class NotificationViewModel extends ViewModel {
                 });
     }
 
+    /**
+     * Calls the dismissNotification cloud function, dismissing a notification.
+     * @param userId UUID identifying the user.
+     * @param deviceId UUID identifying the user's device.
+     * @param notificationId UUID identifying dismissed notification.
+     * @return Void task.
+     */
     public Task<Void> dismissNotification(UUID userId, UUID deviceId, UUID notificationId) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());

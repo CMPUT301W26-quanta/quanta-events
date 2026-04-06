@@ -43,6 +43,9 @@ import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
+/**
+ * Fragment for displaying UI for displaying enrolled-in events to entrants.
+ */
 public class EntrantEventListFragment extends Fragment implements Tagged {
     private FragmentEntrantEventListBinding binding;
     private EventCardAdapter adapter;

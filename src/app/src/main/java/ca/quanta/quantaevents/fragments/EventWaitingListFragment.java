@@ -31,6 +31,9 @@ import ca.quanta.quantaevents.utils.CsvExporter;
 import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 
+/**
+ * Fragment for displaying UI for displaying waitlisted entrants and export options.
+ */
 public class EventWaitingListFragment extends Fragment {
     private FragmentEventWaitlistBinding binding;
     private EventViewModel eventViewModel;
