@@ -27,14 +27,25 @@ export async function coInviteAccept(request: CallableRequest): Promise<{}> {
         throw new HttpsError("not-found", "The event does not exist.");
     }
 
-    await db
+    const userCollection = db.collection("users") as UserDocCollection;
+    const userRef = userCollection.doc(userId);
+    const user = await userRef.get();
+
+    if (!user.exists) {
+		throw new HttpsError("not-found", "The user does not exist.");
+	}
+    else {
+
+        await db
         .collection("users")
         .doc(userId)
         .update({
           "entrant.coOrganizedEvents": FieldValue.arrayUnion(data.eventId),
         });
 
-    logger.info("User became co-organizer successfully");
+        logger.info("User became co-organizer successfully");
+
+    }
 
     return {};
 }

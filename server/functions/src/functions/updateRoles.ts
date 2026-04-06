@@ -51,6 +51,7 @@ export async function updateRoles(request: CallableRequest) {
 			history: [],
 			undismissedNotifications: [],
 			receiveNotifications: true,
+            coOrganizedEvents: [],
 		});
 	}
 
