@@ -68,8 +68,8 @@ public class EventNotificationEditorFragment extends Fragment {
             Boolean finale = binding.checkFinal.isChecked();
 
             model.createNotification(userId, deviceId, message,
-                    title, eventId.toString(),
-                    waited, cancelled, selected, finale)
+                            title, eventId,
+                            waited, cancelled, selected, finale)
                     .addOnSuccessListener(notificationId -> {
                         if (!isAdded() || binding == null) return;
                         binding.saveButton.setEnabled(true);

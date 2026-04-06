@@ -19,9 +19,10 @@ public class InviteViewModel extends ViewModel {
 
     /**
      * Calls the inviteAccept cloud function, accepting a lottery invite.
-     * @param userId UUID to identify user.
+     *
+     * @param userId   UUID to identify user.
      * @param deviceId UUID to identify the user's device.
-     * @param eventId UUID of the event to accept the invite on.
+     * @param eventId  UUID of the event to accept the invite on.
      * @return Nothing.
      */
     public Task<Void> inviteAccept(UUID userId, UUID deviceId, UUID eventId) {
@@ -43,9 +44,10 @@ public class InviteViewModel extends ViewModel {
 
     /**
      * Calls the inviteReject cloud function, rejecting a lottery invite.
-     * @param userId UUID to identify user.
+     *
+     * @param userId   UUID to identify user.
      * @param deviceId UUID to identify the user's device.
-     * @param eventId UUID of the event to reject the invite on.
+     * @param eventId  UUID of the event to reject the invite on.
      * @return Nothing.
      */
     public Task<Void> inviteReject(UUID userId, UUID deviceId, UUID eventId) {
@@ -67,9 +69,10 @@ public class InviteViewModel extends ViewModel {
 
     /**
      * Calls the coInviteAccept cloud function, assigning a user as co-organizer for an event
-     * @param userId UUID identifying the user.
+     *
+     * @param userId   UUID identifying the user.
      * @param deviceId UUID identifying user's device.
-     * @param eventId UUID identifying the event.
+     * @param eventId  UUID identifying the event.
      * @return Void task.
      */
     public Task<Void> coInviteAccept(UUID userId, UUID deviceId, UUID eventId) {
@@ -88,29 +91,4 @@ public class InviteViewModel extends ViewModel {
                     return Tasks.forResult(null);
                 });
     }
-
-    /**
-     * Calls the coInviteReject cloud function, cancelling a co-organizer invite.
-     * @param userId UUID identifying user.
-     * @param deviceId UUID identifying user's device.
-     * @param eventId UUID identifying the event.
-     * @return Void task.
-     */
-    public Task<Void> coInviteReject(UUID userId, UUID deviceId, UUID eventId) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("userId", userId.toString());
-        data.put("deviceId", deviceId.toString());
-
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("eventId", eventId.toString());
-        data.put("data", payload);
-
-        return functions
-                .getHttpsCallable("coInviteReject")
-                .call(data)
-                .onSuccessTask(callResult -> {
-                    return Tasks.forResult(null);
-                });
-    }
-
 }
