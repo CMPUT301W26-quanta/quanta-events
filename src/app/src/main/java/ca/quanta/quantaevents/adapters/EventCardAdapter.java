@@ -20,8 +20,14 @@ import java.util.UUID;
 
 import ca.quanta.quantaevents.R;
 
+/**
+ * Adapter for handling event cards.
+ */
 public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.EventViewHolder> {
 
+    /**
+     * Interface of item click listener.
+     */
     public interface OnItemClickListener {
         void onItemClick(EventCardItem item);
     }
@@ -29,10 +35,21 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
     private final List<EventCardItem> items = new ArrayList<>();
     private final OnItemClickListener listener;
 
+    /**
+     * Constructor for this object.
+     * @param listener Event card click listener.
+     */
     public EventCardAdapter(OnItemClickListener listener) {
         this.listener = listener;
     }
 
+    /**
+     * Inflates event card layout.
+     * @param parent   The ViewGroup into which the new View will be added after it is bound to
+     *                 an adapter position.
+     * @param viewType The view type of the new View.
+     * @return View holder holding an inflated event card view.
+     */
     @NonNull
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -41,6 +58,12 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
         return new EventViewHolder(view);
     }
 
+    /**
+     * Sets the values for an event card.
+     * @param holder   The ViewHolder which should be updated to represent the contents of the
+     *                 item at the given position in the data set.
+     * @param position The position of the item within the adapter's data set.
+     */
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         EventCardItem item = items.get(position);
@@ -67,8 +90,8 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
     }
 
     /**
-     * No parameters needed
-     * @return Returns size of the list of events
+     * Gets the size of the list of events.
+     * @return Integer size of the list of events
      */
     @Override
     public int getItemCount() {
@@ -80,7 +103,6 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
      * @param item
      * No return value
      */
-
     public void updateInsert(EventCardItem item) {
         for (int i = 0; i < items.size(); i++) {
             EventCardItem current = items.get(i);
@@ -95,6 +117,11 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
         notifyItemInserted(0);
     }
 
+    /**
+     * Updates the location of an event.
+     * @param eventId UUID identifying the event.
+     * @param location String identifying the event location.
+     */
     public void updateLocation(UUID eventId, String location) {
         for (int i = 0; i < items.size(); i++) {
             EventCardItem current = items.get(i);
@@ -112,6 +139,11 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
         }
     }
 
+    /**
+     * Updates the event image.
+     * @param eventId UUID identifying the event.
+     * @param image Bitmap containing new image data.
+     */
     public void updateImage(UUID eventId, Bitmap image) {
         for (int i = 0; i < items.size(); i++) {
             EventCardItem current = items.get(i);
@@ -130,8 +162,8 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
     }
 
     /**
-     * clear the existing list and return a new list of events to the fragment
-     * @param newItems
+     * clears the existing list and make it a new list of events to the fragment
+     * @param newItems List of events to be cleared and replaced.
      */
     public void setItems(List<EventCardItem> newItems) {
         items.clear();
@@ -139,6 +171,9 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
         notifyDataSetChanged();
     }
 
+    /**
+     * View holder for displaying an event card.
+     */
     static class EventViewHolder extends RecyclerView.ViewHolder {
         final CardView card;
 
@@ -147,6 +182,10 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Even
         final TextView eventStartTime;
         final TextView location;
 
+        /**
+         * Constructor for this class.
+         * @param itemView Inflated event card view.
+         */
         EventViewHolder(@NonNull View itemView) {
             super(itemView);
 

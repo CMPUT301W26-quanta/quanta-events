@@ -41,6 +41,9 @@ import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
+/**
+ * Fragment for displaying UI for displaying created events.
+ */
 public class EventDashboardFragment extends Fragment implements Tagged {
     private FragmentEventDashboardBinding binding;
     private EventCardAdapter adapter;

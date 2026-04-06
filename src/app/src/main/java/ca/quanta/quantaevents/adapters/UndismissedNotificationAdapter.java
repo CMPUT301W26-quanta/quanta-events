@@ -32,7 +32,6 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
          * Retrieve the requested event and provide the success or failure to the callbacks.
          * <p>
          * SAFETY: Must handle lifetime/existence checks to be safe. No checks are performed internally.
-         *
          * @param eventId  UUID of the event to fetch
          * @param consumer Consumes the fetched event
          * @param onFail   On failure to fetch the event, this is called instead
@@ -41,7 +40,6 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
 
         /**
          * Dismisses the notification, optionally removing the notification if the behaviour requires it.
-         *
          * @param position       The position of this notification in the list.
          * @param notificationId UUID of this notification.
          */
@@ -49,32 +47,32 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
 
         /**
          * Accepts the invite with this given event id
-         *
          * @param eventId UUID of this event.
          */
         void accepted(UUID eventId);
 
         /**
          * Declines the invite with this given event id
-         *
          * @param eventId UUID of this event.
          */
         void declined(UUID eventId);
 
         /**
          * Accepts the co-organizer invite with this given event id
-         *
          * @param eventId
          */
         void acceptedCoInvite(UUID eventId);
 
         /**
          * Should navigate to the event details of the given event
-         *
          * @param eventId UUID of the event to navigate to.
          */
         void goToEvent(UUID eventId);
 
+        /**
+         * Sets which adapter to use.
+         * @param adapter The adapter to use.
+         */
         void setAdapter(UndismissedNotificationAdapter adapter);
     }
 
@@ -88,9 +86,7 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
 
         /**
          * Bind the notification at the current position to this view holder
-         *
          * @param notification The notification to bind
-         * @param position     Position of this notification
          */
         public abstract void bind(ExternalUndismissedNotification notification);
     }
@@ -108,11 +104,21 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
             this.handler = handler;
         }
 
+        /**
+         * Creates a co invite view holder.
+         * @param parent View group this belongs to.
+         * @param handler Handler to handle interaction with invite.
+         * @return New co invite view holder.
+         */
         public static CoInviteViewHolder newInstance(ViewGroup parent, AsyncHandler handler) {
             ItemLotteryNotificationCardBinding binding = ItemLotteryNotificationCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new CoInviteViewHolder(binding, handler);
         }
 
+        /**
+         * Binds a notification and sets up co invite functionality.
+         * @param notification The notification to bind
+         */
         @Override
         public void bind(ExternalUndismissedNotification notification) {
             handler.getEvent(
@@ -158,11 +164,21 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
             this.handler = handler;
         }
 
+        /**
+         * Creates a invite view holder.
+         * @param parent View group this belongs to.
+         * @param handler Handler to handle interaction with invite.
+         * @return New invite view holder.
+         */
         public static InviteViewHolder newInstance(ViewGroup parent, AsyncHandler handler) {
             ItemInviteNotificationCardBinding binding = ItemInviteNotificationCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new InviteViewHolder(binding, handler);
         }
 
+        /**
+         * Binds a notification and sets up invite functionality.
+         * @param notification The notification to bind
+         */
         @Override
         public void bind(ExternalUndismissedNotification notification) {
             handler.getEvent(
@@ -197,11 +213,21 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
             this.handler = handler;
         }
 
+        /**
+         * Creates a lottery view holder.
+         * @param parent View group this belongs to.
+         * @param handler Handler to handle interaction with invite.
+         * @return New lottery view holder.
+         */
         public static LotteryViewHolder newInstance(ViewGroup parent, AsyncHandler handler) {
             ItemLotteryNotificationCardBinding binding = ItemLotteryNotificationCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new LotteryViewHolder(binding, handler);
         }
 
+        /**
+         * Binds a lottery notification and sets up functionality.
+         * @param notification The notification to bind
+         */
         @Override
         public void bind(ExternalUndismissedNotification notification) {
             handler.getEvent(
@@ -264,11 +290,21 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
             this.handler = handler;
         }
 
+        /**
+         * Creates a message view holder.
+         * @param parent View group this belongs to.
+         * @param handler Handler to handle interaction with message.
+         * @return New message view holder.
+         */
         public static MessageViewHolder newInstance(ViewGroup parent, AsyncHandler handler) {
             ItemMessageNotificationCardBinding binding = ItemMessageNotificationCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new MessageViewHolder(binding, handler);
         }
 
+        /**
+         * Binds message notification and setups up functionality.
+         * @param notification The notification to bind
+         */
         @Override
         public void bind(ExternalUndismissedNotification notification) {
             binding.notificationTitle.setText(notification.getTitle());
@@ -298,11 +334,20 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
             super(itemView);
         }
 
+        /**
+         * Creates a blank view holder.
+         * @param parent View group this belongs to.
+         * @return New blank view holder.
+         */
         public static BlankViewHolder newInstance(ViewGroup parent) {
             View view = new View(parent.getContext());
             return new BlankViewHolder(view);
         }
 
+        /**
+         * Binds a notification.
+         * @param notification The notification to bind
+         */
         @Override
         public void bind(ExternalUndismissedNotification notification) {
         }
@@ -313,7 +358,6 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
 
     /**
      * Creates a new {@link UndismissedNotificationAdapter}
-     *
      * @param notifications The list of notifications to adapt
      * @param handler       The async operation handler
      */
@@ -323,6 +367,13 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
         this.handler = handler;
     }
 
+    /**
+     * Creates a new view holder based on view type.
+     * @param parent   The ViewGroup into which the new View will be added after it is bound to
+     *                 an adapter position.
+     * @param viewType The view type of the new View.
+     * @return message, lottery, invite, co invite, or blank view holder based on view type.
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -340,17 +391,32 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
         }
     }
 
+    /**
+     * Populates a view holder with notification data.
+     * @param holder   The ViewHolder which should be updated to represent the contents of the
+     *                 item at the given position in the data set.
+     * @param position The position of the item within the adapter's data set.
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ExternalUndismissedNotification notification = notifications.get(position);
         holder.bind(notification);
     }
 
+    /**
+     * Gets the number of notifications to be displayed.
+     * @return Integer representing number of notifications to be displayed.
+     */
     @Override
     public int getItemCount() {
         return this.notifications.size();
     }
 
+    /**
+     * Gets the view type of a notification.
+     * @param position position to query
+     * @return Integer 0, 1, 2, 3, or -1 based on notification type.
+     */
     @Override
     public int getItemViewType(int position) {
         ExternalUndismissedNotification notification = notifications.get(position);

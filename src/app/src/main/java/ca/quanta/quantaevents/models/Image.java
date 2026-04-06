@@ -29,6 +29,11 @@ public class Image {
         this.imageData = imageData;
     }
 
+    /**
+     * Constructor for an image given a map with some data.
+     * @param imageId UUID identifying the image.
+     * @param data Map of image data.
+     */
     public Image(UUID imageId, java.util.Map<String, Object> data) {
         this.imageId = imageId;
         this.imageData = data.get("imageData").toString();

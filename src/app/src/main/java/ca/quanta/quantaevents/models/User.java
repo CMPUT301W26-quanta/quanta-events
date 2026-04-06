@@ -43,6 +43,11 @@ public class User {
             return Objects.hashCode(receiveNotifications);
         }
 
+        /**
+         * Gets an entrant from a map.
+         * @param map Map of data to get entrant.
+         * @return Entrant obtained from map.
+         */
         @Nullable
         static Entrant fromMap(@Nullable Map<String, Object> map) {
             if (map == null) {
@@ -64,6 +69,11 @@ public class User {
             return o != null && getClass() == o.getClass();
         }
 
+        /**
+         * Gets an organizer from a map.
+         * @param map Map of data to get organizer.
+         * @return Organizer obtained from map.
+         */
         @Nullable
         static Organizer fromMap(@Nullable Map<String, Object> map) {
             if (map == null) {
@@ -84,6 +94,11 @@ public class User {
             return o != null && getClass() == o.getClass();
         }
 
+        /**
+         * Gets an admin from a map.
+         * @param map Map of data to get admin.
+         * @return Admin obtained from map.
+         */
         @Nullable
         static Admin fromMap(@Nullable Map<String, Object> map) {
             if (map == null) {
@@ -155,6 +170,12 @@ public class User {
 
     }
 
+    /**
+     * Constructor for a user from an https result.
+     * @param httpsResult Https result to get user data from.
+     * @param userId UUID identifying the user.
+     * @param deviceId UUID identifying the user's device.
+     */
     public User(Map<String, Object> httpsResult, UUID userId, UUID deviceId) {
         this.userId = userId;
         this.deviceId = deviceId;
@@ -168,7 +189,6 @@ public class User {
 
     /**
      * Constructor for a User object when user and device ID are known.
-     *
      * @param name                 Name of the user.
      * @param email                Email address of the user.
      * @param phoneNumber          Phone number of the user.
@@ -252,6 +272,11 @@ public class User {
         return phoneNumber;
     }
 
+    /**
+     * Checks if this user is the same as another.
+     * @param o   the reference object with which to compare.
+     * @return True if yes, False if no.
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -259,6 +284,10 @@ public class User {
         return Objects.equals(entrant, user.entrant) && Objects.equals(organizer, user.organizer) && Objects.equals(admin, user.admin) && Objects.equals(userId, user.userId) && Objects.equals(deviceId, user.deviceId) && Objects.equals(name, user.name) && Objects.equals(email, user.email) && Objects.equals(phoneNumber, user.phoneNumber);
     }
 
+    /**
+     * Creates a hashcode for a user.
+     * @return Hashcode representing a user.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(entrant, organizer, admin, userId, deviceId, name, email, phoneNumber);

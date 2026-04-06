@@ -42,13 +42,31 @@ import ca.quanta.quantaevents.viewmodels.UserViewModel;
  * Fragment for the invite page of a private event
  */
 public class EventInviteFragment extends Fragment {
+
+    /**
+     * View holder for holding profile views.
+     */
     public static class InviteProfileViewHolder extends ProfileAdapter.ProfileViewHolder {
+
+        /**
+         * Factory class for creating profile view holders.
+         */
         public static class Factory implements ProfileAdapter.ProfileViewHolder.Factory<InviteProfileViewHolder> {
             private final OnInviteButtonClickedListener listener;
+
+            /**
+             * Constructor for a factory.
+             * @param listener Invite button click listener for the event.
+             */
             public Factory( OnInviteButtonClickedListener listener) {
                 this.listener = listener;
             }
 
+            /**
+             * Creates a new invite profile view holder.
+             * @param parent The view group this belongs to.
+             * @return New invite profile view holder.
+             */
             @Override
             public InviteProfileViewHolder createNew(ViewGroup parent) {
                 ItemInviteProfileCardBinding binding = ItemInviteProfileCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
@@ -56,6 +74,9 @@ public class EventInviteFragment extends Fragment {
             }
         }
 
+        /**
+         * Interface for invite button functionality.
+         */
         public interface OnInviteButtonClickedListener {
             void OnInviteButtonClickedListener(UUID profileID);
         }
@@ -63,7 +84,11 @@ public class EventInviteFragment extends Fragment {
         private final ItemInviteProfileCardBinding binding;
         private final OnInviteButtonClickedListener listener;
 
-
+        /**
+         * Constructor for an invite profile view holder.
+         * @param itemView Root view of the view holder.
+         * @param listener Invite button click listener for the event.
+         */
         public InviteProfileViewHolder(@NonNull View itemView, OnInviteButtonClickedListener listener) {
             super(itemView);
             binding = ItemInviteProfileCardBinding.bind(itemView);

@@ -25,6 +25,9 @@ import ca.quanta.quantaevents.databinding.FragmentShowQrBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.utils.ToastManager;
 
+/**
+ * Fragment for displaying UI for generating and showing event QR codes.
+ */
 public class ShowQRFragment extends Fragment {
     private FragmentShowQrBinding binding;
 
@@ -86,7 +89,13 @@ public class ShowQRFragment extends Fragment {
         });
     }
 
-    // generates th bit map QRCode
+    /**
+     * Generates a bit map QR code.
+     * @param eventId UUID identifying the event to generate the code for.
+     * @param edgeSize Integer for setting the dimensions of the generated code.
+     * @return Bitmap of event data, represented as a QR code.
+     * @throws WriterException When generated the QR code fails.
+     */
     private Bitmap generateQrCode(UUID eventId, int edgeSize) throws WriterException {
         BarcodeEncoder writer = new BarcodeEncoder();
 

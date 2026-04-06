@@ -74,8 +74,9 @@ public class RegisterFragment extends Fragment {
     }
 
     /**
-     * Listener for the save button that extracts text input and check box values..
-     * and decides what to do on success or on failure
+     * Listener for the save button that extracts text input and check box values
+     * and decides what to do on success or on failure.
+     * @param v View that was clicked.
      */
     public void onSaveClick(View v) {
         if (redirectedToHome) {
@@ -124,12 +125,19 @@ public class RegisterFragment extends Fragment {
 
     }
 
-    // Regidrect the user to appropriate fragment
+    /**
+     * Redirects the user to appropriate fragment.
+     */
     private void observeSessionAndRedirect() {
         sessionStore.getUserId().observe(getViewLifecycleOwner(), userId -> tryRedirect());
         sessionStore.getDeviceId().observe(getViewLifecycleOwner(), deviceId -> tryRedirect());
     }
 
+    /**
+     * Converts a string to a null value if the string is empty.
+     * @param value String to be checked.
+     * @return null if the string is empty, the passed in string otherwise.
+     */
     @Nullable
     static String normalizeEmpty(@Nullable String value) {
         if (value == null || value.isEmpty()) {
@@ -145,7 +153,9 @@ public class RegisterFragment extends Fragment {
         redirectedToHome = false;
     }
 
-    // triess redirecting user to appropriate fragment.
+    /**
+     * Tries to redirect the user to the appropriate fragment.
+     */
     private void tryRedirect() {
         if (redirectedToHome) {
             return;

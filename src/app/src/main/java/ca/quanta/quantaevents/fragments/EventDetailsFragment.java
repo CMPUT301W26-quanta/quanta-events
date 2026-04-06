@@ -54,6 +54,9 @@ import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.functions.FirebaseFunctionsException;
 
+/**
+ * Fragment for displaying UI for displaying the details of an event.
+ */
 public class EventDetailsFragment extends Fragment {
     private FragmentEventDetailsBinding binding;
     private SessionStore sessionStore;

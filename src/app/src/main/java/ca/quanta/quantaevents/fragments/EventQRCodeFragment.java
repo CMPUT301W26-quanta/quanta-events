@@ -24,6 +24,9 @@ import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentEventQrCodeBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
+/**
+ * Fragment for displaying UI for scanning event QR codes.
+ */
 public class EventQRCodeFragment extends Fragment {
     private FragmentEventQrCodeBinding binding;
 
@@ -79,12 +82,18 @@ public class EventQRCodeFragment extends Fragment {
         });
     }
 
+    /**
+     * Resumes the QR code scanning process.
+     */
     @Override
     public void onResume() {
         super.onResume();
         binding.qrCodeScanner.resume();
     }
 
+    /**
+     * Pauses the QR code scanning process.
+     */
     @Override
     public void onPause() {
         super.onPause();

@@ -41,6 +41,9 @@ import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
+/**
+ * Fragment for displaying UI for displaying new events to entrants.
+ */
 public class EntrantEventBrowserFragment extends Fragment {
     private FragmentEntrantEventBrowserBinding binding;
     private EventCardAdapter adapter;
@@ -161,8 +164,9 @@ public class EntrantEventBrowserFragment extends Fragment {
         adapter = null;
     }
 
-    // decides if events should be loaded based on if they
-    // have been loaded before or if session is valid
+    /**
+     * Loads events based on if they hve been loaded before or if session is valid.
+     */
     private void maybeLoadAllEvents() {
         if (loadedInitialEvents) {
             return;
@@ -174,8 +178,9 @@ public class EntrantEventBrowserFragment extends Fragment {
         loadAvailableEvents();
     }
 
-    // loads all the available events based on the user session and
-    // by default sorts them by registration end time.
+    /**
+     * Loads all available events to user and sorts them by registration end time by default.
+     */
     private void loadAvailableEvents() {
         if (userId == null || deviceId == null) {
             Log.d("EntrantEventBrowser", "Session missing: userId/deviceId null");

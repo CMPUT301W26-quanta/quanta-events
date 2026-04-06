@@ -24,6 +24,9 @@ import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.viewmodels.NotificationViewModel;
 
+/**
+ * Fragment for displaying UI for creating and sending notifications.
+ */
 public class EventNotificationEditorFragment extends Fragment {
 
     private FragmentNotificationEditorBinding binding;
