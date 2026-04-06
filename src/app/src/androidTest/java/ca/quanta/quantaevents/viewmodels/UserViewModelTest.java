@@ -18,7 +18,7 @@ public class UserViewModelTest {
     private static final UUID DEVICE_ID = new UUID(0, 0);
 
     UserViewModel users;
-    private static final UUIDHolder holder = new UUIDHolder(null);
+    private static final UUIDHolder holder = new UUIDHolder();
 
     public UserViewModelTest() {
         users = new UserViewModel();
@@ -37,7 +37,7 @@ public class UserViewModelTest {
 
     @Test
     public void CreateDeleteUserTest() throws InterruptedException {
-        UUIDHolder holder = new UUIDHolder(null);
+        UUIDHolder holder = new UUIDHolder();
 
         TaskHandler.handle(users.createUser(NAME, EMAIL, PHONE, false, DEVICE_ID), holder::setUuid);
 

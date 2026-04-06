@@ -21,8 +21,8 @@ public class NotificationViewModelTest {
 
     private static final Integer EVENT_CAPACITY = 10;
 
-    private static final UUIDHolder userHolder = new UUIDHolder(null);
-    private static final UUIDHolder eventHolder = new UUIDHolder(null);
+    private static final UUIDHolder userHolder = new UUIDHolder();
+    private static final UUIDHolder eventHolder = new UUIDHolder();
 
     private static final String USER_NAME = "INSTRUMENTED TEST USER";
     private static final String USER_EMAIL = "instrumented.user@gmail.com";

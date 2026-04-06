@@ -1,13 +1,10 @@
 package ca.quanta.quantaevents.viewmodels;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.HttpsCallableResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,8 +23,9 @@ public class ImageViewModel extends ViewModel {
 
     /**
      * Calls the createImage cloud function, creating and adding an image to the database.
-     * @param userId UUID to identify user.
-     * @param deviceId UUID to identify the user's device.
+     *
+     * @param userId    UUID to identify user.
+     * @param deviceId  UUID to identify the user's device.
      * @param imageData Base64-encoded image data.
      * @return UUID assigned to newly created image.
      */
@@ -44,14 +42,15 @@ public class ImageViewModel extends ViewModel {
                 .getHttpsCallable("createImage")
                 .call(data)
                 .onSuccessTask(callResult -> {
-                        Map<String, Object> result = (Map<String, Object>) callResult.getData();
-                        return Tasks.forResult(UUID.fromString((String) result.get("imageId")));
+                    Map<String, Object> result = (Map<String, Object>) callResult.getData();
+                    return Tasks.forResult(UUID.fromString((String) result.get("imageId")));
                 });
     }
 
     /**
      * Calls the getAllImages cloud function, getting all image IDs stored in the database.
-     * @param userId This user's id (for permissions checking).
+     *
+     * @param userId   This user's id (for permissions checking).
      * @param deviceId This user's device id (for permissions checking).
      * @return List of image UUIDs.
      */
@@ -68,21 +67,22 @@ public class ImageViewModel extends ViewModel {
                 .getHttpsCallable("getAllImages")
                 .call(data)
                 .onSuccessTask(callResult -> {
-                        List<String> imageIDs = (List<String>) callResult.getData();
-                        ArrayList<UUID> imageUUIDs = new ArrayList<>();
+                    List<String> imageIDs = (List<String>) callResult.getData();
+                    ArrayList<UUID> imageUUIDs = new ArrayList<>();
 
-                        for (String imageID : imageIDs) {
-                            imageUUIDs.add(UUID.fromString(imageID));
-                        }
+                    for (String imageID : imageIDs) {
+                        imageUUIDs.add(UUID.fromString(imageID));
+                    }
 
-                        return Tasks.forResult(imageUUIDs);
+                    return Tasks.forResult(imageUUIDs);
                 });
     }
 
     /**
      * Calls the getImage cloud function and fetches the image from the database.
-     * @param imageId UUID to identify the image
-     * @param userId UUID to identify user.
+     *
+     * @param imageId  UUID to identify the image
+     * @param userId   UUID to identify user.
      * @param deviceId UUID to identify the user's device.
      * @return Map containing image data.
      */
@@ -110,12 +110,13 @@ public class ImageViewModel extends ViewModel {
     /**
      * Calls the deleteImage cloud function and deletes the image (and all references to it)
      * from the database.
-     * @param imageId UUID to identify the image to delete.
-     * @param userId UUID to identify this user.
+     *
+     * @param imageId  UUID to identify the image to delete.
+     * @param userId   UUID to identify this user.
      * @param deviceId UUID to identify this user's device.
-     * @return True if successful, and error if unsuccessful.
+     * @return null if successful, and error if unsuccessful.
      */
-    public Task<Boolean> deleteImage(UUID imageId, UUID userId, UUID deviceId) {
+    public Task<Void> deleteImage(UUID imageId, UUID userId, UUID deviceId) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId.toString());
         data.put("deviceId", deviceId.toString());
@@ -127,8 +128,8 @@ public class ImageViewModel extends ViewModel {
         return functions
                 .getHttpsCallable("deleteImage")
                 .call(data)
-                .onSuccessTask(callResult -> {
-                        return Tasks.forResult(null);
-                });
+                .onSuccessTask(callResult ->
+                        Tasks.forResult(null)
+                );
     }
 }

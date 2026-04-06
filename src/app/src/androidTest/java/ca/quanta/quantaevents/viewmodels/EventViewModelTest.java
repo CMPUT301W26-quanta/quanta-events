@@ -28,7 +28,7 @@ public class EventViewModelTest {
 
     private static final Integer CAPACITY = 10;
 
-    private static final UUIDHolder userHolder = new UUIDHolder(null);
+    private static final UUIDHolder userHolder = new UUIDHolder();
 
     private static final String USER_NAME = "INSTRUMENTED TEST USER";
     private static final String USER_EMAIL = "instrumented.user@gmail.com";
@@ -56,7 +56,7 @@ public class EventViewModelTest {
 
     @Test
     public void MainEventTest() throws InterruptedException {
-        UUIDHolder holder = new UUIDHolder(null);
+        UUIDHolder holder = new UUIDHolder();
 
         TaskHandler.handle(
                 events.createEvent(
@@ -108,7 +108,7 @@ public class EventViewModelTest {
                     assertNull(event.getImageId());
                 }
         );
-        
+
         // Can't delete test event, we aren't admin
     }
 }
