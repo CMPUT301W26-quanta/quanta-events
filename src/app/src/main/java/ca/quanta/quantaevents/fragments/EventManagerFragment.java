@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,14 +30,19 @@ public class EventManagerFragment extends Fragment {
     private boolean isDrawn;
 
     private boolean isPrivate;
+    EventViewModel eventModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventManagerFragmentArgs args = EventManagerFragmentArgs.fromBundle(getArguments());
-        eventId = args.getEventId();
-        isDrawn = args.getIsDrawn();
-        isPrivate = args.getIsPrivate();
+        this.eventId = args.getEventId();
+        this.isDrawn = args.getIsDrawn();
+        this.isPrivate = args.getIsPrivate();
+
+        // **** set up the view models
+
+        this.eventModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
     }
 
     @Override
@@ -57,31 +61,32 @@ public class EventManagerFragment extends Fragment {
         LoaderState loader = new ViewModelProvider(requireActivity()).get(LoaderState.class);
 
         sessionStore.observeSession(getViewLifecycleOwner(), (uid, did) -> {
-            userId = uid;
-            deviceId = did;
+            this.userId = uid;
+            this.deviceId = did;
         });
 
         readArgs();
 
         // sets on click listener to navigate to editor fragment
-        binding.editDetailsButton.setOnClickListener(
+        this.binding.editDetailsButton.setOnClickListener(
                 v -> {
                     NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToCreateeditorfragment(eventId);
                     Navigation.findNavController(v).navigate(action);
                 }
         );
-        if (isPrivate) {
-            binding.shareQrButton.setText("Invite Entrants");
-            binding.shareQrButton.setOnClickListener(
+
+        if (this.isPrivate) {
+            this.binding.shareQrButton.setText("Invite Entrants");
+            this.binding.shareQrButton.setOnClickListener(
                     v -> {
                         NavDirections action = EventManagerFragmentDirections.actionEventManagerFragmentToEventInviteFragment(eventId);
                         Navigation.findNavController(v).navigate(action);
                     }
             );
         } else {
-            binding.shareQrButton.setText("Share QR Code");
+            this.binding.shareQrButton.setText("Share QR Code");
             // sets onc lick listener to navigate to show qr fragment
-            binding.shareQrButton.setOnClickListener(
+            this.binding.shareQrButton.setOnClickListener(
                     v -> {
                         NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToShowqrfragment(eventId);
                         Navigation.findNavController(v).navigate(action);
@@ -90,14 +95,15 @@ public class EventManagerFragment extends Fragment {
         }
 
         //sets on click listener to navigate to waiting list fragment
-        binding.viewWaitListButton.setOnClickListener(
+        this.binding.viewWaitListButton.setOnClickListener(
                 v -> {
                     NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToEventwaitinglistfragment(eventId);
                     Navigation.findNavController(v).navigate(action);
                 }
         );
+
         // set on click listner to navigate to send notification fragment
-        binding.sendNotificationButton.setOnClickListener(
+        this.binding.sendNotificationButton.setOnClickListener(
                 v -> {
                     NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToSendnotificationfragment(eventId);
                     Navigation.findNavController(v).navigate(action);
@@ -105,39 +111,66 @@ public class EventManagerFragment extends Fragment {
         );
 
         // set on click listener to navigate to waitlist map fragment
-        binding.viewWaitListMapButton.setOnClickListener(
+        this.binding.viewWaitListMapButton.setOnClickListener(
                 v -> {
                     NavDirections action = EventManagerFragmentDirections.actionEventmanagerfragmentToEventwaitinglistmapfragment(eventId);
                     Navigation.findNavController(v).navigate(action);
                 }
         );
 
-        if(isDrawn) {
-            binding.drawLotteryButton.setEnabled(false);
-            binding.drawLotteryButton.setAlpha(0.5f);
+        binding.inviteCoOrganizerButton.setOnClickListener(
+                v -> {
+                    NavDirections action = EventManagerFragmentDirections.actionEventManagerFragmentToInviteCoOrganizerFragment(eventId);
+                    Navigation.findNavController(v).navigate(action);
+                }
+        );
+
+        if (this.isDrawn) {
+            // disable draw lottery button
+            this.binding.drawLotteryButton.setEnabled(false);
+            this.binding.drawLotteryButton.setAlpha(0.5f);
+
+            // setup cancel selected button
+            this.binding.cancelSelectedButton.setOnClickListener(v -> {
+                loader.loadTask(eventModel.cancelSelected(this.userId, this.deviceId, this.eventId)
+                        .addOnSuccessListener(x -> {
+                            if (!this.isAdded() || this.binding == null) return;
+                            ToastManager.show(this.getContext(), "Successfully canceled selected entrants.");
+                        })
+                        .addOnFailureListener(exception -> {
+                            if (!this.isAdded() || this.binding == null) return;
+                            exception.printStackTrace();
+                            ToastManager.show(this.getContext(), "Failed to cancel selected entrants");
+                        })
+                );
+            });
         } else {
-            binding.drawLotteryButton.setOnClickListener(v -> {
-                binding.drawLotteryButton.setEnabled(false);
-                binding.drawLotteryButton.setAlpha(0.5f);
-                EventViewModel events = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
-                loader.loadTask(events.drawLottery(userId, deviceId, eventId)
-                                .addOnSuccessListener(_void -> {
-                                    if (!isAdded() || binding == null) return;
-                                    ToastManager.show(getContext(), "Drew lottery");
-                                })
-                        .addOnFailureListener(exc -> {
-                            if (!isAdded() || binding == null) return;
-                            exc.printStackTrace();
-                            binding.drawLotteryButton.setEnabled(true);
-                            binding.drawLotteryButton.setAlpha(1.0f);
-                            ToastManager.show(getContext(), "Failed to draw lottery");
+            // disable cancel selected button
+            this.binding.cancelSelectedButton.setEnabled(false);
+            this.binding.cancelSelectedButton.setAlpha(0.5f);
+
+            // setup draw lottery button
+            this.binding.drawLotteryButton.setOnClickListener(v -> {
+                this.binding.drawLotteryButton.setEnabled(false);
+                this. binding.drawLotteryButton.setAlpha(0.5f);
+                loader.loadTask(eventModel.drawLottery(this.userId, this.deviceId, this.eventId)
+                        .addOnSuccessListener(x -> {
+                            if (!this.isAdded() || this.binding == null) return;
+                            ToastManager.show(this.getContext(), "Successfully drew lottery.");
+                        })
+                        .addOnFailureListener(exception -> {
+                            if (!this.isAdded() || this.binding == null) return;
+                            exception.printStackTrace();
+                            this.binding.drawLotteryButton.setEnabled(true);
+                            this.binding.drawLotteryButton.setAlpha(1.0f);
+                            ToastManager.show(this.getContext(), "Failed to draw lottery.");
                         })
                 );
             });
         }
 
         // send on click listener to navigate back to previous fragment
-        binding.backButton.setOnClickListener(
+        this.binding.backButton.setOnClickListener(
                 v -> {
                     Navigation.findNavController(v).popBackStack();
                 }
@@ -148,20 +181,20 @@ public class EventManagerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentEventManagerBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+        this.binding = FragmentEventManagerBinding.inflate(inflater, container, false);
+        return this.binding.getRoot();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         ToastManager.cancel();
-        binding = null;
+        this.binding = null;
     }
 
     private void readArgs() {
         EventManagerFragmentArgs args = EventManagerFragmentArgs.fromBundle(getArguments());
-        eventId = args.getEventId();
-        isDrawn = args.getIsDrawn();
+        this.eventId = args.getEventId();
+        this.isDrawn = args.getIsDrawn();
     }
 }

@@ -40,7 +40,7 @@ export async function joinWaitlist(request: CallableRequest) {
 	);
 	const { eventId, joinLocation } = data;
 	const userData = await util.verifyUser(userId, deviceId);
-	util.requireRole(userData, "entrant");
+	const entrantUser = util.requireRole(userData, "entrant");
 
 	const db = getFirestore();
 	const eventDoc = await db.collection("events").doc(eventId).get();
@@ -52,6 +52,14 @@ export async function joinWaitlist(request: CallableRequest) {
 	const now = new Date();
 	const registrationStart = event.registrationStartTime.toDate();
 	const registrationEnd = event.registrationEndTime.toDate();
+
+	if (entrantUser.entrant.coOrganizedEvents.includes(data.eventId)) {
+		throw new HttpsError(
+			"permission-denied",
+			"User is a co-organizer for this event",
+		);
+	}
+
 	if (now < registrationStart) {
 		throw new HttpsError(
 			"failed-precondition",

@@ -32,6 +32,11 @@ initializeApp();
 
 export const health = onCall({ maxInstances: 1 }, functions.health);
 
+export const cancelSelected = onCall(
+	{ maxInstances: 1 },
+	functions.cancelSelected,
+);
+
 export const createComment = onCall(
 	{ maxInstances: 1 },
 	functions.createComment,
@@ -133,10 +138,17 @@ export const getNotification = onCall(
 	functions.getNotification,
 );
 
-export const getWaitlistMap = onCall({ maxInstances: 1}, functions.getWaitlistMap);
+export const getWaitlistMap = onCall(
+	{ maxInstances: 1 },
+	functions.getWaitlistMap,
+);
 
 export const getEvents = onCall({ maxInstances: 1 }, functions.getEvents);
 
 export const setToken = onCall({ maxInstances: 1 }, functions.setToken);
 
 export const updateRoles = onCall({ maxInstances: 1 }, functions.updateRoles);
+
+export const createCoInvitation = onCall({ maxInstances: 1 }, functions.createCoInvitation);
+
+export const coInviteAccept = onCall({ maxInstances: 1 }, functions.coInviteAccept);

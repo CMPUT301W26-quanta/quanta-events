@@ -25,6 +25,8 @@ declare global {
 		undismissedNotifications: string[];
 		/** Whether the user should recieve notifications or not */
 		receiveNotifications: boolean;
+		/** List of event UUIDS this user co-organizes */
+		coOrganizedEvents: string[];
 	}
 
 	interface OrganizerMap {
@@ -113,7 +115,8 @@ declare global {
 	type NotificationAnyKind =
 		| NotificationMessageKind
 		| NotificationLotteryKind
-		| NotificationInviteKind;
+		| NotificationInviteKind
+		| NotificationCoInviteKind;
 
 	interface NotificationMessageKind {
 		kind: "MESSAGE";
@@ -132,6 +135,10 @@ declare global {
 
 	interface NotificationInviteKind {
 		kind: "INVITE";
+	}
+
+	interface NotificationCoInviteKind {
+		kind: "COINVITE";
 	}
 
 	/** The form comments are stored as in the database. */
@@ -170,7 +177,7 @@ declare global {
 		title: string;
 		message: string;
 
-		kind: "MESSAGE" | "LOTTERY" | "INVITE";
+		kind: "MESSAGE" | "LOTTERY" | "INVITE" | "COINVITE";
 		lotterySelected: boolean | null;
 	}
 

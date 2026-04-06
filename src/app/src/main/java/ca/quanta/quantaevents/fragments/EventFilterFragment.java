@@ -40,19 +40,31 @@ public class EventFilterFragment extends Fragment {
         // set title of the page to Filter Events and the subtitle.
         // also sets the icon for the page
         infoStore.setTitle("Filter Events");
-        infoStore.setSubtitle("Apply filters to search events");
+        infoStore.setSubtitle("Apply filters to search events.");
         infoStore.setIconRes(R.drawable.material_symbols_filter_alt_outline);
 
-        binding.applyButton.setOnClickListener(v -> {
+        // populate the filters with the current values
+
+        Bundle filters = Navigation.findNavController(this.requireView())
+                .getPreviousBackStackEntry()
+                .getSavedStateHandle()
+                .get("filters");
+
+        if (filters != null) {
+            this.populateFilterFields(filters);
+        }
+
+        this.binding.applyButton.setOnClickListener(v -> {
             Bundle result = new Bundle();
+
             String from = getTagValue(binding.inputFrom);
             String to = getTagValue(binding.inputTo);
-            String category = getTextValue(binding.inputCategory);
+            String search = getTextValue(binding.inputCategory);
             Integer capacity = getIntegerValue(binding.inputCapacity);
 
             if (from != null) result.putString("from", from);
             if (to != null) result.putString("to", to);
-            if (category != null) result.putString("category", category);
+            if (search != null) result.putString("search", search);
             if (capacity != null) result.putInt("capacity", capacity);
 
             Navigation.findNavController(v)
@@ -63,17 +75,29 @@ public class EventFilterFragment extends Fragment {
             Navigation.findNavController(v).popBackStack();
         });
 
-        binding.inputTo.setOnClickListener(v -> showDateTimePicker(binding.inputTo));
-        binding.inputFrom.setOnClickListener(v -> showDateTimePicker(binding.inputFrom));
+        this.binding.inputTo.setOnClickListener(v -> showDateTimePicker(binding.inputTo));
+        this.binding.inputFrom.setOnClickListener(v -> showDateTimePicker(binding.inputFrom));
 
-        binding.resetButton.setOnClickListener(v -> {
-            binding.inputFrom.setText(null);
-            binding.inputFrom.setTag(null);
-            binding.inputTo.setText(null);
-            binding.inputTo.setTag(null);
-            binding.inputCategory.setText(null);
-            binding.inputCategory.setTag(null);
+        this.binding.resetButton.setOnClickListener(v -> {
+            this.binding.inputFrom.setText(null);
+            this.binding.inputFrom.setTag(null);
+            this.binding.inputTo.setText(null);
+            this.binding.inputTo.setTag(null);
+            this.binding.inputCategory.setText(null);
+            this.binding.inputCategory.setTag(null);
         });
+    }
+
+    private void populateFilterFields(Bundle filters) {
+        String from = filters.containsKey("from") ? filters.getString("from") : null;
+        String to = filters.containsKey("to") ? filters.getString("to") : null;
+        String search = filters.containsKey("search") ? filters.getString("search") : null;
+        Integer capacity = filters.containsKey("capacity") ? filters.getInt("capacity") : null;
+
+        if (from != null) this.binding.inputFrom.setText(from);
+        if (to != null) this.binding.inputTo.setText(to);
+        if (search != null) this.binding.inputCategory.setText(search);
+        if (capacity != null) this.binding.inputCapacity.setText(String.valueOf(capacity));
     }
 
     @Override

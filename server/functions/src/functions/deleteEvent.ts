@@ -4,39 +4,34 @@ import { CallableRequest, HttpsError } from "firebase-functions/https";
 import * as z from "zod";
 import * as util from "../util";
 
-const deleteEventInterface = util.standardForm(
-	z.object({
-		eventId: z.uuid(),
-	}),
-);
+const deleteEventInterface = util.standardForm(z.object({ eventId: z.uuid() }));
 
 export async function deleteEvent(request: CallableRequest) {
-	const payload = util.parseInterface(deleteEventInterface, request);
+	const { userId, deviceId, data } = util.parseInterface(
+		deleteEventInterface,
+		request,
+	);
 
-	const userData = await util.verifyUser(payload.userId, payload.deviceId);
-
-	// organizers can not delete their own events
+	// note: organizers can not delete their own events
 	// (per the user stories, only admins can remove/delete events)
+	// that's why we require the admin role; not organizer
+
+	const userData = await util.verifyUser(userId, deviceId);
 	util.requireRole(userData, "admin");
 
-	logger.info(`Deleting event ${payload.data.eventId}.`);
+	logger.info(`Deleting event ${data.eventId}.`);
 
 	const db = getFirestore();
 
-	const eventRef = db.collection("events").doc(payload.data.eventId);
+	const eventCollection = db.collection("events") as EventDocCollection;
+	const eventRef = eventCollection.doc(data.eventId);
 	const event = await eventRef.get();
 
 	if (!event.exists) {
 		throw new HttpsError("not-found", "Event not found");
 	}
 
-	const eventDoc = event.data() as EventDocument;
-
-	if (eventDoc.imageId !== null) {
-		await util.removeImage(eventDoc.imageId);
-	}
-
-	await eventRef.delete();
+	await util.deleteEvent(data.eventId);
 
 	return {};
 }

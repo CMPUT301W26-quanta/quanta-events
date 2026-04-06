@@ -1,3 +1,4 @@
+export * from "./functions/cancelSelected";
 export * from "./functions/checkWaitlist";
 export * from "./functions/createComment";
 export * from "./functions/createEvent";
@@ -32,5 +33,10 @@ export * from "./functions/joinWaitlist";
 export * from "./functions/leaveWaitlist";
 export * from "./functions/setToken";
 export * from "./functions/updateEvent";
+export * from "./functions/updateUser";
+export * from "./functions/deleteEvent";
+export * from "./functions/getWaitlistMap";
 export * from "./functions/updateRoles";
 export * from "./functions/updateUser";
+export * from "./functions/createCoInvitation";
+export * from "./functions/coInviteAccept";
