@@ -5,124 +5,146 @@ import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { logger } from "firebase-functions";
 
 const joinWaitlistInterface = util.standardForm(
-  z.object({
-    eventId: z.uuid(),
-    joinLocation: z
-          .object({
-            latitude: z.number(),
-            longitude: z.number(),
-            accuracyM: z.number().nullable(),
-          })
-          .nullable(),
-  })
+	z.object({
+		eventId: z.uuid(),
+		joinLocation: z
+			.object({
+				latitude: z.number(),
+				longitude: z.number(),
+				accuracyM: z.number().nullable(),
+			})
+			.nullable(),
+	}),
 );
 
 function haversineDistanceM(
-  lat1: number, lng1: number,
-  lat2: number, lng2: number
+	lat1: number,
+	lng1: number,
+	lat2: number,
+	lng2: number,
 ): number {
-  const R = 6371000;
-  const toRad = (deg: number) => (deg * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	const R = 6371000;
+	const toRad = (deg: number) => (deg * Math.PI) / 180;
+	const dLat = toRad(lat2 - lat1);
+	const dLng = toRad(lng2 - lng1);
+	const a =
+		Math.sin(dLat / 2) ** 2 +
+		Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+	return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 export async function joinWaitlist(request: CallableRequest) {
-  const { userId, deviceId, data } = util.parseInterface(
-    joinWaitlistInterface,
-    request
-  );
-  const { eventId, joinLocation } = data;
-  const userData = await util.verifyUser(userId, deviceId);
-  const entrantUser = util.requireRole(userData, "entrant");
+	const { userId, deviceId, data } = util.parseInterface(
+		joinWaitlistInterface,
+		request,
+	);
+	const { eventId, joinLocation } = data;
+	const userData = await util.verifyUser(userId, deviceId);
+	const entrantUser = util.requireRole(userData, "entrant");
 
-  const db = getFirestore();
-  const eventDoc = await db.collection("events").doc(eventId).get();
-  if (!eventDoc.exists) {
-    throw new HttpsError("not-found", "Event not found");
-  }
-  const event = eventDoc.data() as EventDocument;
+	const db = getFirestore();
+	const eventDoc = await db.collection("events").doc(eventId).get();
+	if (!eventDoc.exists) {
+		throw new HttpsError("not-found", "Event not found");
+	}
+	const event = eventDoc.data() as EventDocument;
 
-  const now = new Date();
-  const registrationStart = event.registrationStartTime.toDate();
-  const registrationEnd = event.registrationEndTime.toDate();
+	const now = new Date();
+	const registrationStart = event.registrationStartTime.toDate();
+	const registrationEnd = event.registrationEndTime.toDate();
 
-  if (entrantUser.entrant.coOrganizedEvents.includes(data.eventId)) {
-    throw new HttpsError("permission-denied", "User is a co-organizer for this event")
-  }
+	if (entrantUser.entrant.coOrganizedEvents.includes(data.eventId)) {
+		throw new HttpsError(
+			"permission-denied",
+			"User is a co-organizer for this event",
+		);
+	}
 
-  if (now < registrationStart) {
-    throw new HttpsError("failed-precondition", "Registration has not started yet");
-  }
-  if (now > registrationEnd) {
-    throw new HttpsError("failed-precondition", "Registration has closed");
-  }
+	if (now < registrationStart) {
+		throw new HttpsError(
+			"failed-precondition",
+			"Registration has not started yet",
+		);
+	}
+	if (now > registrationEnd) {
+		throw new HttpsError("failed-precondition", "Registration has closed");
+	}
 
-  const alreadyInWaitlist = event.waitList?.includes(userId);
-  const alreadyInFinalList = event.finalList?.includes(userId);
-  if (alreadyInWaitlist || alreadyInFinalList) {
-    throw new HttpsError("already-exists", "User is already registered for this event");
-  }
+	const alreadyInWaitlist = event.waitList?.includes(userId);
+	const alreadyInFinalList = event.finalList?.includes(userId);
+	if (alreadyInWaitlist || alreadyInFinalList) {
+		throw new HttpsError(
+			"already-exists",
+			"User is already registered for this event",
+		);
+	}
 
-  if (
-    event.registrationLimit !== null &&
-    event.registrationLimit !== 0 &&
-    (event.waitList?.length ?? 0) >= event.registrationLimit
-  ) {
-    throw new HttpsError("resource-exhausted", "Waitlist is full");
-  }
+	if (
+		event.registrationLimit !== null &&
+		event.registrationLimit !== 0 &&
+		(event.waitList?.length ?? 0) >= event.registrationLimit
+	) {
+		throw new HttpsError("resource-exhausted", "Waitlist is full");
+	}
 
-  const requiresGeolocation = !!event.geolocation;
-  if (requiresGeolocation && !joinLocation) {
-    throw new HttpsError("failed-precondition", "Location is required for this event");
-  }
+	const requiresGeolocation = !!event.geolocation;
+	if (requiresGeolocation && !joinLocation) {
+		throw new HttpsError(
+			"failed-precondition",
+			"Location is required for this event",
+		);
+	}
 
-  if (requiresGeolocation && joinLocation && event.locationLat != null && event.locationLng != null) {
-    const MAX_DISTANCE_M = 15000; // 15 km
-    const distance = haversineDistanceM(
-      joinLocation.latitude,
-      joinLocation.longitude,
-      event.locationLat,
-      event.locationLng
-    );
-    const effectiveDistance = distance - (joinLocation.accuracyM ?? 0);
-    if (effectiveDistance > MAX_DISTANCE_M) {
-      throw new HttpsError("failed-precondition", "You must be within 15 km of the event location to join the waitlist");
-    }
-  }
+	if (
+		requiresGeolocation &&
+		joinLocation &&
+		event.locationLat != null &&
+		event.locationLng != null
+	) {
+		const MAX_DISTANCE_M = 15000; // 15 km
+		const distance = haversineDistanceM(
+			joinLocation.latitude,
+			joinLocation.longitude,
+			event.locationLat,
+			event.locationLng,
+		);
+		const effectiveDistance = distance - (joinLocation.accuracyM ?? 0);
+		if (effectiveDistance > MAX_DISTANCE_M) {
+			throw new HttpsError(
+				"failed-precondition",
+				"You must be within 15 km of the event location to join the waitlist",
+			);
+		}
+	}
 
-  await db
-    .collection("events")
-    .doc(eventId)
-    .update({
-      waitList: FieldValue.arrayUnion(userId),
-    });
-  await db
-    .collection("users")
-    .doc(userId)
-    .update({
-      "entrant.enteredEvents": FieldValue.arrayUnion(eventId),
-    });
+	await db
+		.collection("events")
+		.doc(eventId)
+		.update({
+			waitList: FieldValue.arrayUnion(userId),
+		});
+	await db
+		.collection("users")
+		.doc(userId)
+		.update({
+			"entrant.enteredEvents": FieldValue.arrayUnion(eventId),
+		});
 
-  if (joinLocation) {
-    await db
-      .collection("events")
-      .doc(eventId)
-      .collection("waitlistEntries")
-      .doc(userId)
-      .set({
-        userId,
-        latitude: joinLocation.latitude,
-        longitude: joinLocation.longitude,
-        accuracyM: joinLocation.accuracyM ?? null,
-        joinedAt: FieldValue.serverTimestamp(),
-      });
-  }
+	if (joinLocation) {
+		await db
+			.collection("events")
+			.doc(eventId)
+			.collection("waitlistEntries")
+			.doc(userId)
+			.set({
+				userId,
+				latitude: joinLocation.latitude,
+				longitude: joinLocation.longitude,
+				accuracyM: joinLocation.accuracyM ?? null,
+				joinedAt: FieldValue.serverTimestamp(),
+			});
+	}
 
-  logger.info("User joined waitlist", { userId, eventId });
-  return {};
+	logger.info("User joined waitlist", { userId, eventId });
+	return {};
 }
