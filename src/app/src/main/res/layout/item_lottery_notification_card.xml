@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/profile_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp"
+    app:strokeColor="@color/border"
+    app:strokeWidth="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
+
+        <!-- Message -->
+        <TextView
+            android:id="@+id/notification_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Loading message..."
+            android:textSize="16sp"
+            android:textColor="@color/text_color" />
+
+        <!-- Accept icon -->
+        <ImageView
+            android:id="@+id/icon_accept"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/material_symbols_check_small" />
+
+        <!-- Decline icon -->
+        <ImageView
+            android:id="@+id/icon_decline"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/material_symbols_close_small" />
+
+        <!-- Dismiss icon -->
+        <ImageView
+            android:id="@+id/icon_dismiss"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/material_symbols_delete" />
+
+        <!-- Event icon -->
+        <ImageView
+            android:id="@+id/icon_event"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/material_symbols_event_outline" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

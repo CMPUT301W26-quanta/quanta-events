@@ -31,7 +31,8 @@ public class Event {
 
     private String eventName;
     private String eventDescription;
-    private String location;
+    private Double locationLat;
+    private Double locationLng;
     @Nullable
     private String eventCategory;
     @Nullable
@@ -62,7 +63,8 @@ public class Event {
                  @Nullable ZonedDateTime eventTime,
                  String eventName,
                  String eventDescription,
-                 String location,
+                 Double locationLat,
+                 Double locationLng,
                  @Nullable String eventCategory,
                  @Nullable String eventGuidelines,
                  boolean geolocation,
@@ -81,7 +83,8 @@ public class Event {
         this.eventTime = eventTime;
         this.eventName = eventName;
         this.eventDescription = eventDescription;
-        this.location = location;
+        this.locationLat = locationLat;
+        this.locationLng = locationLng;
         this.eventCategory = eventCategory;
         this.eventGuidelines = eventGuidelines;
         this.geolocation = geolocation;
@@ -104,7 +107,8 @@ public class Event {
         this.eventTime = data.get("eventTime") == null ? null : ZonedDateTime.parse(data.get("eventTime").toString());
         this.eventName = data.get("eventName").toString();
         this.eventDescription = data.get("eventDescription").toString();
-        this.location = data.get("location").toString();
+        this.locationLat = data.get("locationLat") == null ? null : Double.parseDouble(data.get("locationLat").toString());
+        this.locationLng = data.get("locationLng") == null ? null : Double.parseDouble(data.get("locationLng").toString());
         this.eventCategory = data.get("eventCategory") == null ? null : data.get("eventCategory").toString();
         this.eventGuidelines = data.get("eventGuidelines") == null ? null : data.get("eventGuidelines").toString();
         this.geolocation = Boolean.parseBoolean(data.getOrDefault("geolocation", "false").toString());
@@ -131,7 +135,8 @@ public class Event {
         this.eventTime = data.get("eventTime") == null ? null : ZonedDateTime.parse(data.get("eventTime").toString());
         this.eventName = data.get("eventName").toString();
         this.eventDescription = data.get("eventDescription").toString();
-        this.location = data.get("location").toString();
+        this.locationLat = data.get("locationLat") == null ? null : Double.parseDouble(data.get("locationLat").toString());
+        this.locationLng = data.get("locationLng") == null ? null : Double.parseDouble(data.get("locationLng").toString());
         this.eventCategory = data.get("eventCategory") == null ? null : data.get("eventCategory").toString();
         this.eventGuidelines = data.get("eventGuidelines") == null ? null : data.get("eventGuidelines").toString();
         this.geolocation = Boolean.parseBoolean(data.getOrDefault("geolocation", "false").toString());
@@ -192,9 +197,11 @@ public class Event {
         return eventDescription;
     }
 
-    public String getLocation() {
-        return location;
-    }
+    @Nullable
+    public Double getLocationLat() { return locationLat; }
+
+    @Nullable
+    public Double getLocationLng() { return locationLng; }
 
     @Nullable
     public String getEventCategory() {

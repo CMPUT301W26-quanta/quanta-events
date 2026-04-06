@@ -11,12 +11,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import ca.quanta.quantaevents.R;
-import ca.quanta.quantaevents.models.Notification;
+import ca.quanta.quantaevents.models.ExternalNotification;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
-    private final ArrayList<Notification> notifications;
+    private final ArrayList<ExternalNotification> notifications;
 
-    public NotificationAdapter(ArrayList<Notification> notifications) {
+    public NotificationAdapter(ArrayList<ExternalNotification> notifications) {
         this.notifications = notifications;
     }
 
@@ -36,7 +36,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     @Override
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
-        Notification notification = notifications.get(position);
+        ExternalNotification notification = notifications.get(position);
 
         String title = notification.getTitle();
         holder.title.setText(title != null ? title : "[Title not set]");

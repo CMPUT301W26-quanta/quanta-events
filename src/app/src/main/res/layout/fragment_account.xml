@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragments.TestFragmentTwo">
+    android:layout_height="match_parent">
 
     <ScrollView
         android:id="@+id/scroll_view"
@@ -102,39 +100,6 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <CheckBox
-                android:id="@+id/check_entrant"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:checked="true"
-                android:text="Make me an entrant."
-                android:textColor="@color/text_color"
-                app:buttonTint="@color/color_dark_purple"
-                app:strokeColor="@color/border"
-                app:strokeWidth="2dp" />
-
-            <CheckBox
-                android:id="@+id/check_organizer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Make me an organizer."
-                android:textColor="@color/text_color"
-                app:buttonTint="@color/color_dark_purple"
-                app:strokeColor="@color/border"
-                app:strokeWidth="2dp" />
-
-            <CheckBox
-                android:id="@+id/check_admin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Make me an administrator."
-                android:textColor="@color/text_color"
-                app:buttonTint="@color/color_dark_purple"
-                app:strokeColor="@color/border"
-                app:strokeWidth="2dp" />
-
-            <CheckBox
                 android:id="@+id/check_notifications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -144,6 +109,15 @@
                 app:buttonTint="@color/color_dark_gray"
                 app:strokeColor="@color/border"
                 app:strokeWidth="2dp" />
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchDarkMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dark Mode"
+                android:textSize="16sp"
+                android:paddingVertical="12dp"
+                app:thumbTint="@color/switch_thumb_color"
+                app:trackTint="@color/switch_track_color" />
         </LinearLayout>
     </ScrollView>
 
