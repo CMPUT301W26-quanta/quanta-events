@@ -22,6 +22,9 @@ import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 
+/**
+ * Fragment for displaying UI for organizers to manage events.
+ */
 public class EventManagerFragment extends Fragment {
     private FragmentEventManagerBinding binding;
     private UUID userId;

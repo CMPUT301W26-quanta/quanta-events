@@ -55,6 +55,9 @@ import ca.quanta.quantaevents.utils.ToastManager;
 import ca.quanta.quantaevents.viewmodels.EventViewModel;
 import ca.quanta.quantaevents.viewmodels.ImageViewModel;
 
+/**
+ * Fragment for displaying UI for creating, editing, and saving events.
+ */
 public class EventCreateEditorFragment extends Fragment {
     private static final String TAG = "EventCreateEditor";
     private FragmentEventCreateEditorBinding binding;
@@ -162,6 +165,10 @@ public class EventCreateEditorFragment extends Fragment {
         }
     }
 
+    /**
+     * Places a pin on the map, identifying event location.
+     * @param latLng Latitude and longitude of the event location.
+     */
     private void placePin(LatLng latLng) {
         if (selectedMarker != null) selectedMarker.remove();
         selectedMarker = pickerMap.addMarker(new MarkerOptions().position(latLng));

@@ -26,7 +26,7 @@ import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.utils.ToastManager;
 
 /**
- * Fragment for displaying UI for generating event QR codes.
+ * Fragment for displaying UI for generating and showing event QR codes.
  */
 public class ShowQRFragment extends Fragment {
     private FragmentShowQrBinding binding;

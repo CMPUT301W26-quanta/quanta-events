@@ -25,6 +25,9 @@ import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.databinding.FragmentEventFilterBinding;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 
+/**
+ * Fragment for displaying UI for filtering events.
+ */
 public class EventFilterFragment extends Fragment {
     private FragmentEventFilterBinding binding;
     private final DateTimeFormatter displayFormatter =
