@@ -144,5 +144,3 @@ export const updateRoles = onCall({ maxInstances: 1 }, functions.updateRoles);
 export const createCoInvitation = onCall({ maxInstances: 1 }, functions.createCoInvitation);
 
 export const coInviteAccept = onCall({ maxInstances: 1 }, functions.coInviteAccept);
-
-export const coInviteReject = onCall({ maxInstances: 1 }, functions.coInviteReject);

@@ -193,7 +193,16 @@ public class InviteCoOrganizerFragment extends Fragment {
 
             // Send an invitation to be a co organizer
             InviteCoOrganizerFragmentArgs args = InviteCoOrganizerFragmentArgs.fromBundle(this.getArguments());
-            eventModel.createCoInvitation(this.userId, this.deviceId, args.getEventId(), profileID);
+            eventModel.createCoInvitation(this.userId, this.deviceId, args.getEventId(), profileID)
+                    .addOnSuccessListener(v -> {
+                                if (!isAdded() || binding == null) return;
+                                ToastManager.show(getContext(), "Invite Sent", Toast.LENGTH_LONG);
+                            }
+                    )
+                    .addOnFailureListener(v -> {
+                        if (!isAdded() || binding == null) return;
+                        ToastManager.show(getContext(), "Failed to send invite", Toast.LENGTH_LONG);
+                    });
 
         });
         ProfileAdapter<InviteCoOrganizerFragment.OrganizerProfileViewHolder> profilesAdapter = new ProfileAdapter(entrantProfiles, factory);

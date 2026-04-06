@@ -39,7 +39,7 @@ export async function updateRoles(request: CallableRequest) {
 
     // Granted entrant permission
     if (isEntrant && currentEntrant == null) {
-        userDoc!.entrant = {enteredEvents: [], history: [], undismissedNotifications: [], receiveNotifications: true};  // Reset and make true as default
+        userDoc!.entrant = {enteredEvents: [], history: [], undismissedNotifications: [], receiveNotifications: true, coOrganizedEvents: []};  // Reset and make true as default
     }
     // Banned from being entrant
     else if (!isEntrant && currentEntrant !== null) {

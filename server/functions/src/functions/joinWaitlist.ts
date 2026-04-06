@@ -50,6 +50,15 @@ export async function joinWaitlist(request: CallableRequest) {
   const now = new Date();
   const registrationStart = event.registrationStartTime.toDate();
   const registrationEnd = event.registrationEndTime.toDate();
+
+  if (userData.entrant === null) {
+    throw new HttpsError("permission-denied", "User is not an entrant")
+  }
+
+  if (userData.entrant.coOrganizedEvents.includes(data.eventId)) {
+    throw new HttpsError("permission-denied", "User is a co-organizer for this event")
+  }
+
   if (now < registrationStart) {
     throw new HttpsError("failed-precondition", "Registration has not started yet");
   }

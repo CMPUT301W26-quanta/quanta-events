@@ -91,7 +91,7 @@ public class CoInviteNotificationAdapter extends RecyclerView.Adapter<CoInviteNo
                         ToastManager.show(this.parentFragment.getContext(), "Successfully accepted co-organizing invitation.", Toast.LENGTH_LONG);
                     })
                     .addOnFailureListener(exception -> {
-                        Log.e("CoInviteNotificationAdapter", "Failed to accept co-organizing invite..", exception);
+                        Log.e("CoInviteNotificationAdapter", "Failed to accept co-organizing invite.", exception);
 
                         ToastManager.show(this.parentFragment.getContext(), "Failed to accept co-organizing invite.", Toast.LENGTH_LONG);
 
@@ -104,20 +104,8 @@ public class CoInviteNotificationAdapter extends RecyclerView.Adapter<CoInviteNo
         });
 
         holder.buttonDecline.setOnClickListener(v -> {
-            inviteModel.coInviteReject(this.userId, this.deviceId, notification.getEventId())
-                    .addOnSuccessListener(x -> {
-                        ToastManager.show(this.parentFragment.getContext(), "Successfully rejected co-organizing invitation.", Toast.LENGTH_LONG);
-                    })
-                    .addOnFailureListener(exception -> {
-                        Log.e("CoInviteNotificationAdapter", "Failed to reject co-organizing invite..", exception);
-
-                        ToastManager.show(this.parentFragment.getContext(), "Failed to reject invite.", Toast.LENGTH_LONG);
-
-                        if (exception instanceof FirebaseFunctionsException) {
-                            Log.e("CoInviteNotificationAdapter", "FirebaseFunctionsException getCode() result: " + ((FirebaseFunctionsException) exception).getCode());
-                        }
-                    });
-
+            // Do nothing, basically
+            ToastManager.show(this.parentFragment.getContext(), "Successfully rejected co-organizing invitation.", Toast.LENGTH_LONG);
             dismissNotification(holder.getBindingAdapterPosition(), notification.getNotificationId());
         });
 

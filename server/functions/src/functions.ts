@@ -39,4 +39,3 @@ export * from "./functions/updateRoles";
 export * from "./functions/updateUser";
 export * from "./functions/createCoInvitation";
 export * from "./functions/coInviteAccept";
-export * from "./functions/coInviteReject";

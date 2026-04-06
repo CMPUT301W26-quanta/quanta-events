@@ -25,6 +25,8 @@ declare global {
 		undismissedNotifications: string[];
 		/** Whether the user should recieve notifications or not */
 		receiveNotifications: boolean;
+		// List of UUIDS this user co-organizes
+		coOrganizedEvents: string[];
 	}
 
 	interface OrganizerMap {
