@@ -104,7 +104,7 @@ public class EventWaitingListMapFragment extends Fragment implements OnMapReadyC
 
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            googleMap.setMyLocationEnabled(true);
+            //googleMap.setMyLocationEnabled(true);
         }
 
         googleMap.getUiSettings().setZoomControlsEnabled(true);

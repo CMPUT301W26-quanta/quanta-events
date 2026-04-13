@@ -70,7 +70,7 @@ public class NotificationService extends FirebaseMessagingService {
     private void showNotification(String title, String body) {
         String channelId = "default_channel";
         CharSequence name = "Default Channel";
-        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+        int importance = NotificationManager.IMPORTANCE_HIGH;
 
         NotificationChannelCompat channel = new NotificationChannelCompat.Builder(channelId, importance)
                 .setName(name)
@@ -83,8 +83,9 @@ public class NotificationService extends FirebaseMessagingService {
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(title)
                 .setContentText(body)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
+                .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
                 .build();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {

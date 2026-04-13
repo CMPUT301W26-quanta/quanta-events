@@ -17,18 +17,22 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.firebase.functions.FirebaseFunctionsException;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import ca.quanta.quantaevents.NotificationService;
 import ca.quanta.quantaevents.R;
 import ca.quanta.quantaevents.adapters.UndismissedNotificationAdapter;
+import ca.quanta.quantaevents.burger.SmartBurger;
 import ca.quanta.quantaevents.burger.SmartBurgerState;
 import ca.quanta.quantaevents.burger.Tagged;
 import ca.quanta.quantaevents.databinding.FragmentHomeBinding;
 import ca.quanta.quantaevents.models.Event;
 import ca.quanta.quantaevents.models.ExternalUndismissedNotification;
+import ca.quanta.quantaevents.models.User;
 import ca.quanta.quantaevents.stores.FragmentInfoStore;
 import ca.quanta.quantaevents.stores.SessionStore;
 import ca.quanta.quantaevents.utils.ToastManager;
@@ -85,6 +89,19 @@ public class HomeFragment extends Fragment implements Tagged {
         this.binding.infoButton.setOnClickListener(_view -> {
             NavDirections action = HomeFragmentDirections.actionHomeFragmentToInformationFragment();
             Navigation.findNavController(requireView()).navigate(action);
+        });
+
+        sessionStore.observeSession(this, (userId, deviceId) -> {
+            if (userId == null || deviceId == null) {
+                sessionStore.setRoleMask(0);
+                return;
+            }
+            userModel.getUser(userId, deviceId)
+                    .addOnSuccessListener(data -> sessionStore.setRoleMask(extractRoleMask(data)))
+                    .addOnFailureListener(_ex -> sessionStore.setRoleMask(0));
+            FirebaseMessaging.getInstance().getToken().addOnSuccessListener(
+                    token -> NotificationService.updateToken(token, userId.toString(), deviceId.toString()).addOnFailureListener(Throwable::printStackTrace)
+            );
         });
 
         new ViewModelProvider(requireActivity()).get(SmartBurgerState.class).show(this);
@@ -311,6 +328,27 @@ public class HomeFragment extends Fragment implements Tagged {
             Navigation.findNavController(requireView()).navigate(R.id.registerFragment);
         }
     }
+
+    private int extractRoleMask(User userData) {
+        int mask = 0;
+        if (userData == null) {
+            return mask;
+        }
+        Boolean entrant = userData.isEntrant();
+        Boolean organizer = userData.isOrganizer();
+        Boolean admin = userData.isAdmin();
+        if (entrant) {
+            mask |= SmartBurger.ENTRANT_GROUP;
+        }
+        if (organizer) {
+            mask |= SmartBurger.ORGANIZER_GROUP;
+        }
+        if (admin) {
+            mask |= SmartBurger.ADMIN_GROUP;
+        }
+        return mask;
+    }
+
 
     private static final UUID TAG = UUID.randomUUID();
 
