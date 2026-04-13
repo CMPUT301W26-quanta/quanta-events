@@ -148,6 +148,7 @@ public class UndismissedNotificationAdapter extends RecyclerView.Adapter<Undismi
                 if (position != NO_POSITION)
                     handler.dismissed(position, notification.getNotificationId());
             });
+            binding.iconEvent.setOnClickListener(_v -> handler.goToEvent(notification.getEventId()));
         }
     }
 
